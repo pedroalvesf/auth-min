@@ -21,12 +21,12 @@ class RateLimitMiddleware {
                 const timeRemaining = blockDurationMs - timeSinceLastAttempt;
                 const minutesRemaining = Math.ceil(timeRemaining / (60 * 1000));
                 res.writeHead(429, {
-                    'Content-Type': 'application/json',
-                    'Retry-After': Math.ceil(timeRemaining / 1000).toString()
+                    "Content-Type": "application/json",
+                    "Retry-After": Math.ceil(timeRemaining / 1000).toString(),
                 });
                 res.end(JSON.stringify({
                     error: `Too many failed attempts. Try again in ${minutesRemaining} minutes.`,
-                    retryAfter: Math.ceil(timeRemaining / 1000)
+                    retryAfter: Math.ceil(timeRemaining / 1000),
                 }));
                 return false; // Bloqueado
             }
