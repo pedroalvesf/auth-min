@@ -1,7 +1,7 @@
-import { User } from "../auth/enterprise/entities/user";
-import { UniqueEntityID } from "../../core/entities/unique-entity-id";
+import { User } from "@/domain/auth/enterprise/entities/user";
+import { UniqueEntityID } from "@/core/entities/unique-entity-id";
 
-export interface UserRepository {
+export interface UsersRepository {
   findById(id: UniqueEntityID): Promise<User | null>;
   findByEmail(email: string): Promise<User | null>;
   save(user: User): Promise<void>;

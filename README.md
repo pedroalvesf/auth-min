@@ -1,24 +1,25 @@
 # 🔐 Auth-Min
 
-Ultra-lightweight authentication microservice built with **DDD** + **Clean Architecture** and **native implementations**.
+Authentication service built with **NestJS** + **DDD** + **Clean Architecture** for scalable and maintainable systems.
 
 ## ⚡ Features
 
-- 🚀 **Ultra-performance**: 135MB RAM, HTTP native server
-- 🔐 **JWT Authentication**: Native implementation (no dependencies)
-- 👥 **Role-based Access**: USER, ADMIN, MODERATOR
-- 📊 **Login History**: IP tracking and audit logs
-- 🛡️ **Security**: Scrypt password hashing + timing-safe comparisons
-- 🐳 **Ready for Production**: Docker + docker-compose included
-- 📝 **Well Documented**: Comprehensive architecture guide
+- 🚀 **NestJS Framework**: Enterprise-grade Node.js framework
+- 🔐 **JWT Authentication**: Secure access & refresh token management
+- 📱 **Device-based Auth**: Device tracking and management
+- 🛡️ **Security**: Bcrypt password hashing + token validation
+- 🔄 **Token Refresh**: Automatic access token renewal
+- 🚫 **Token Revocation**: Device and user-level token management
+- 📝 **Clean Architecture**: DDD principles with dependency injection
 
 ## 🏗️ Architecture
 
+- **NestJS Framework** with modular design
 - **Domain Driven Design (DDD)**
-- **Clean Architecture** 
-- **Dependency Inversion**
+- **Clean Architecture** layers
+- **Dependency Injection** with @Injectable decorators
 - **Either Pattern** for error handling
-- **Native implementations** (no heavy frameworks)
+- **Repository Pattern** for data access
 
 ## 🚀 Quick Start
 
@@ -60,8 +61,11 @@ npm run dev
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | POST | `/auth/register` | Register new user |
-| POST | `/auth/login` | Login and get tokens |
-| POST | `/auth/validate` | Validate JWT token |
+| POST | `/auth/authenticate-device` | Device authentication |
+| POST | `/auth/refresh-token` | Refresh access token |
+| POST | `/auth/validate-token` | Validate JWT token |
+| POST | `/auth/revoke-device` | Revoke specific device |
+| POST | `/auth/revoke-all-devices` | Revoke all user devices |
 | GET | `/health` | Health check |
 
 ## 📚 Documentation
@@ -75,19 +79,22 @@ See [ARCHITECTURE.md](./ARCHITECTURE.md) for detailed documentation covering:
 
 ## 🛠️ Tech Stack
 
-- **Runtime**: Node.js native HTTP server
+- **Framework**: NestJS
 - **Language**: TypeScript
 - **Database**: PostgreSQL + Prisma ORM
-- **Authentication**: Native JWT implementation
-- **Password**: Native Scrypt hashing
+- **Authentication**: JWT with refresh tokens
+- **Password**: Bcrypt hashing
+- **DI**: NestJS dependency injection
 - **Container**: Docker
 
-## 🎯 Production Dependencies
+## 🎯 Key Dependencies
 
-Only **3 production dependencies**:
+- `@nestjs/common` - NestJS core framework
+- `@nestjs/core` - NestJS application core
 - `@prisma/client` - Database ORM
-- `prisma` - Database toolkit
-- `dotenv` - Environment variables
+- `bcrypt` - Password hashing
+- `jsonwebtoken` - JWT token handling
+- `reflect-metadata` - Decorator metadata
 
 ## 📈 Performance
 

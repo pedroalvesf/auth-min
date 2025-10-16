@@ -1,12 +1,10 @@
 import { Entity } from "../../../../core/entities/entity";
 import { UniqueEntityID } from "../../../../core/entities/unique-entity-id";
-import { Role } from "./role";
 
 export interface UserProps {
   email: string;
   password: string;
   name?: string;
-  role: Role;
   isActive: boolean;
   lastLoginAt?: Date;
   createdAt: Date;
@@ -28,10 +26,6 @@ export class User extends Entity<UserProps> {
 
   get createdAt() {
     return this.props.createdAt;
-  }
-
-  get role() {
-    return this.props.role;
   }
 
   get isActive() {
@@ -56,17 +50,17 @@ export class User extends Entity<UserProps> {
     this.touch();
   }
 
-  set role(role: Role) {
-    this.props.role = role;
-    this.touch();
-  }
-
   set isActive(isActive: boolean) {
     this.props.isActive = isActive;
     this.touch();
   }
 
   updateLastLogin() {
+    this.props.lastLoginAt = new Date();
+    this.touch();
+  }
+
+  sign() {
     this.props.lastLoginAt = new Date();
     this.touch();
   }
@@ -83,7 +77,6 @@ export class User extends Entity<UserProps> {
     return new User(
       {
         ...props,
-        role: Role.USER,
         isActive: true,
         createdAt: now,
         updatedAt: now,

@@ -1,48 +1,40 @@
 import "dotenv/config";
-import { PrismaClient } from "@prisma/client";
+import { setupContainer } from "./infra/container/container-setup";
+import { 
+  getAuthenticateDeviceUseCase, 
+  getValidateTokenUseCase, 
+  getRefreshAccessTokenUseCase,
+  getRegisterUserUseCase 
+} from "./core/container/use-case-factory";
 import { HttpServer } from "./infra/http/server";
 import { registerHttpRoutes } from "./infra/http/routes";
-import { PrismaUserRepository } from "./infra/database/prisma/repositories/prisma-user-repository";
-import { PrismaSessionRepository } from "./infra/database/prisma/repositories/prisma-session-repository";
-import { RegisterUserUseCase } from "./domain/auth/application/use-cases/register-user";
-import { LoginUserUseCase } from "./domain/auth/application/use-cases/login-user";
-import { ValidateTokenUseCase } from "./domain/auth/application/use-cases/validate-token";
 
 async function bootstrap() {
-  const prisma = new PrismaClient();
+  // Inicializar container IoC
+  setupContainer();
+  
   const server = new HttpServer();
 
-  const userRepository = new PrismaUserRepository(prisma);
-  const sessionRepository = new PrismaSessionRepository(prisma);
-
-  const jwtSecret = process.env.JWT_SECRET;
-  if (!jwtSecret) {
-    throw new Error("JWT_SECRET environment variable is required");
-  }
-
-  const registerUserUseCase = new RegisterUserUseCase(userRepository);
-  const loginUserUseCase = new LoginUserUseCase(
-    userRepository,
-    sessionRepository,
-    jwtSecret
-  );
-  const validateTokenUseCase = new ValidateTokenUseCase(
-    userRepository,
-    jwtSecret
-  );
+  // Resolver casos de uso via DI
+  const authenticateDeviceUseCase = getAuthenticateDeviceUseCase();
+  const validateTokenUseCase = getValidateTokenUseCase();
+  const refreshAccessTokenUseCase = getRefreshAccessTokenUseCase();
+  const registerUserUseCase = getRegisterUserUseCase();
 
   registerHttpRoutes(server, {
-    registerUserUseCase,
-    loginUserUseCase,
+    authenticateDeviceUseCase,
     validateTokenUseCase,
+    refreshAccessTokenUseCase,
+    registerUserUseCase,
   });
 
   const port = parseInt(process.env.PORT || "3000");
 
   server.listen(port, () => {
-    console.log(`=� Auth service running on port ${port}`);
+    console.log(`🚀 Auth service running on port ${port}`);
+    console.log(`📦 Container IoC configurado`);
     console.log(
-      `=� Memory usage: ${Math.round(
+      `💾 Memory usage: ${Math.round(
         process.memoryUsage().heapUsed / 1024 / 1024
       )}MB`
     );
@@ -50,7 +42,7 @@ async function bootstrap() {
 
   process.on("SIGINT", async () => {
     console.log("Shutting down gracefully...");
-    await prisma.$disconnect();
+    // TODO: Desconectar Prisma via container se necessário
     process.exit(0);
   });
 }

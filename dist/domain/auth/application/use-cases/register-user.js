@@ -3,18 +3,18 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.RegisterUserUseCase = void 0;
 const either_1 = require("../../../../core/either");
 const user_1 = require("../../../auth/enterprise/entities/user");
-const password_1 = require("../../../../infra/security/password");
 const user_already_exists_error_1 = require("./errors/user-already-exists-error");
 class RegisterUserUseCase {
-    constructor(userRepository) {
+    constructor(userRepository, hashGenerator) {
         this.userRepository = userRepository;
+        this.hashGenerator = hashGenerator;
     }
     async execute(dto) {
         const existingUser = await this.userRepository.findByEmail(dto.email);
         if (existingUser) {
             return (0, either_1.left)(new user_already_exists_error_1.UserAlreadyExistsError());
         }
-        const hashedPassword = await password_1.PasswordService.hash(dto.password);
+        const hashedPassword = await this.hashGenerator.hash(dto.password);
         const user = user_1.User.create({
             email: dto.email,
             password: hashedPassword,

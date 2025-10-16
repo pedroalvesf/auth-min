@@ -2,7 +2,6 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.User = void 0;
 const entity_1 = require("../../../../core/entities/entity");
-const role_1 = require("./role");
 class User extends entity_1.Entity {
     get email() {
         return this.props.email;
@@ -15,9 +14,6 @@ class User extends entity_1.Entity {
     }
     get createdAt() {
         return this.props.createdAt;
-    }
-    get role() {
-        return this.props.role;
     }
     get isActive() {
         return this.props.isActive;
@@ -36,15 +32,15 @@ class User extends entity_1.Entity {
         this.props.name = name;
         this.touch();
     }
-    set role(role) {
-        this.props.role = role;
-        this.touch();
-    }
     set isActive(isActive) {
         this.props.isActive = isActive;
         this.touch();
     }
     updateLastLogin() {
+        this.props.lastLoginAt = new Date();
+        this.touch();
+    }
+    sign() {
         this.props.lastLoginAt = new Date();
         this.touch();
     }
@@ -55,7 +51,6 @@ class User extends entity_1.Entity {
         const now = new Date();
         return new User({
             ...props,
-            role: role_1.Role.USER,
             isActive: true,
             createdAt: now,
             updatedAt: now,

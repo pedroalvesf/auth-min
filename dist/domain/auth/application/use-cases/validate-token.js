@@ -2,17 +2,21 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ValidateTokenUseCase = void 0;
 const either_1 = require("../../../../core/either");
-const jwt_1 = require("../../../../infra/security/jwt");
 const unique_entity_id_1 = require("../../../../core/entities/unique-entity-id");
 const invalid_token_error_1 = require("./errors/invalid-token-error");
 class ValidateTokenUseCase {
-    constructor(userRepository, jwtSecret) {
+    constructor(userRepository, accessTokenRepository, tokenValidator) {
         this.userRepository = userRepository;
-        this.jwtSecret = jwtSecret;
+        this.accessTokenRepository = accessTokenRepository;
+        this.tokenValidator = tokenValidator;
     }
     async execute(token) {
-        const payload = jwt_1.JwtService.verify(token, this.jwtSecret);
-        if (!payload || payload.type === 'refresh') {
+        const payload = await this.tokenValidator.validate(token);
+        if (!payload || payload.type === "refresh") {
+            return (0, either_1.left)(new invalid_token_error_1.InvalidTokenError());
+        }
+        const storedAccessToken = await this.accessTokenRepository.findByToken(token);
+        if (!storedAccessToken || storedAccessToken.isExpired()) {
             return (0, either_1.left)(new invalid_token_error_1.InvalidTokenError());
         }
         const user = await this.userRepository.findById(new unique_entity_id_1.UniqueEntityID(payload.sub));
@@ -22,7 +26,7 @@ class ValidateTokenUseCase {
         return (0, either_1.right)({
             userId: user.id.toString(),
             email: user.email,
-            name: user.name
+            name: user.name,
         });
     }
 }

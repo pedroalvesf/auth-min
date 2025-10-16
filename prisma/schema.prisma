@@ -13,49 +13,107 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum Role {
-  USER
-  ADMIN
-  MODERATOR
-}
-
 model User {
-  id           String         @id @default(cuid())
+  id           String         @id @default(uuid())
   email        String         @unique
   password     String
   name         String?
-  role         Role           @default(USER)
-  isActive     Boolean        @default(true) @map("is_active")
-  lastLoginAt  DateTime?      @map("last_login_at")
-  createdAt    DateTime       @default(now()) @map("created_at")
-  updatedAt    DateTime       @updatedAt @map("updated_at")
-  sessions     Session[]
+  isActive     Boolean        @default(true)
+  lastLoginAt  DateTime?
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  RefreshTokens RefreshToken[]
+  AccessTokens  AccessToken[]
   loginHistory LoginHistory[]
+  devices      Device[]
 
-  @@map("users")
+  @@index([email])
 }
 
-model Session {
-  id        String   @id @default(cuid())
-  userId    String   @map("user_id")
+model RefreshToken {
+  id        String    @id @default(uuid())
+  userId    String
+  deviceId  String
+  token     String    @unique
+  expiresAt DateTime
+  revokedAt DateTime?
+  revoked Boolean @default(false)
+  createdAt DateTime  @default(now())
+
+  User      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  Device    Device   @relation(fields: [deviceId], references: [id])
+
+
+  @@index([userId])
+  @@index([token])
+}
+
+model AccessToken {
+  id        String   @id @default(uuid())
+  userId    String
   token     String   @unique
-  expiresAt DateTime @map("expires_at")
-  createdAt DateTime @default(now()) @map("created_at")
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  revoked Boolean @default(false)
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@map("sessions")
+  @@index([userId])
 }
 
 model LoginHistory {
-  id        String   @id @default(cuid())
-  userId    String   @map("user_id")
-  ipAddress String   @map("ip_address")
-  userAgent String?  @map("user_agent")
+  id        String   @id @default(uuid())
+  userId    String
+  ipAddress String
+  userAgent String?
   success   Boolean  @default(true)
-  createdAt DateTime @default(now()) @map("created_at")
+  createdAt DateTime @default(now())
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([createdAt])
-  @@map("login_history")
 }
+
+model Device {
+  id               String        @id @default(uuid())
+  userId           String
+  name             String
+  type             String
+  operatingSystem  String
+  ipAddress        String
+  browser          String
+  location         String
+  lastLogin        DateTime
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime?     @updatedAt
+  active           Boolean       @default(true)
+  User             User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  RefreshToken     RefreshToken[]
+
+  @@index([userId])
+}
+
+// model Role {
+//   id              String       @id @default(uuid())
+//   name            String
+//   level           Int          @default(0)
+//   assignableRoles String[]     @default([])
+//   permissions     Permission[] @relation("RolePermissions")
+//   createdAt       DateTime     @default(now())
+//   updatedAt       DateTime     @updatedAt
+//   User            User[]       @relation("UserRoles")
+
+
+//   @@index([name])
+//   @@index([level])
+// }
+
+// model Permission {
+//   id          String @id @default(uuid())
+//   name        String
+//   description String
+//   createdAt   DateTime @default(now())
+//   updatedAt   DateTime @updatedAt
+//   Role        Role[]   @relation("RolePermissions")
+
+//   @@index([name])
+// }

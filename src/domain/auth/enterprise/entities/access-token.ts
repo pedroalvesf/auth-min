@@ -1,14 +1,15 @@
 import { Entity } from "../../../../core/entities/entity";
 import { UniqueEntityID } from "../../../../core/entities/unique-entity-id";
 
-export interface SessionProps {
+export interface AccessTokenProps {
   userId: UniqueEntityID;
   token: string;
   expiresAt: Date;
   createdAt: Date;
+  revoked: boolean;
 }
 
-export class Session extends Entity<SessionProps> {
+export class AccessToken extends Entity<AccessTokenProps> {
   get userId() {
     return this.props.userId;
   }
@@ -25,21 +26,23 @@ export class Session extends Entity<SessionProps> {
     return this.props.createdAt;
   }
 
-  isExpired(): boolean {
+  get revoked() {
+    return this.props.revoked;
+  }
+
+  isExpired() {
+    if (this.props.revoked) {
+      return true;
+    }
     return new Date() > this.props.expiresAt;
   }
 
-  static create(props: Omit<SessionProps, "createdAt">, id?: UniqueEntityID) {
-    return new Session(
-      {
-        ...props,
-        createdAt: new Date(),
-      },
-      id
-    );
+  revoke() {
+    this.props.revoked = true;
   }
 
-  static reconstruct(props: SessionProps, id?: UniqueEntityID) {
-    return new Session(props, id);
+  static create(props: AccessTokenProps, id?: UniqueEntityID) {
+    const accessToken = new AccessToken(props, id);
+    return accessToken;
   }
 }
