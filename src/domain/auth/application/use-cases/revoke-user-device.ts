@@ -1,8 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable } from "@nestjs/common";
 import { Either, left, right } from "@/core/either";
-import { DevicesRepository } from "../../repositories/devices-repository";
-import { RefreshTokenRepository } from "../../repositories/refresh-token-repository";
-import { AccessTokenRepository } from "../../repositories/access-token-repository";
+import { DevicesRepository } from "../repositories/devices-repository";
+import { RefreshTokenRepository } from "../repositories/refresh-token-repository";
+import { AccessTokenRepository } from "../repositories/access-token-repository";
 import { UniqueEntityID } from "@/core/entities/unique-entity-id";
 import { DeviceNotFoundError } from "./errors/device-not-found-error";
 import { UnauthorizedDeviceAccessError } from "./errors/unauthorized-device-access-error";
@@ -29,7 +29,9 @@ export class RevokeUserDeviceUseCase {
     userId,
     deviceId,
   }: RevokeUserDeviceUseCaseRequest): Promise<RevokeUserDeviceUseCaseResponse> {
-    const device = await this.devicesRepository.findById(new UniqueEntityID(deviceId));
+    const device = await this.devicesRepository.findById(
+      new UniqueEntityID(deviceId)
+    );
 
     if (!device) {
       return left(new DeviceNotFoundError());
@@ -41,8 +43,10 @@ export class RevokeUserDeviceUseCase {
     }
 
     // Revogar todos os refresh tokens deste dispositivo
-    const refreshTokens = await this.refreshTokenRepository.findByDeviceId(device.id);
-    
+    const refreshTokens = await this.refreshTokenRepository.findByDeviceId(
+      device.id
+    );
+
     for (const refreshToken of refreshTokens) {
       if (!refreshToken.revoked) {
         refreshToken.revoke();

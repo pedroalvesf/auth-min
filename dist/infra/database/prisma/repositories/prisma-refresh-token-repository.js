@@ -1,105 +1,61 @@
 "use strict";
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PrismaRefreshTokenRepository = void 0;
-const refresh_token_1 = require("../../../../domain/auth/enterprise/entities/refresh-token");
-const unique_entity_id_1 = require("../../../../core/entities/unique-entity-id");
-class PrismaRefreshTokenRepository {
+const common_1 = require("@nestjs/common");
+const prisma_service_1 = require("../prisma.service");
+const prisma_refresh_token_mapper_1 = require("../mappers/prisma-refresh-token-mapper");
+let PrismaRefreshTokenRepository = class PrismaRefreshTokenRepository {
     constructor(prisma) {
         this.prisma = prisma;
+    }
+    async create(refreshToken) {
+        const data = prisma_refresh_token_mapper_1.PrismaRefreshTokenMapper.toPrisma(refreshToken);
+        await this.prisma.refreshToken.create({ data });
+    }
+    async findByDeviceId(deviceId) {
+        const refreshTokens = await this.prisma.refreshToken.findMany({
+            where: { deviceId },
+        });
+        return refreshTokens.map(prisma_refresh_token_mapper_1.PrismaRefreshTokenMapper.toDomain);
+    }
+    async findByUserId(userId) {
+        const refreshTokens = await this.prisma.refreshToken.findMany({
+            where: { userId },
+        });
+        return refreshTokens.map(prisma_refresh_token_mapper_1.PrismaRefreshTokenMapper.toDomain);
     }
     async findByToken(token) {
         const refreshToken = await this.prisma.refreshToken.findUnique({
             where: { token },
         });
-        if (!refreshToken) {
-            return null;
-        }
-        return refresh_token_1.RefreshToken.reconstruct({
-            userId: new unique_entity_id_1.UniqueEntityID(refreshToken.userId),
-            deviceId: new unique_entity_id_1.UniqueEntityID(refreshToken.deviceId),
-            token: refreshToken.token,
-            expiresAt: refreshToken.expiresAt,
-            createdAt: refreshToken.createdAt,
-            revokedAt: refreshToken.revokedAt ?? undefined,
-            revoked: refreshToken.revoked,
-        }, new unique_entity_id_1.UniqueEntityID(refreshToken.id));
-    }
-    async findByUserId(userId) {
-        const refreshTokens = await this.prisma.refreshToken.findMany({
-            where: { userId: userId.toString() },
-            orderBy: { createdAt: "desc" },
-        });
-        return refreshTokens.map((token) => refresh_token_1.RefreshToken.reconstruct({
-            userId: new unique_entity_id_1.UniqueEntityID(token.userId),
-            token: token.token,
-            expiresAt: token.expiresAt,
-            createdAt: token.createdAt,
-            revokedAt: token.revokedAt,
-        }, new unique_entity_id_1.UniqueEntityID(token.id)));
-    }
-    async findValidByUserId(userId) {
-        const refreshTokens = await this.prisma.refreshToken.findMany({
-            where: {
-                userId: userId.toString(),
-                revokedAt: null,
-                expiresAt: { gt: new Date() },
-            },
-            orderBy: { createdAt: "desc" },
-        });
-        return refreshTokens.map((token) => refresh_token_1.RefreshToken.reconstruct({
-            userId: new unique_entity_id_1.UniqueEntityID(token.userId),
-            token: token.token,
-            expiresAt: token.expiresAt,
-            createdAt: token.createdAt,
-            revokedAt: token.revokedAt,
-        }, new unique_entity_id_1.UniqueEntityID(token.id)));
+        return refreshToken
+            ? prisma_refresh_token_mapper_1.PrismaRefreshTokenMapper.toDomain(refreshToken)
+            : null;
     }
     async save(refreshToken) {
-        await this.prisma.refreshToken.upsert({
+        const data = prisma_refresh_token_mapper_1.PrismaRefreshTokenMapper.toPrisma(refreshToken);
+        await this.prisma.refreshToken.update({
             where: { id: refreshToken.id.toString() },
-            create: {
-                id: refreshToken.id.toString(),
-                userId: refreshToken.userId.toString(),
-                deviceId: refreshToken.deviceId.toString(),
-                token: refreshToken.token,
-                expiresAt: refreshToken.expiresAt,
-                revokedAt: refreshToken.revokedAt ?? undefined,
-                revoked: refreshToken.revoked,
-                createdAt: refreshToken.createdAt,
-            },
-            update: {
-                revokedAt: refreshToken.revokedAt ?? undefined,
-                revoked: refreshToken.revoked,
-            },
+            data,
         });
     }
     async delete(id) {
         await this.prisma.refreshToken.delete({
-            where: { id: id.toString() },
+            where: { id },
         });
     }
-    async deleteByUserId(userId) {
-        await this.prisma.refreshToken.deleteMany({
-            where: { userId: userId.toString() },
-        });
-    }
-    async deleteExpired() {
-        await this.prisma.refreshToken.deleteMany({
-            where: {
-                expiresAt: { lt: new Date() },
-            },
-        });
-    }
-    async revokeByUserId(userId) {
-        await this.prisma.refreshToken.updateMany({
-            where: {
-                userId: userId.toString(),
-                revokedAt: null,
-            },
-            data: {
-                revokedAt: new Date(),
-            },
-        });
-    }
-}
+};
 exports.PrismaRefreshTokenRepository = PrismaRefreshTokenRepository;
+exports.PrismaRefreshTokenRepository = PrismaRefreshTokenRepository = __decorate([
+    (0, common_1.Injectable)(),
+    __metadata("design:paramtypes", [prisma_service_1.PrismaService])
+], PrismaRefreshTokenRepository);

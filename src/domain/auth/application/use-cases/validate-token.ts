@@ -1,9 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable } from "@nestjs/common";
 import { Either, left, right } from "../../../../core/either";
 import { TokenValidator } from "../cryptography/token-validator";
-import { UsersRepository } from "@/domain/auth/repositories/users-repository";
-import { AccessTokenRepository } from "@/domain/auth/repositories/access-token-repository";
-import { UniqueEntityID } from "../../../../core/entities/unique-entity-id";
+import { UsersRepository } from "@/domain/auth/application/repositories/users-repository";
+import { AccessTokenRepository } from "@/domain/auth/application/repositories/access-token-repository";
 import { InvalidTokenError } from "./errors/invalid-token-error";
 
 export interface ValidateTokenResult {
@@ -37,9 +36,7 @@ export class ValidateTokenUseCase {
       return left(new InvalidTokenError());
     }
 
-    const user = await this.userRepository.findById(
-      new UniqueEntityID(payload.sub)
-    );
+    const user = await this.userRepository.findById(payload.sub.toString());
 
     if (!user) {
       return left(new InvalidTokenError());

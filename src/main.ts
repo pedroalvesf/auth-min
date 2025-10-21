@@ -1,50 +1,25 @@
-import "dotenv/config";
-import { setupContainer } from "./infra/container/container-setup";
-import { 
-  getAuthenticateDeviceUseCase, 
-  getValidateTokenUseCase, 
-  getRefreshAccessTokenUseCase,
-  getRegisterUserUseCase 
-} from "./core/container/use-case-factory";
-import { HttpServer } from "./infra/http/server";
-import { registerHttpRoutes } from "./infra/http/routes";
+import 'reflect-metadata'
+import 'dotenv/config'
+import { NestFactory } from '@nestjs/core'
+import { AppModule } from './app.module'
 
 async function bootstrap() {
-  // Inicializar container IoC
-  setupContainer();
+  const app = await NestFactory.create(AppModule)
   
-  const server = new HttpServer();
+  // Enable CORS
+  app.enableCors({
+    origin: '*',
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+    allowedHeaders: 'Content-Type, Authorization',
+  })
 
-  // Resolver casos de uso via DI
-  const authenticateDeviceUseCase = getAuthenticateDeviceUseCase();
-  const validateTokenUseCase = getValidateTokenUseCase();
-  const refreshAccessTokenUseCase = getRefreshAccessTokenUseCase();
-  const registerUserUseCase = getRegisterUserUseCase();
-
-  registerHttpRoutes(server, {
-    authenticateDeviceUseCase,
-    validateTokenUseCase,
-    refreshAccessTokenUseCase,
-    registerUserUseCase,
-  });
-
-  const port = parseInt(process.env.PORT || "3000");
-
-  server.listen(port, () => {
-    console.log(`🚀 Auth service running on port ${port}`);
-    console.log(`📦 Container IoC configurado`);
-    console.log(
-      `💾 Memory usage: ${Math.round(
-        process.memoryUsage().heapUsed / 1024 / 1024
-      )}MB`
-    );
-  });
-
-  process.on("SIGINT", async () => {
-    console.log("Shutting down gracefully...");
-    // TODO: Desconectar Prisma via container se necessário
-    process.exit(0);
-  });
+  const port = parseInt(process.env.PORT || '3000')
+  
+  await app.listen(port)
+  
+  console.log(`🚀 Auth service running on port ${port}`)
+  console.log(`📦 NestJS DI configurado`)
+  console.log(`💾 Memory usage: ${Math.round(process.memoryUsage().heapUsed / 1024 / 1024)}MB`)
 }
 
-bootstrap().catch(console.error);
+bootstrap().catch(console.error)

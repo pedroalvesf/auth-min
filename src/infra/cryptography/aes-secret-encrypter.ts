@@ -1,26 +1,30 @@
 import { Injectable } from '@nestjs/common'
-import { createCipher, createDecipher } from 'crypto'
+import { createCipheriv, createDecipheriv, randomBytes, createHash } from 'crypto'
 import { SecretEncrypter } from '@/domain/auth/application/cryptography/secret-encrypter'
 
 @Injectable()
 export class AesSecretEncrypter implements SecretEncrypter {
   private readonly algorithm = 'aes-256-cbc'
-  private readonly secretKey: string
+  private readonly secretKey: Buffer
 
   constructor() {
-    this.secretKey = process.env.SECRET_ENCRYPTION_KEY || 'default-secret-key-for-2fa'
+    const key = process.env.SECRET_ENCRYPTION_KEY || 'default-secret-key-for-2fa'
+    this.secretKey = createHash('sha256').update(key).digest()
   }
 
   async encrypt(plainText: string): Promise<string> {
-    const cipher = createCipher(this.algorithm, this.secretKey)
+    const iv = randomBytes(16)
+    const cipher = createCipheriv(this.algorithm, this.secretKey, iv)
     let encrypted = cipher.update(plainText, 'utf8', 'hex')
     encrypted += cipher.final('hex')
-    return encrypted
+    return iv.toString('hex') + ':' + encrypted
   }
 
   async decrypt(encryptedText: string): Promise<string> {
-    const decipher = createDecipher(this.algorithm, this.secretKey)
-    let decrypted = decipher.update(encryptedText, 'hex', 'utf8')
+    const [ivHex, encrypted] = encryptedText.split(':')
+    const iv = Buffer.from(ivHex, 'hex')
+    const decipher = createDecipheriv(this.algorithm, this.secretKey, iv)
+    let decrypted = decipher.update(encrypted, 'hex', 'utf8')
     decrypted += decipher.final('utf8')
     return decrypted
   }

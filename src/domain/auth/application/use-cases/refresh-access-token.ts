@@ -1,7 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable } from "@nestjs/common";
 import { Either, left, right } from "@/core/either";
-import { UsersRepository } from "@/domain/auth/repositories/users-repository";
-import { RefreshTokenRepository } from "@/domain/auth/repositories/refresh-token-repository";
+import { UsersRepository } from "@/domain/auth/application/repositories/users-repository";
+import { RefreshTokenRepository } from "@/domain/auth/application/repositories/refresh-token-repository";
 import { AccessToken } from "@/domain/auth/enterprise/entities/access-token";
 import { Encrypter } from "../cryptography/encrypter";
 import { InvalidTokenError } from "@/domain/auth/application/use-cases/errors/invalid-token-error";

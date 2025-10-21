@@ -1,0 +1,45 @@
+"use strict";
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.AuthModule = void 0;
+const common_1 = require("@nestjs/common");
+const jwt_1 = require("@nestjs/jwt");
+const passport_1 = require("@nestjs/passport");
+const jwt_strategy_1 = require("./jwt.strategy");
+const jwt_auth_guard_1 = require("./jwt-auth.guard");
+const env_module_1 = require("../env/env.module");
+const env_service_1 = require("../env/env.service");
+const database_module_1 = require("../database/database.module");
+let AuthModule = class AuthModule {
+};
+exports.AuthModule = AuthModule;
+exports.AuthModule = AuthModule = __decorate([
+    (0, common_1.Module)({
+        imports: [
+            passport_1.PassportModule.register({ defaultStrategy: "jwt" }),
+            database_module_1.DatabaseModule,
+            env_module_1.EnvModule,
+            jwt_1.JwtModule.registerAsync({
+                imports: [env_module_1.EnvModule],
+                inject: [env_service_1.EnvService],
+                global: true,
+                useFactory(env) {
+                    const privateKeyBase64 = env.get("JWT_PRIVATE_KEY");
+                    const publicKeyBase64 = env.get("JWT_PUBLIC_KEY");
+                    return {
+                        signOptions: { algorithm: "RS256" },
+                        privateKey: Buffer.from(privateKeyBase64, "base64").toString("utf-8"),
+                        publicKey: Buffer.from(publicKeyBase64, "base64").toString("utf-8"),
+                    };
+                },
+            }),
+        ],
+        providers: [jwt_strategy_1.JwtStrategy, jwt_auth_guard_1.JwtAuthGuard],
+        exports: [jwt_auth_guard_1.JwtAuthGuard],
+    })
+], AuthModule);

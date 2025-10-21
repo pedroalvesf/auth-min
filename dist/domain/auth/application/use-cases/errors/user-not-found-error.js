@@ -2,8 +2,8 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserNotFoundError = void 0;
 class UserNotFoundError extends Error {
-    constructor() {
-        super("User not found");
+    constructor(identifier) {
+        super(`User not found: "${identifier}".`);
     }
 }
 exports.UserNotFoundError = UserNotFoundError;

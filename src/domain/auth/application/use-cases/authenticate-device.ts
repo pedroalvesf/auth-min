@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable } from "@nestjs/common";
 import { Either, left, right } from "@/core/either";
 import { Device } from "../../enterprise/entities/device";
 import { RefreshToken } from "../../enterprise/entities/refresh-token";
@@ -9,9 +9,10 @@ import { Encrypter } from "../cryptography/encrypter";
 import { UniqueEntityID } from "@/core/entities/unique-entity-id";
 
 import { InvalidCredentialsError } from "./errors/invalid-credentials-error";
-import { DevicesRepository } from "../../repositories/devices-repository";
-import { UsersRepository } from "../../repositories/users-repository";
-import { RefreshTokenRepository } from "../../repositories/refresh-token-repository";
+import { DevicesRepository } from "../repositories/devices-repository";
+import { UsersRepository } from "../repositories/users-repository";
+import { RefreshTokenRepository } from "../repositories/refresh-token-repository";
+import { WrongCredentialsError } from "./errors/wrong-credentials-error";
 
 interface AuthenticateDeviceUseCaseRequest {
   password: string;
@@ -19,7 +20,7 @@ interface AuthenticateDeviceUseCaseRequest {
 }
 
 type AuthenticateDeviceUseCaseResponse = Either<
-  InvalidCredentialsError,
+  WrongCredentialsError,
   {
     accessToken: AccessToken;
     refreshToken: RefreshToken;
@@ -40,9 +41,9 @@ export class AuthenticateDeviceUseCase {
     password,
     device,
   }: AuthenticateDeviceUseCaseRequest): Promise<AuthenticateDeviceUseCaseResponse> {
-    const user = await this.usersRepository.findById(device.userId);
+    const user = await this.usersRepository.findById(device.userId.toString());
     if (!user) {
-      return left(new InvalidCredentialsError());
+      return left(new WrongCredentialsError());
     }
 
     const isPasswordValid = await this.hashComparer.compare(
@@ -54,7 +55,7 @@ export class AuthenticateDeviceUseCase {
       return right(result);
     }
 
-    return left(new InvalidCredentialsError());
+    return left(new WrongCredentialsError());
   }
 
   private async authenticateUser(user: User, device: Device) {

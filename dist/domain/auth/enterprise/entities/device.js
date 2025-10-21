@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Device = void 0;
-const entity_1 = require("@/core/entities/entity");
+const entity_1 = require("../../../../core/entities/entity");
 class Device extends entity_1.Entity {
     get userId() {
         return this.props.userId;
