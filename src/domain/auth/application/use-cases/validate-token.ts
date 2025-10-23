@@ -2,7 +2,6 @@ import { Injectable } from "@nestjs/common";
 import { Either, left, right } from "../../../../core/either";
 import { TokenValidator } from "../cryptography/token-validator";
 import { UsersRepository } from "@/domain/auth/application/repositories/users-repository";
-import { AccessTokenRepository } from "@/domain/auth/application/repositories/access-token-repository";
 import { InvalidTokenError } from "./errors/invalid-token-error";
 
 export interface ValidateTokenResult {
@@ -15,7 +14,6 @@ export interface ValidateTokenResult {
 export class ValidateTokenUseCase {
   constructor(
     private userRepository: UsersRepository,
-    private accessTokenRepository: AccessTokenRepository,
     private tokenValidator: TokenValidator
   ) {}
 
@@ -28,11 +26,8 @@ export class ValidateTokenUseCase {
       return left(new InvalidTokenError());
     }
 
-    const storedAccessToken = await this.accessTokenRepository.findByToken(
-      token
-    );
-
-    if (!storedAccessToken || storedAccessToken.isExpired()) {
+    // Validação baseada apenas no JWT token sem verificar no banco
+    if (!payload.sub) {
       return left(new InvalidTokenError());
     }
 

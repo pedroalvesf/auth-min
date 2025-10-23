@@ -16,9 +16,8 @@ const token_validator_1 = require("../cryptography/token-validator");
 const users_repository_1 = require("../repositories/users-repository");
 const invalid_token_error_1 = require("./errors/invalid-token-error");
 let ValidateTokenUseCase = class ValidateTokenUseCase {
-    constructor(userRepository, accessTokenRepository, tokenValidator) {
+    constructor(userRepository, tokenValidator) {
         this.userRepository = userRepository;
-        this.accessTokenRepository = accessTokenRepository;
         this.tokenValidator = tokenValidator;
     }
     async execute(token) {
@@ -26,8 +25,8 @@ let ValidateTokenUseCase = class ValidateTokenUseCase {
         if (!payload || payload.type === "refresh") {
             return (0, either_1.left)(new invalid_token_error_1.InvalidTokenError());
         }
-        const storedAccessToken = await this.accessTokenRepository.findByToken(token);
-        if (!storedAccessToken || storedAccessToken.isExpired()) {
+        // Validação baseada apenas no JWT token sem verificar no banco
+        if (!payload.sub) {
             return (0, either_1.left)(new invalid_token_error_1.InvalidTokenError());
         }
         const user = await this.userRepository.findById(payload.sub.toString());
@@ -44,5 +43,6 @@ let ValidateTokenUseCase = class ValidateTokenUseCase {
 exports.ValidateTokenUseCase = ValidateTokenUseCase;
 exports.ValidateTokenUseCase = ValidateTokenUseCase = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [users_repository_1.UsersRepository, Object, token_validator_1.TokenValidator])
+    __metadata("design:paramtypes", [users_repository_1.UsersRepository,
+        token_validator_1.TokenValidator])
 ], ValidateTokenUseCase);

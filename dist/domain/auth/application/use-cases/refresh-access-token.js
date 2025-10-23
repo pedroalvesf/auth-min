@@ -34,12 +34,12 @@ let RefreshAccessTokenUseCase = class RefreshAccessTokenUseCase {
         if (refreshTokenEntity.isExpired()) {
             return (0, either_1.left)(new refresh_token_expired_error_1.RefreshTokenExpiredError());
         }
-        const user = await this.userRepository.findById(refreshTokenEntity.userId);
+        const user = await this.userRepository.findById(refreshTokenEntity.userId.toString());
         if (!user) {
-            return (0, either_1.left)(new user_not_found_error_1.UserNotFoundError());
+            return (0, either_1.left)(new user_not_found_error_1.UserNotFoundError(refreshTokenEntity.userId.toString()));
         }
         const { accessToken } = await this.encrypter.encrypt({
-            sub: user.id.toString(),
+            sub: refreshTokenEntity.userId.toString(),
             deviceId: refreshTokenEntity.deviceId.toString(),
         });
         const newAccessTokenEntity = access_token_1.AccessToken.create({

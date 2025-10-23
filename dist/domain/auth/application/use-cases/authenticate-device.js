@@ -35,11 +35,11 @@ let AuthenticateDeviceUseCase = class AuthenticateDeviceUseCase {
             return (0, either_1.left)(new wrong_credentials_error_1.WrongCredentialsError());
         }
         const isPasswordValid = await this.hashComparer.compare(password, user.password);
-        if (isPasswordValid) {
-            const result = await this.authenticateUser(user, device);
-            return (0, either_1.right)(result);
+        if (!isPasswordValid) {
+            return (0, either_1.left)(new wrong_credentials_error_1.WrongCredentialsError());
         }
-        return (0, either_1.left)(new wrong_credentials_error_1.WrongCredentialsError());
+        const result = await this.authenticateUser(user, device);
+        return (0, either_1.right)(result);
     }
     async authenticateUser(user, device) {
         const updatedDevice = await this.getOrCreateDevice(device);

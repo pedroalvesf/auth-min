@@ -32,7 +32,7 @@ export class RevokeAllDevicesUseCase {
   }: RevokeAllDevicesUseCaseRequest): Promise<RevokeAllDevicesUseCaseResponse> {
     const user = await this.usersRepository.findById(userId);
     if (!user) {
-      return left(new UserNotFoundError());
+      return left(new UserNotFoundError(userId));
     }
 
     const devices = await this.devicesRepository.findManyByUserId(userId);

@@ -48,14 +48,16 @@ export class RefreshAccessTokenUseCase {
       return left(new RefreshTokenExpiredError());
     }
 
-    const user = await this.userRepository.findById(refreshTokenEntity.userId);
+    const user = await this.userRepository.findById(
+      refreshTokenEntity.userId.toString()
+    );
 
     if (!user) {
-      return left(new UserNotFoundError());
+      return left(new UserNotFoundError(refreshTokenEntity.userId.toString()));
     }
 
     const { accessToken } = await this.encrypter.encrypt({
-      sub: user.id.toString(),
+      sub: refreshTokenEntity.userId.toString(),
       deviceId: refreshTokenEntity.deviceId.toString(),
     });
 

@@ -50,12 +50,13 @@ export class AuthenticateDeviceUseCase {
       password,
       user.password
     );
-    if (isPasswordValid) {
-      const result = await this.authenticateUser(user, device);
-      return right(result);
+    
+    if (!isPasswordValid) {
+      return left(new WrongCredentialsError());
     }
 
-    return left(new WrongCredentialsError());
+    const result = await this.authenticateUser(user, device);
+    return right(result);
   }
 
   private async authenticateUser(user: User, device: Device) {

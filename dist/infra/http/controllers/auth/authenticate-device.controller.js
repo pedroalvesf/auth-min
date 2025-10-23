@@ -35,10 +35,10 @@ let AuthenticateDeviceController = class AuthenticateDeviceController {
         if (!user) {
             throw new common_1.HttpException("Credenciais inválidas", common_1.HttpStatus.UNAUTHORIZED);
         }
-        const ipAddress = headers.get("x-ipaddress") ?? "";
-        const operatingSystem = headers.get("x-operatingsystem") ?? "Unknown";
-        const browser = headers.get("x-browser") ?? "Unknown";
-        const deviceType = headers.get("x-type") ?? "Unknown";
+        const ipAddress = headers["x-ipaddress"] ?? "";
+        const operatingSystem = headers["x-operatingsystem"] ?? "Unknown";
+        const browser = headers["x-browser"] ?? "Unknown";
+        const deviceType = headers["x-type"] ?? "Unknown";
         if (!ipAddress || !operatingSystem || !browser || !deviceType) {
             throw new common_1.HttpException("Headers obrigatórios ausentes: x-ipaddress, x-operatingsystem, x-browser, x-type", common_1.HttpStatus.BAD_REQUEST);
         }

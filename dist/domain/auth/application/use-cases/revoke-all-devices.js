@@ -25,7 +25,7 @@ let RevokeAllDevicesUseCase = class RevokeAllDevicesUseCase {
     async execute({ userId, }) {
         const user = await this.usersRepository.findById(userId);
         if (!user) {
-            return (0, either_1.left)(new user_not_found_error_1.UserNotFoundError());
+            return (0, either_1.left)(new user_not_found_error_1.UserNotFoundError(userId));
         }
         const devices = await this.devicesRepository.findManyByUserId(userId);
         const refreshTokens = await this.refreshTokenRepository.findByUserId(userId);

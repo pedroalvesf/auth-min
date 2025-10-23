@@ -2,8 +2,6 @@ import { Injectable } from "@nestjs/common";
 import { Either, left, right } from "@/core/either";
 import { DevicesRepository } from "../repositories/devices-repository";
 import { RefreshTokenRepository } from "../repositories/refresh-token-repository";
-import { AccessTokenRepository } from "../repositories/access-token-repository";
-import { UniqueEntityID } from "@/core/entities/unique-entity-id";
 import { DeviceNotFoundError } from "./errors/device-not-found-error";
 import { UnauthorizedDeviceAccessError } from "./errors/unauthorized-device-access-error";
 
@@ -21,20 +19,17 @@ type RevokeUserDeviceUseCaseResponse = Either<
 export class RevokeUserDeviceUseCase {
   constructor(
     private devicesRepository: DevicesRepository,
-    private refreshTokenRepository: RefreshTokenRepository,
-    private accessTokenRepository: AccessTokenRepository
+    private refreshTokenRepository: RefreshTokenRepository
   ) {}
 
   async execute({
     userId,
     deviceId,
   }: RevokeUserDeviceUseCaseRequest): Promise<RevokeUserDeviceUseCaseResponse> {
-    const device = await this.devicesRepository.findById(
-      new UniqueEntityID(deviceId)
-    );
+    const device = await this.devicesRepository.findById(deviceId);
 
     if (!device) {
-      return left(new DeviceNotFoundError());
+      return left(new DeviceNotFoundError(deviceId));
     }
 
     // Verificar se o dispositivo pertence ao usuário
@@ -44,7 +39,7 @@ export class RevokeUserDeviceUseCase {
 
     // Revogar todos os refresh tokens deste dispositivo
     const refreshTokens = await this.refreshTokenRepository.findByDeviceId(
-      device.id
+      device.id.toString()
     );
 
     for (const refreshToken of refreshTokens) {
@@ -54,8 +49,7 @@ export class RevokeUserDeviceUseCase {
       }
     }
 
-    // Revogar todos os access tokens do usuário (mais seguro)
-    await this.accessTokenRepository.revokeByUserId(new UniqueEntityID(userId));
+    // Access tokens são revogados automaticamente quando o refresh token é revogado
 
     // Desativar o dispositivo
     device.active = false;

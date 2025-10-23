@@ -28,7 +28,7 @@ export class AuthenticateDeviceController {
   @HttpCode(201)
   async handle(
     @Body() body: AuthenticateDeviceDto,
-    @Headers() headers: Headers
+    @Headers() headers: Record<string, string>
   ) {
     const user = await this.usersRepository.findByEmail(body.email);
 
@@ -36,10 +36,10 @@ export class AuthenticateDeviceController {
       throw new HttpException("Credenciais inválidas", HttpStatus.UNAUTHORIZED);
     }
 
-    const ipAddress = headers.get("x-ipaddress") ?? "";
-    const operatingSystem = headers.get("x-operatingsystem") ?? "Unknown";
-    const browser = headers.get("x-browser") ?? "Unknown";
-    const deviceType = headers.get("x-type") ?? "Unknown";
+    const ipAddress = headers["x-ipaddress"] ?? "";
+    const operatingSystem = headers["x-operatingsystem"] ?? "Unknown";
+    const browser = headers["x-browser"] ?? "Unknown";
+    const deviceType = headers["x-type"] ?? "Unknown";
 
     if (!ipAddress || !operatingSystem || !browser || !deviceType) {
       throw new HttpException(
