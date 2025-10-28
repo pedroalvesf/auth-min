@@ -33,7 +33,7 @@ let CreateUserUseCase = class CreateUserUseCase {
             password: hashedPassword,
             name,
         }, new unique_entity_id_1.UniqueEntityID(email));
-        await this.userRepository.save(user);
+        await this.userRepository.create(user);
         return (0, either_1.right)({ user });
     }
 };

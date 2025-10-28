@@ -1,6 +1,7 @@
-import { IsOptional } from 'class-validator'
+import { IsNotEmpty, IsString } from 'class-validator'
 
 export class RevokeDeviceSessionDto {
-  @IsOptional()
-  deviceId?: string
+  @IsNotEmpty()
+  @IsString()
+  deviceId!: string
 }

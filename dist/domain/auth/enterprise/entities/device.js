@@ -44,6 +44,10 @@ class Device extends entity_1.Entity {
         this.props.active = active;
         this.touch();
     }
+    deactivate() {
+        this.props.active = false;
+        this.touch();
+    }
     touch() {
         this.props.updatedAt = new Date();
     }

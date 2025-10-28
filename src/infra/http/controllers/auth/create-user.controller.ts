@@ -26,7 +26,7 @@ export class CreateUserController {
 
   @Post()
   @HttpCode(201)
-  async handle(@Body() body: CreateUserDto, @Headers() headers: Headers) {
+  async handle(@Body() body: CreateUserDto, @Headers() headers: Record<string, string>) {
     const { email, password, name } = body;
     const result = await this.createUser.execute({
       email,
@@ -45,18 +45,16 @@ export class CreateUserController {
       }
     }
 
-    const geo = await geoip.lookup(headers.get("x-ipaddress") ?? "");
+    const geo = await geoip.lookup(headers["x-ipaddress"]);
     const location = geo ? `${geo.city}, ${geo.country}` : "unknown";
 
     const deviceEntity = Device.create({
       userId: new UniqueEntityID(result.value.user.id.toString()),
-      name: `${headers.get("x-operatingsystem") ?? "Unknown"} - ${
-        headers.get("x-browser") ?? "Unknown"
-      }`,
-      type: headers.get("x-type") ?? "Unknown",
-      operatingSystem: headers.get("x-operatingsystem") ?? "Unknown",
-      ipAddress: headers.get("x-ipaddress") ?? "Unknown",
-      browser: headers.get("x-browser") ?? "Unknown",
+      name: `${headers["x-operatingsystem"]} - ${headers["x-browser"]}`,
+      type: headers["x-type"],
+      operatingSystem: headers["x-operatingsystem"],
+      ipAddress: headers["x-ipaddress"],
+      browser: headers["x-browser"],
       location: location,
       lastLogin: new Date(),
       createdAt: new Date(),

@@ -21,11 +21,10 @@ const tokenPayloadSchema = zod_1.z.object({
 });
 let JwtStrategy = class JwtStrategy extends (0, passport_1.PassportStrategy)(passport_jwt_1.Strategy) {
     constructor(config) {
-        const publicKey = config.get('JWT_PUBLIC_KEY');
         super({
             jwtFromRequest: passport_jwt_1.ExtractJwt.fromAuthHeaderAsBearerToken(),
-            secretOrKey: Buffer.from(publicKey, 'base64').toString('utf-8'),
-            algorithms: ['RS256']
+            secretOrKey: config.get('JWT_SECRET'),
+            algorithms: ['HS256']
         });
     }
     async validate(payload) {

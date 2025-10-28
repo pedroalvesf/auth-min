@@ -46,15 +46,15 @@ let CreateUserController = class CreateUserController {
                     throw new common_1.BadRequestException(error.message);
             }
         }
-        const geo = await geoip_lite_1.default.lookup(headers.get("x-ipaddress") ?? "");
+        const geo = await geoip_lite_1.default.lookup(headers["x-ipaddress"]);
         const location = geo ? `${geo.city}, ${geo.country}` : "unknown";
         const deviceEntity = device_1.Device.create({
             userId: new unique_entity_id_1.UniqueEntityID(result.value.user.id.toString()),
-            name: `${headers.get("x-operatingsystem") ?? "Unknown"} - ${headers.get("x-browser") ?? "Unknown"}`,
-            type: headers.get("x-type") ?? "Unknown",
-            operatingSystem: headers.get("x-operatingsystem") ?? "Unknown",
-            ipAddress: headers.get("x-ipaddress") ?? "Unknown",
-            browser: headers.get("x-browser") ?? "Unknown",
+            name: `${headers["x-operatingsystem"]} - ${headers["x-browser"]}`,
+            type: headers["x-type"],
+            operatingSystem: headers["x-operatingsystem"],
+            ipAddress: headers["x-ipaddress"],
+            browser: headers["x-browser"],
             location: location,
             lastLogin: new Date(),
             createdAt: new Date(),

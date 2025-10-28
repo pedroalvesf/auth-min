@@ -71,6 +71,11 @@ export class Device extends Entity<DeviceProps> {
     this.touch();
   }
 
+  deactivate() {
+    this.props.active = false;
+    this.touch();
+  }
+
   private touch() {
     this.props.updatedAt = new Date();
   }

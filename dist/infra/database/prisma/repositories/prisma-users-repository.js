@@ -31,6 +31,10 @@ let PrismaUsersRepository = class PrismaUsersRepository {
             return null;
         return prisma_users_mapper_1.PrismaUsersMapper.toDomain(user);
     }
+    async create(user) {
+        const data = prisma_users_mapper_1.PrismaUsersMapper.toPrisma(user);
+        await this.prisma.user.create({ data });
+    }
     async save(user) {
         const data = prisma_users_mapper_1.PrismaUsersMapper.toPrisma(user);
         await this.prisma.user.update({ where: { id: user.id.toString() }, data });

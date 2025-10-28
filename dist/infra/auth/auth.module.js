@@ -29,12 +29,9 @@ exports.AuthModule = AuthModule = __decorate([
                 inject: [env_service_1.EnvService],
                 global: true,
                 useFactory(env) {
-                    const privateKeyBase64 = env.get("JWT_PRIVATE_KEY");
-                    const publicKeyBase64 = env.get("JWT_PUBLIC_KEY");
                     return {
-                        signOptions: { algorithm: "RS256" },
-                        privateKey: Buffer.from(privateKeyBase64, "base64").toString("utf-8"),
-                        publicKey: Buffer.from(publicKeyBase64, "base64").toString("utf-8"),
+                        secret: env.get("JWT_SECRET"),
+                        signOptions: { algorithm: "HS256" },
                     };
                 },
             }),

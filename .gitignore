@@ -1,8 +1,11 @@
 node_modules
 # Keep environment variables out of version control
 .env
-
+/dist
+/node_modules
 /generated/prisma
 
 # Architecture documentation
 ARCHITECTURE.md
+CRYPTOGRAPHY_DOCUMENTATION.md
+POSTMAN_TESTING_GUIDE.md

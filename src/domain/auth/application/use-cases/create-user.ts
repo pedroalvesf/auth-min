@@ -48,7 +48,7 @@ export class CreateUserUseCase {
       new UniqueEntityID(email)
     );
 
-    await this.userRepository.save(user);
+    await this.userRepository.create(user);
 
     return right({ user });
   }

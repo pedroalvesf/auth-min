@@ -314,8 +314,12 @@ Salve como `auth-min.postman_collection.json`:
 
 ```env
 DATABASE_URL="postgresql://auth_user:auth_password@localhost:5432/auth_db"
-JWT_SECRET="your-super-secret-jwt-key"
+JWT_SECRET="your-super-secret-jwt-key-change-in-production-min-32-chars"
 PORT=3000
+
+# Não é mais necessário:
+# JWT_PRIVATE_KEY e JWT_PUBLIC_KEY foram removidos
+# Os arquivos private.pem e public.pem foram removidos
 ```
 
 ## **🔟 Comandos Úteis durante Desenvolvimento**

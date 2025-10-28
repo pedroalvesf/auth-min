@@ -84,7 +84,7 @@ export class AuthenticateDeviceUseCase {
       revoked: false,
     });
 
-    await this.refreshTokenRepository.save(refreshTokenEntity);
+    await this.refreshTokenRepository.create(refreshTokenEntity);
 
     user.sign();
     await this.usersRepository.save(user);

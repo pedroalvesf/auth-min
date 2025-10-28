@@ -62,7 +62,7 @@ let AuthenticateDeviceUseCase = class AuthenticateDeviceUseCase {
             expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
             revoked: false,
         });
-        await this.refreshTokenRepository.save(refreshTokenEntity);
+        await this.refreshTokenRepository.create(refreshTokenEntity);
         user.sign();
         await this.usersRepository.save(user);
         return {

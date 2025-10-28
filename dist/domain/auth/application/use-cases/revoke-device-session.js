@@ -10,44 +10,49 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.RevokeDeviceSessionUseCase = void 0;
-const either_1 = require("../../../../core/either");
-const devices_repository_1 = require("../repositories/devices-repository");
-const refresh_token_repository_1 = require("../repositories/refresh-token-repository");
-const users_repository_1 = require("../repositories/users-repository");
-const device_not_found_error_1 = require("./errors/device-not-found-error");
-const user_not_found_error_1 = require("./errors/user-not-found-error");
 const common_1 = require("@nestjs/common");
+const either_1 = require("../../../../core/either");
+const refresh_token_repository_1 = require("../repositories/refresh-token-repository");
+const devices_repository_1 = require("../repositories/devices-repository");
+const refresh_token_not_found_error_1 = require("./errors/refresh-token-not-found-error");
+const device_not_found_error_1 = require("./errors/device-not-found-error");
 let RevokeDeviceSessionUseCase = class RevokeDeviceSessionUseCase {
-    constructor(devicesRepository, refreshTokenRepository, usersRepository) {
-        this.devicesRepository = devicesRepository;
+    constructor(refreshTokenRepository, devicesRepository) {
         this.refreshTokenRepository = refreshTokenRepository;
-        this.usersRepository = usersRepository;
+        this.devicesRepository = devicesRepository;
     }
-    async execute({ userId, deviceId, }) {
-        const user = await this.usersRepository.findById(userId);
-        if (!user) {
-            return (0, either_1.left)(new user_not_found_error_1.UserNotFoundError(userId));
+    async execute({ deviceId, userId, }) {
+        // Buscar todos os refresh tokens do dispositivo
+        const refreshTokens = await this.refreshTokenRepository.findByDeviceId(deviceId);
+        if (refreshTokens.length === 0) {
+            return (0, either_1.left)(new refresh_token_not_found_error_1.RefreshTokenNotFoundError());
         }
+        // Revogar todos os refresh tokens do dispositivo
+        for (const refreshToken of refreshTokens) {
+            if (!refreshToken.revoked) {
+                refreshToken.revoke();
+                await this.refreshTokenRepository.save(refreshToken);
+            }
+        }
+        // Verificar se o dispositivo pertence ao usuário e desativá-lo
         const device = await this.devicesRepository.findById(deviceId);
-        if (!device || device.userId.toString() !== userId) {
+        if (!device) {
             return (0, either_1.left)(new device_not_found_error_1.DeviceNotFoundError(deviceId));
         }
-        const refreshTokens = await this.refreshTokenRepository.findByDeviceId(deviceId);
-        for (const token of refreshTokens) {
-            token.revoke();
-            await this.refreshTokenRepository.delete(token.id.toString());
+        // Verificar se o dispositivo pertence ao usuário
+        if (device.userId.toString() !== userId) {
+            return (0, either_1.left)(new device_not_found_error_1.DeviceNotFoundError(deviceId));
         }
-        device.active = false;
+        device.deactivate();
         await this.devicesRepository.save(device);
-        user.sign();
-        await this.usersRepository.save(user);
-        return (0, either_1.right)({ success: true });
+        return (0, either_1.right)({
+            success: true,
+        });
     }
 };
 exports.RevokeDeviceSessionUseCase = RevokeDeviceSessionUseCase;
 exports.RevokeDeviceSessionUseCase = RevokeDeviceSessionUseCase = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [devices_repository_1.DevicesRepository,
-        refresh_token_repository_1.RefreshTokenRepository,
-        users_repository_1.UsersRepository])
+    __metadata("design:paramtypes", [refresh_token_repository_1.RefreshTokenRepository,
+        devices_repository_1.DevicesRepository])
 ], RevokeDeviceSessionUseCase);

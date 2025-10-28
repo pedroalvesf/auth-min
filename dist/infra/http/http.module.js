@@ -15,9 +15,11 @@ const auth_module_1 = require("../auth/auth.module");
 const create_user_controller_1 = require("./controllers/auth/create-user.controller");
 const authenticate_device_controller_1 = require("./controllers/auth/authenticate-device.controller");
 const revoke_all_devices_controller_1 = require("./controllers/auth/revoke-all-devices.controller");
+const revoke_device_session_controller_1 = require("./controllers/auth/revoke-device-session.controller");
 const create_user_1 = require("../../domain/auth/application/use-cases/create-user");
 const authenticate_device_1 = require("../../domain/auth/application/use-cases/authenticate-device");
 const revoke_all_devices_1 = require("../../domain/auth/application/use-cases/revoke-all-devices");
+const revoke_device_session_1 = require("../../domain/auth/application/use-cases/revoke-device-session");
 let HttpModule = class HttpModule {
 };
 exports.HttpModule = HttpModule;
@@ -28,11 +30,13 @@ exports.HttpModule = HttpModule = __decorate([
             create_user_controller_1.CreateUserController,
             authenticate_device_controller_1.AuthenticateDeviceController,
             revoke_all_devices_controller_1.RevokeAllDevicesController,
+            revoke_device_session_controller_1.RevokeDeviceSessionController,
         ],
         providers: [
             create_user_1.CreateUserUseCase,
             authenticate_device_1.AuthenticateDeviceUseCase,
             revoke_all_devices_1.RevokeAllDevicesUseCase,
+            revoke_device_session_1.RevokeDeviceSessionUseCase,
         ],
     })
 ], HttpModule);
