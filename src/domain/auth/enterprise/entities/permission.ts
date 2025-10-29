@@ -1,41 +1,85 @@
-// import { Entity } from "@/core/entities/entity";
-// import { UniqueEntityID } from "@/core/entities/unique-entity-id";
+import { Entity } from "@/core/entities/entity";
+import { UniqueEntityID } from "@/core/entities/unique-entity-id";
+import { Optional } from "@/core/types/optional";
 
-// interface PermissionProps {
-//   name: string;
-//   description: string;
-//   createdAt: Date;
-//   updatedAt?: Date;
-// }
+export interface PermissionProps {
+  name: string;
+  slug: string;
+  description?: string;
+  resource: string;
+  action: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
 
-// export class Permission extends Entity<PermissionProps> {
-//   get name() {
-//     return this.props.name;
-//   }
+export class Permission extends Entity<PermissionProps> {
+  get name() {
+    return this.props.name;
+  }
 
-//   get description() {
-//     return this.props.description;
-//   }
+  get slug() {
+    return this.props.slug;
+  }
 
-//   get createdAt() {
-//     return this.props.createdAt;
-//   }
+  get description() {
+    return this.props.description;
+  }
 
-//   get updatedAt() {
-//     return this.props.updatedAt;
-//   }
+  get resource() {
+    return this.props.resource;
+  }
 
-//   set description(description: string) {
-//     this.props.description = description;
-//     this.touch();
-//   }
+  get action() {
+    return this.props.action;
+  }
 
-//   private touch() {
-//     this.props.updatedAt = new Date();
-//   }
+  get createdAt() {
+    return this.props.createdAt;
+  }
 
-//   static create(props: PermissionProps, id?: UniqueEntityID) {
-//     const permission = new Permission(props, id);
-//     return permission;
-//   }
-// }
+  get updatedAt() {
+    return this.props.updatedAt;
+  }
+
+  set description(description: string | undefined) {
+    this.props.description = description;
+    this.touch();
+  }
+
+  matches(resource: string, action: string): boolean {
+    // Suporta wildcard: "users:*" matches "users:create", "users:read", etc.
+    if (this.props.action === "*" && this.props.resource === resource) {
+      return true;
+    }
+
+    // Suporta super wildcard: "*:*" matches tudo
+    if (this.props.resource === "*" && this.props.action === "*") {
+      return true;
+    }
+
+    return this.props.resource === resource && this.props.action === action;
+  }
+
+  private touch() {
+    this.props.updatedAt = new Date();
+  }
+
+  static create(
+    props: Optional<PermissionProps, "createdAt" | "updatedAt">,
+    id?: UniqueEntityID
+  ) {
+    const now = new Date();
+    return new Permission(
+      {
+        ...props,
+        createdAt: props.createdAt ?? now,
+        updatedAt: props.updatedAt ?? now,
+      },
+      id
+    );
+  }
+
+  static reconstruct(props: PermissionProps, id: UniqueEntityID) {
+    return new Permission(props, id);
+  }
+}

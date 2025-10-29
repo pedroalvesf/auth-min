@@ -50,7 +50,27 @@ docker-compose up -d
 npm run prisma:migrate
 ```
 
-### 5. Development
+### 5. Seed Database (Optional but Recommended)
+Populate database with test users, roles and permissions from centralized config:
+```bash
+npm run db:seed
+```
+
+This creates:
+- **23 permissions** (users, roles, devices, audit, permissions + wildcards)
+- **5 roles** with hierarchy (super-admin → admin → manager → editor → viewer)
+- **4 test users** with different access levels
+
+Test credentials:
+- `superadmin@authmin.com` / `senha123` (full access - `*:*`)
+- `admin@authmin.com` / `senha123` (admin access)
+- `manager@authmin.com` / `senha123` (manager access)
+- `user@authmin.com` / `senha123` (read-only access)
+
+**📋 Manage Permissions:** Edit `prisma/permissions.config.ts` and re-run seed.  
+**📖 Full Guide:** See `prisma/README_PERMISSIONS.md`
+
+### 6. Development
 ```bash
 npm run dev
 # Server running on http://localhost:3000
@@ -70,11 +90,22 @@ npm run dev
 
 ## 📚 Documentation
 
-See [ARCHITECTURE.md](./ARCHITECTURE.md) for detailed documentation covering:
+### 🆕 New Planning Documents
+- **[QUICK_START.md](./QUICK_START.md)** - Start here! Quick overview and getting started
+- **[STRATEGIC_ROADMAP.md](./STRATEGIC_ROADMAP.md)** - Complete strategic planning and roadmap (6-12 months)
+- **[IMPLEMENTATION_GUIDE.md](./IMPLEMENTATION_GUIDE.md)** - Practical week-by-week implementation guide
+
+### Existing Technical Documentation
+- **[CRYPTOGRAPHY_DOCUMENTATION.md](./CRYPTOGRAPHY_DOCUMENTATION.md)** - Deep dive into security implementation
+- **[POSTMAN_TESTING_GUIDE.md](./POSTMAN_TESTING_GUIDE.md)** - API testing guide with Postman
+
+### What's Covered
 - Complete architecture overview
-- API documentation with examples
+- Strategic roadmap (50+ planned features)
+- Step-by-step implementation guides
 - Security implementation details
-- Database schema
+- Database schema and migrations
+- API documentation with examples
 - How to integrate with other projects
 
 ## 🛠️ Tech Stack

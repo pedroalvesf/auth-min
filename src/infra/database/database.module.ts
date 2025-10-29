@@ -6,6 +6,10 @@ import { PrismaRefreshTokenRepository } from "./prisma/repositories/prisma-refre
 import { DevicesRepository } from "@/domain/auth/application/repositories/devices-repository";
 import { PrismaDevicesRepository } from "./prisma/repositories/prisma-devices-repository";
 import { RefreshTokenRepository } from "@/domain/auth/application/repositories/refresh-token-repository";
+import { PermissionsRepository } from "@/domain/auth/application/repositories/permissions-repository";
+import { PrismaRolesRepository } from "./prisma/repositories/prisma-roles-repository";
+import { PrismaPermissionsRepository } from "./prisma/repositories/prisma-permissions-repository";
+import { RolesRepository } from "@/domain/auth/application/repositories/roles-repository";
 
 @Global()
 @Module({
@@ -23,12 +27,22 @@ import { RefreshTokenRepository } from "@/domain/auth/application/repositories/r
       provide: UsersRepository,
       useClass: PrismaUsersRepository,
     },
+    {
+      provide: RolesRepository,
+      useClass: PrismaRolesRepository,
+    },
+    {
+      provide: PermissionsRepository,
+      useClass: PrismaPermissionsRepository,
+    },
   ],
   exports: [
     PrismaService,
     DevicesRepository,
     RefreshTokenRepository,
     UsersRepository,
+    RolesRepository,
+    PermissionsRepository,
   ],
 })
 export class DatabaseModule {}

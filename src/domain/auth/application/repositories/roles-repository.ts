@@ -1,14 +1,11 @@
-// import { Role } from "@/domain/auth/enterprise/entities/role";
+import { Role } from "../../enterprise/entities/role";
 
-// export abstract class RolesRepository {
-//   abstract findById(id: string): Promise<Role | null>;
-//   abstract create(role: Role): Promise<void>;
-//   abstract save(role: Role): Promise<void>;
-//   abstract findManyByPartnerId(partnerId: string): Promise<Role[]>;
-//   abstract delete(id: string): Promise<void>;
-//   abstract findByLevel(level: number): Promise<Role[]>;
-//   abstract findByLevelRange(
-//     minLevel: number,
-//     maxLevel: number
-//   ): Promise<Role[]>;
-// }
+export abstract class RolesRepository {
+  abstract create(role: Role): Promise<void>;
+  abstract save(role: Role): Promise<void>;
+  abstract findById(id: string): Promise<Role | null>;
+  abstract findBySlug(slug: string): Promise<Role | null>;
+  abstract findByName(name: string): Promise<Role | null>;
+  abstract findMany(): Promise<Role[]>;
+  abstract delete(id: string): Promise<void>;
+}
