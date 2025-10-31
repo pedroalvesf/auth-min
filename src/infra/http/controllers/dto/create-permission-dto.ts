@@ -8,7 +8,7 @@ export class CreatePermissionDto {
   })
   @IsString()
   @MinLength(3)
-  name: string;
+  name!: string;
 
   @ApiProperty({
     example: "posts",
@@ -16,7 +16,7 @@ export class CreatePermissionDto {
   })
   @IsString()
   @MinLength(2)
-  resource: string;
+  resource!: string;
 
   @ApiProperty({
     example: "create",
@@ -24,7 +24,7 @@ export class CreatePermissionDto {
   })
   @IsString()
   @MinLength(1)
-  action: string;
+  action!: string;
 
   @ApiProperty({
     example: "Permite criar novos posts no sistema",

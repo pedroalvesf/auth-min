@@ -16,6 +16,7 @@ import { AuthenticateDeviceUseCase } from "@/domain/auth/application/use-cases/a
 import { UniqueEntityID } from "@/core/entities/unique-entity-id";
 import geoip from "geoip-lite";
 import { Device } from "@/domain/auth/enterprise/entities/device";
+import { ApiOperation, ApiResponse } from "@nestjs/swagger";
 
 @Controller("auth/user")
 export class CreateUserController {
@@ -26,7 +27,26 @@ export class CreateUserController {
 
   @Post()
   @HttpCode(201)
-  async handle(@Body() body: CreateUserDto, @Headers() headers: Record<string, string>) {
+  @ApiOperation({ summary: "Create new user" })
+  @ApiResponse({ status: 201, description: "User created successfully" })
+  @ApiResponse({ status: 400, description: "Invalid input data" })
+  @ApiResponse({ status: 409, description: "User already exists" })
+  @ApiResponse({ status: 403, description: "Insufficient permissions" })
+  @ApiResponse({ status: 404, description: "User not found" })
+  @ApiResponse({ status: 500, description: "Internal server error" })
+  @ApiResponse({ status: 503, description: "Service unavailable" })
+  @ApiResponse({ status: 504, description: "Gateway timeout" })
+  @ApiResponse({ status: 505, description: "HTTP version not supported" })
+  @ApiResponse({ status: 506, description: "Variant also negotiates" })
+  @ApiResponse({ status: 507, description: "Insufficient storage" })
+  @ApiResponse({ status: 508, description: "Loop detected" })
+  @ApiResponse({ status: 509, description: "Bandwidth limit exceeded" })
+  @ApiResponse({ status: 510, description: "Not extended" })
+  @ApiResponse({ status: 511, description: "Network authentication required" })
+  async handle(
+    @Body() body: CreateUserDto,
+    @Headers() headers: Record<string, string>
+  ) {
     const { email, password, name } = body;
     const result = await this.createUser.execute({
       email,

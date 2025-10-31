@@ -36,4 +36,37 @@ export class PrismaUsersRepository implements UsersRepository {
   async delete(id: string): Promise<void> {
     await this.prisma.user.delete({ where: { id } });
   }
+
+  async assignRole(
+    userId: string,
+    roleId: string,
+    assignedBy?: string
+  ): Promise<void> {
+    await this.prisma.userRole.create({
+      data: {
+        userId,
+        roleId,
+        assignedBy,
+      },
+    });
+  }
+
+  async removeRole(userId: string, roleId: string): Promise<void> {
+    await this.prisma.userRole.delete({
+      where: {
+        userId_roleId: {
+          userId,
+          roleId,
+        },
+      },
+    });
+  }
+
+  async findRolesByUserId(userId: string) {
+    const userRoles = await this.prisma.userRole.findMany({
+      where: { userId },
+      include: { Role: true },
+    });
+    return userRoles.map((userRole) => userRole.Role);
+  }
 }

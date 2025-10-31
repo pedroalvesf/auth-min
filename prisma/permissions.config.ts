@@ -205,7 +205,7 @@ export const ROLES: RoleConfig[] = [
     slug: 'super-admin',
     description: 'Acesso total ao sistema. Pode fazer qualquer coisa.',
     level: 0,
-    assignableRoles: ['admin', 'manager', 'editor', 'viewer'],
+    assignableRoles: ['admin', 'moderator', 'user'],
     permissions: [
       '*:*', // Super permission
     ],
@@ -217,7 +217,7 @@ export const ROLES: RoleConfig[] = [
     slug: 'admin',
     description: 'Administrador com permissões elevadas. Pode gerenciar usuários e visualizar logs.',
     level: 1,
-    assignableRoles: ['manager', 'editor', 'viewer'],
+    assignableRoles: ['moderator', 'user'],
     permissions: [
       // Usuários
       'users:*',
@@ -238,20 +238,28 @@ export const ROLES: RoleConfig[] = [
     ],
   },
 
-  // ===== MANAGER (Level 2) =====
+  // ===== MODERATOR (Level 2) =====
   {
-    name: 'Manager',
-    slug: 'manager',
-    description: 'Gerente que pode visualizar e editar usuários, mas não deletar.',
+    name: 'Moderator',
+    slug: 'moderator',
+    description: 'Moderador que pode visualizar e editar usuários, gerenciar roles e permissões.',
     level: 2,
-    assignableRoles: ['editor', 'viewer'],
+    assignableRoles: ['user'],
     permissions: [
       // Usuários (sem delete)
       'users:read',
       'users:update',
       
-      // Roles (apenas leitura)
+      // Roles (CRUD completo)
+      'roles:create',
       'roles:read',
+      'roles:update',
+      'roles:assign',
+      
+      // Permissions (CRUD completo)
+      'permissions:create',
+      'permissions:read',
+      'permissions:update',
       
       // Devices
       'devices:read',
@@ -262,29 +270,19 @@ export const ROLES: RoleConfig[] = [
     ],
   },
 
-  // ===== EDITOR (Level 3) =====
+  // ===== USER (Level 3) =====
   {
-    name: 'Editor',
-    slug: 'editor',
-    description: 'Editor com acesso de leitura a usuários e dispositivos.',
+    name: 'User',
+    slug: 'user',
+    description: 'Usuário comum com acesso básico ao sistema.',
     level: 3,
-    assignableRoles: ['viewer'],
-    permissions: [
-      'users:read',
-      'devices:read',
-    ],
-  },
-
-  // ===== VIEWER (Level 4) =====
-  {
-    name: 'Viewer',
-    slug: 'viewer',
-    description: 'Acesso somente leitura ao sistema.',
-    level: 4,
     assignableRoles: [],
     permissions: [
+      // Apenas leitura básica
       'users:read',
       'devices:read',
+      'roles:read',
+      'permissions:read',
     ],
   },
 ];

@@ -13,20 +13,24 @@ import { RevokeDeviceSessionUseCase } from "@/domain/auth/application/use-cases/
 import { RevokeDeviceSessionDto } from "../dto/revoke-device-dto";
 import { RefreshTokenNotFoundError } from "@/domain/auth/application/use-cases/errors/refresh-token-not-found-error";
 import { DeviceNotFoundError } from "@/domain/auth/application/use-cases/errors/device-not-found-error";
+import { ApiResponse } from "@nestjs/swagger";
+import { ApiOperation } from "@nestjs/swagger";
 
 @Controller("/revoke-device-session")
 @UseGuards(JwtAuthGuard)
 export class RevokeDeviceSessionController {
-  constructor(
-    private revokeDeviceSessionUseCase: RevokeDeviceSessionUseCase
-  ) {}
+  constructor(private revokeDeviceSessionUseCase: RevokeDeviceSessionUseCase) {}
 
   @Delete()
   @HttpCode(200)
-  async handle(
-    @Body() body: RevokeDeviceSessionDto,
-    @Request() request: any
-  ) {
+  @ApiOperation({ summary: "Revoke device session" })
+  @ApiResponse({
+    status: 200,
+    description: "Device session revoked successfully",
+  })
+  @ApiResponse({ status: 400, description: "Device session not found" })
+  @ApiResponse({ status: 404, description: "Device not found" })
+  async handle(@Body() body: RevokeDeviceSessionDto, @Request() request: any) {
     const userId = request.user.sub;
 
     const result = await this.revokeDeviceSessionUseCase.execute({
