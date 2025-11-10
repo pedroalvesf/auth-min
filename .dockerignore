@@ -8,5 +8,7 @@ README.md
 Dockerfile
 .dockerignore
 coverage
+coverage/
+node_modules/
 .nyc_output
 dist
