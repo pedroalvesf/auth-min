@@ -5,6 +5,10 @@ node_modules
 /node_modules
 /generated/prisma
 
+# Test coverage reports
+coverage/
+*.lcov
+
 # Architecture documentation
 ARCHITECTURE.md
 CRYPTOGRAPHY_DOCUMENTATION.md

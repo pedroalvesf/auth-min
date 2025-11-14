@@ -8,7 +8,6 @@ import { HashComparer } from "../cryptography/hash-comparer";
 import { Encrypter } from "../cryptography/encrypter";
 import { UniqueEntityID } from "@/core/entities/unique-entity-id";
 
-import { InvalidCredentialsError } from "./errors/invalid-credentials-error";
 import { DevicesRepository } from "../repositories/devices-repository";
 import { UsersRepository } from "../repositories/users-repository";
 import { RefreshTokenRepository } from "../repositories/refresh-token-repository";
@@ -50,7 +49,7 @@ export class AuthenticateDeviceUseCase {
       password,
       user.password
     );
-    
+
     if (!isPasswordValid) {
       return left(new WrongCredentialsError());
     }

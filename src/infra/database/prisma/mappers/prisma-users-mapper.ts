@@ -1,15 +1,21 @@
-import { User as PrismaUser, Prisma } from "@prisma/client";
+import { User as PrismaUser, Prisma, Role as PrismaRole } from "@prisma/client";
 import { User } from "@/domain/auth/enterprise/entities/user";
 import { UniqueEntityID } from "@/core/entities/unique-entity-id";
+import { RoleList } from "@/domain/auth/enterprise/entities/role-list";
+import { PrismaRoleMapper } from "./prisma-role-mapper";
 
 export class PrismaUsersMapper {
-  static toDomain(raw: PrismaUser): User {
+  static toDomain(raw: PrismaUserWithRoles): User {
     return User.create(
       {
         email: raw.email,
         password: raw.password,
         name: raw.name ?? undefined,
+        isActive: raw.isActive,
         lastLoginAt: raw.lastLoginAt ?? undefined,
+        roles: new RoleList(raw.roles?.map(role => PrismaRoleMapper.toDomain(role)) || []),
+        createdAt: raw.createdAt,
+        updatedAt: raw.updatedAt,
       },
       new UniqueEntityID(raw.id)
     );
@@ -39,4 +45,9 @@ export class PrismaUsersMapper {
       updatedAt: user.updatedAt,
     };
   }
+
+}
+
+export type PrismaUserWithRoles = PrismaUser & { 
+  roles?: PrismaRole[] 
 }

@@ -1,6 +1,8 @@
 import { Entity } from "@/core/entities/entity";
 import { UniqueEntityID } from "@/core/entities/unique-entity-id";
 import { Optional } from "@/core/types/optional";
+import { PermissionList } from "./permission-list";
+import { Permission } from "./permission";
 
 export interface RoleProps {
   name: string;
@@ -8,6 +10,7 @@ export interface RoleProps {
   description?: string;
   level: number;
   assignableRoles: string[];
+  permissions: PermissionList;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -41,6 +44,10 @@ export class Role extends Entity<RoleProps> {
     return this.props.updatedAt;
   }
 
+  get permissions() {
+    return this.props.permissions;
+  }
+
   set description(description: string | undefined) {
     this.props.description = description;
     this.touch();
@@ -55,6 +62,20 @@ export class Role extends Entity<RoleProps> {
     return roleLevel > this.props.level;
   }
 
+  addPermission(permission: Permission) {
+    this.props.permissions.add(permission);
+    this.touch();
+  }
+
+  removePermission(permission: Permission) {
+    this.props.permissions.remove(permission);
+    this.touch();
+  }
+
+  hasPermission(permissionSlug: string): boolean {
+    return this.props.permissions.getItems().some(permission => permission.slug === permissionSlug);
+  }
+
   private touch() {
     this.props.updatedAt = new Date();
   }
@@ -62,7 +83,7 @@ export class Role extends Entity<RoleProps> {
   static create(
     props: Optional<
       RoleProps,
-      "createdAt" | "updatedAt" | "level" | "assignableRoles"
+      "createdAt" | "updatedAt" | "level" | "assignableRoles" | "permissions"
     >,
     id?: UniqueEntityID
   ) {
@@ -72,6 +93,7 @@ export class Role extends Entity<RoleProps> {
         ...props,
         level: props.level ?? 0,
         assignableRoles: props.assignableRoles ?? [],
+        permissions: props.permissions ?? new PermissionList(),
         createdAt: props.createdAt ?? now,
         updatedAt: props.updatedAt ?? now,
       },

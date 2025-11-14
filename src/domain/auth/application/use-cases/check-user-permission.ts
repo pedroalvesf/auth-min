@@ -36,7 +36,6 @@ export class CheckUserPermissionUseCase {
       return left(new UserNotFoundError(userId));
     }
 
-    // Buscar todos os roles do usuário
     const userRoles = await this.usersRepository.findRolesByUserId(userId);
 
     if (userRoles.length === 0) {

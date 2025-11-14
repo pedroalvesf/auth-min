@@ -10,6 +10,10 @@ import { PermissionsRepository } from "@/domain/auth/application/repositories/pe
 import { PrismaRolesRepository } from "./prisma/repositories/prisma-roles-repository";
 import { PrismaPermissionsRepository } from "./prisma/repositories/prisma-permissions-repository";
 import { RolesRepository } from "@/domain/auth/application/repositories/roles-repository";
+import { UserRolesRepository } from "@/domain/auth/application/repositories/user-roles-repository";
+import { RolePermissionsRepository } from "@/domain/auth/application/repositories/role-permissions-repository";
+import { PrismaUserRolesRepository } from "./prisma/repositories/prisma-user-roles-repository";
+import { PrismaRolePermissionsRepository } from "./prisma/repositories/prisma-role-permissions-repository";
 
 @Global()
 @Module({
@@ -35,6 +39,14 @@ import { RolesRepository } from "@/domain/auth/application/repositories/roles-re
       provide: PermissionsRepository,
       useClass: PrismaPermissionsRepository,
     },
+    {
+      provide: UserRolesRepository,
+      useClass: PrismaUserRolesRepository,
+    },
+    {
+      provide: RolePermissionsRepository,
+      useClass: PrismaRolePermissionsRepository,
+    },
   ],
   exports: [
     PrismaService,
@@ -43,6 +55,8 @@ import { RolesRepository } from "@/domain/auth/application/repositories/roles-re
     UsersRepository,
     RolesRepository,
     PermissionsRepository,
+    UserRolesRepository,
+    RolePermissionsRepository,
   ],
 })
 export class DatabaseModule {}

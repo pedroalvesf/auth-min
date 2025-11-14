@@ -1,5 +1,6 @@
 import { UniqueEntityID } from "@/core/entities/unique-entity-id";
 import { Role, RoleProps } from "@/domain/auth/enterprise/entities/role";
+import { PermissionList } from "@/domain/auth/enterprise/entities/permission-list";
 
 let roleCounter = 0;
 
@@ -16,6 +17,7 @@ export function makeRole(
       description: `Test role description ${roleCounter}`,
       level: 1,
       assignableRoles: [],
+      permissions: new PermissionList(),
       ...override,
     },
     id

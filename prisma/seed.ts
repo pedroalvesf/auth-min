@@ -7,9 +7,6 @@ const prisma = new PrismaClient();
 async function main() {
   console.log("🌱 Starting database seed...\n");
 
-  // ====================================
-  // 1. CRIAR PERMISSÕES (do arquivo de config)
-  // ====================================
   console.log("📋 Creating permissions from config...");
 
   const createdPermissions: Record<string, any> = {};
@@ -31,15 +28,11 @@ async function main() {
 
   console.log(`\n✅ Created ${PERMISSIONS.length} permissions\n`);
 
-  // ====================================
-  // 2. CRIAR ROLES (do arquivo de config)
-  // ====================================
   console.log("👥 Creating roles from config...");
 
   const createdRoles: Record<string, any> = {};
 
   for (const roleConfig of ROLES) {
-    // Criar o role
     const role = await prisma.role.upsert({
       where: { slug: roleConfig.slug },
       update: {
@@ -59,7 +52,6 @@ async function main() {
     createdRoles[roleConfig.slug] = role;
     console.log(`  ✅ ${roleConfig.name} (level ${roleConfig.level})`);
 
-    // Atribuir permissões ao role
     for (const permSlug of roleConfig.permissions) {
       if (!createdPermissions[permSlug]) {
         console.warn(
@@ -86,14 +78,10 @@ async function main() {
 
   console.log(`\n✅ Created ${ROLES.length} roles with permissions\n`);
 
-  // ====================================
-  // 3. CRIAR USUÁRIOS DE TESTE
-  // ====================================
   console.log("👤 Creating test users...");
 
   const hashedPassword = await hash("senha123", 8);
 
-  // Super Admin User
   const superAdminUser = await prisma.user.upsert({
     where: { email: "superadmin@authmin.com" },
     update: {},
@@ -106,7 +94,6 @@ async function main() {
   });
   console.log("  ✅ superadmin@authmin.com (password: senha123)");
 
-  // Atribuir role super-admin
   await prisma.userRole.upsert({
     where: {
       userId_roleId: {
@@ -122,7 +109,6 @@ async function main() {
     },
   });
 
-  // Admin User
   const adminUser = await prisma.user.upsert({
     where: { email: "admin@authmin.com" },
     update: {},
@@ -150,7 +136,6 @@ async function main() {
     },
   });
 
-  // Moderator User
   const moderatorUser = await prisma.user.upsert({
     where: { email: "moderator@authmin.com" },
     update: {},
@@ -178,7 +163,6 @@ async function main() {
     },
   });
 
-  // Regular User
   const regularUser = await prisma.user.upsert({
     where: { email: "user@authmin.com" },
     update: {},
@@ -208,9 +192,6 @@ async function main() {
 
   console.log("\n✅ Created 4 test users with roles\n");
 
-  // ====================================
-  // 4. RESUMO
-  // ====================================
   console.log("📊 Seed Summary:");
   console.log("=====================================");
 

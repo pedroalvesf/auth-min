@@ -30,6 +30,29 @@ export class PrismaRolesRepository implements RolesRepository {
     return PrismaRoleMapper.toDomain(role);
   }
 
+  async findByIdWithPermissions(id: string): Promise<Role | null> {
+    const role = await this.prisma.role.findUnique({
+      where: { id },
+      include: {
+        Permissions: {
+          include: {
+            Permission: true,
+          },
+        },
+      },
+    });
+
+    if (!role) return null;
+    
+    // Transforma a estrutura para o formato esperado pelo mapper
+    const roleWithPermissions = {
+      ...role,
+      permissions: role.Permissions.map(rolePermission => rolePermission.Permission),
+    };
+    
+    return PrismaRoleMapper.toDomain(roleWithPermissions);
+  }
+
   async findBySlug(slug: string): Promise<Role | null> {
     const role = await this.prisma.role.findUnique({
       where: { slug },

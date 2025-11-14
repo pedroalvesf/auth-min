@@ -15,6 +15,29 @@ export class PrismaUsersRepository implements UsersRepository {
     return user ? PrismaUsersMapper.toDomain(user) : null;
   }
 
+  async findByIdWithRoles(id: string): Promise<User | null> {
+    const user = await this.prisma.user.findUnique({
+      where: { id },
+      include: {
+        Roles: {
+          include: {
+            Role: true,
+          },
+        },
+      },
+    });
+
+    if (!user) return null;
+    
+    // Transforma a estrutura para o formato esperado pelo mapper
+    const userWithRoles = {
+      ...user,
+      roles: user.Roles.map(userRole => userRole.Role),
+    };
+    
+    return PrismaUsersMapper.toDomain(userWithRoles);
+  }
+
   async findByEmail(email: string): Promise<User | null> {
     const user = await this.prisma.user.findUnique({
       where: { email },

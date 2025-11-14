@@ -4,7 +4,7 @@ import { Permission as PrismaPermission } from "@prisma/client";
 
 export class PrismaPermissionMapper {
   static toDomain(raw: PrismaPermission): Permission {
-    return Permission.reconstruct(
+    return Permission.create(
       {
         name: raw.name,
         slug: raw.slug,
