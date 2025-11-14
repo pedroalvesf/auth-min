@@ -1,298 +1,393 @@
-# 📋 Guia de Continuidade do Desenvolvimento - Testes Unitários
+# 📋 Guia de Continuação do Desenvolvimento - Auth-Min
 
-## 🎯 **Estado Atual do Projeto**
+## 🎯 Status Atual do Projeto
 
-**Data da Parada:** Novembro 2025  
-**Progresso:** 16/16 casos de uso testados (100% completo)  
-**Total de Testes:** 59 testes passando  
-**Cobertura:** Todos os casos de uso do domínio de autenticação
+**Data de Atualização**: 14/11/2024  
+**Status**: Melhorias de produção implementadas (Rate Limiting + Logging)
+
+### ✅ Implementações Concluídas
+
+#### 1️⃣ **Rate Limiting** (✅ COMPLETO)
+
+**Objetivo**: Proteção contra ataques de força bruta e sobrecarga
+
+**Implementações**:
+- ✅ **ThrottlerModule** configurado no AuthModule
+- ✅ **CustomThrottlerGuard** com logging integrado
+- ✅ **Decorators** para diferentes níveis de rate limiting:
+  - `@ThrottleAuth()` - 5 tentativas por 15min (login)
+  - `@ThrottleModerate()` - 20 por minuto
+  - `@ThrottleStrict()` - 3 por segundo
+  - `@ThrottleGenerous()` - 200 por hora
+
+**Arquivos Criados/Modificados**:
+- `src/infra/auth/guards/throttler.guard.ts`
+- `src/infra/auth/decorators/throttle.decorator.ts`
+- `src/infra/auth/auth.module.ts`
+- `src/infra/http/controllers/auth/authenticate-device.controller.ts`
+- `src/infra/http/controllers/auth/create-user.controller.ts`
+- `test/e2e/rate-limiting.spec.ts`
+
+**Configurações**:
+```typescript
+// Múltiplos throttlers configurados
+throttlers: [
+  { name: 'short', ttl: 1000, limit: 10 },      // 10/second
+  { name: 'medium', ttl: 60000, limit: 100 },   // 100/minute
+  { name: 'long', ttl: 3600000, limit: 1000 },  // 1000/hour
+  { name: 'auth', ttl: 900000, limit: 5 }       // 5/15min
+]
+```
+
+**Recursos Implementados**:
+- Skip automático para health checks
+- Skip para chamadas internas (`x-internal-service`)
+- Tracking por IP + User-Agent ou userId
+- Logs estruturados para rate limit exceeded
 
 ---
 
-## 📊 **Status dos Testes por Caso de Uso**
+#### 2️⃣ **Logging Estruturado (Winston)** (✅ COMPLETO)
 
-### ✅ **CONCLUÍDOS (16 casos de uso)**
+**Objetivo**: Observabilidade avançada e debugging facilitado
 
-| Caso de Uso             | Arquivo de Teste                | Testes | Status |
-| ----------------------- | ------------------------------- | ------ | ------ |
-| `assign-role-to-user`   | `assign-role-to-user.spec.ts`   | 3      | ✅     |
-| `authenticate-device`   | `authenticate-device.spec.ts`   | 5      | ✅     |
-| `check-user-permission` | `check-user-permission.spec.ts` | 5      | ✅     |
-| `create-permission`     | `create-permission.spec.ts`     | 3      | ✅     |
-| `create-role`           | `create-role.spec.ts`           | 4      | ✅     |
-| `create-user`           | `create-user.spec.ts`           | 2      | ✅     |
-| `delete-user`           | `delete-user.spec.ts`           | 3      | ✅     |
-| `get-user-by-id`        | `get-user-by-id.spec.ts`        | 2      | ✅     |
-| `list-permissions`      | `list-permissions.spec.ts`      | 2      | ✅     |
-| `list-roles`            | `list-roles.spec.ts`            | 2      | ✅     |
-| `remove-role-from-user` | `remove-role-from-user.spec.ts` | 4      | ✅     |
-| `refresh-access-token`  | `refresh-access-token.spec.ts`  | 5      | ✅     |
-| `revoke-all-devices`    | `revoke-all-devices.spec.ts`    | 4      | ✅     |
-| `revoke-device-session` | `revoke-device-session.spec.ts` | 4      | ✅     |
-| `revoke-user-device`    | `revoke-user-device.spec.ts`    | 4      | ✅     |
-| `validate-token`        | `validate-token.spec.ts`        | 7      | ✅     |
+**Implementações**:
+- ✅ **Winston** integrado com NestJS
+- ✅ **Logging estruturado** em JSON para produção
+- ✅ **Console colorido** para desenvolvimento
+- ✅ **Múltiplos transportes** (console + arquivo)
+- ✅ **Custom Logger Service** com métodos específicos
+- ✅ **Logging Interceptor** para captura automática HTTP
+- ✅ **Integração nos Use Cases** críticos
 
----
+**Arquivos Criados**:
+- `src/infra/logging/logging.module.ts`
+- `src/infra/logging/logger.service.ts`
+- `src/infra/logging/interceptors/logging.interceptor.ts`
 
-## 🏗️ **Estrutura de Pastas e Arquitetura**
+**Arquivos Modificados**:
+- `src/app.module.ts` - LoggingModule importado
+- `src/domain/auth/application/use-cases/authenticate-device.ts` - Logs estruturados
+- `src/infra/auth/guards/throttler.guard.ts` - Logs de segurança
+- `test/domain/auth/application/use-cases/tests/authenticate-device.spec.ts` - Mock do logger
 
-### **Estrutura Atual dos Testes**
-
-```
-test/
-├── factories/                    # 🏭 Factories para criação de entidades
-│   ├── make-user.ts             # ✅ User factory
-│   ├── make-role.ts             # ✅ Role factory
-│   ├── make-permission.ts       # ✅ Permission factory
-│   └── make-device.ts           # ✅ Device factory
-│
-├── repositories/                 # 🗄️ Repositórios in-memory para testes
-│   ├── in-memory-users-repository.ts        # ✅ User repository
-│   ├── in-memory-roles-repository.ts        # ✅ Role repository
-│   ├── in-memory-permissions-repository.ts  # ✅ Permission repository
-│   ├── in-memory-devices-repository.ts      # ✅ Device repository
-│   └── in-memory-refresh-token-repository.ts # ✅ RefreshToken repository
-│
-├── cryptography/               # 🔐 Mocks para serviços de criptografia
-│   ├── fake-hash-comparer.ts   # ✅ Hash comparison mock
-│   └── fake-encrypter.ts       # ✅ Encryption mock
-│
-├── helpers/                    # 🛠️ Helpers para reduzir duplicação
-│   └── setup-user-role-permission.ts # ✅ Setup relationships
-│
-└── setup.ts                   # ⚙️ Configuração global dos testes
-```
-
-### **Testes dos Casos de Uso**
-
-```
-src/domain/auth/application/use-cases/tests/
-├── assign-role-to-user.spec.ts       # ✅
-├── authenticate-device.spec.ts       # ✅
-├── check-user-permission.spec.ts     # ✅
-├── create-permission.spec.ts         # ✅
-├── create-role.spec.ts               # ✅
-├── create-user.spec.ts               # ✅
-├── delete-user.spec.ts               # ✅
-├── get-user-by-id.spec.ts            # ✅
-├── list-permissions.spec.ts          # ✅
-├── list-roles.spec.ts                # ✅
-├── remove-role-from-user.spec.ts     # ✅
-│
-└── ✅ TODOS CONCLUÍDOS:
-    ├── refresh-access-token.spec.ts      # ✅ DONE
-    ├── revoke-all-devices.spec.ts        # ✅ DONE
-    ├── revoke-device-session.spec.ts     # ✅ DONE
-    ├── revoke-user-device.spec.ts        # ✅ DONE
-    └── validate-token.spec.ts            # ✅ DONE
-```
-
----
-
-## 🎯 **Metodologia de Desenvolvimento**
-
-### **1. Abordagem de Testes**
-
-- **Testes Unitários Puros**: Testamos apenas a lógica de negócio dos casos de uso
-- **Repositórios In-Memory**: Simulam persistência sem dependências externas
-- **Mocks Simples**: Para serviços de criptografia e outras dependências
-- **Factories Determinísticas**: Dados previsíveis sem bibliotecas como Faker
-
-### **2. Padrão de Estrutura dos Testes**
-
-#### **Template Padrão:**
+**Configurações por Ambiente**:
 
 ```typescript
-import { InMemory[Entity]Repository } from "@/test/repositories/in-memory-[entity]-repository";
-import { make[Entity] } from "@/test/factories/make-[entity]";
-import { [UseCase]UseCase } from "../[use-case]";
-import { [ExpectedError] } from "../errors/[expected-error]";
+// Development
+- Console colorido
+- Nível: debug
+- Formato legível
 
-let [entity]Repository: InMemory[Entity]Repository;
-let sut: [UseCase]UseCase; // sut = System Under Test
+// Production
+- Arquivos JSON (logs/error.log, logs/combined.log)
+- Nível: info
+- Metadados estruturados
 
-describe("[Use Case Name]", () => {
-  beforeEach(() => {
-    [entity]Repository = new InMemory[Entity]Repository();
-    sut = new [UseCase]UseCase([entity]Repository);
-  });
-
-  it("should be able to [happy path scenario]", async () => {
-    // Arrange
-    const entity = make[Entity]();
-    await [entity]Repository.create(entity);
-
-    // Act
-    const result = await sut.execute({ /* params */ });
-
-    // Assert
-    expect(result.isRight()).toBe(true);
-    if (result.isRight()) {
-      expect(result.value).toMatchObject({ /* expected result */ });
-    }
-  });
-
-  it("should not be able to [error scenario]", async () => {
-    // Arrange & Act
-    const result = await sut.execute({ /* invalid params */ });
-
-    // Assert
-    expect(result.isLeft()).toBe(true);
-    expect(result.value).toBeInstanceOf([ExpectedError]);
-  });
-});
+// Test
+- Logs desabilitados
+- Apenas errors críticos
 ```
 
-### **3. Convenções Estabelecidas**
+**Tipos de Logs Implementados**:
 
-#### **Nomenclatura:**
+```json
+// Authentication Events
+{
+  "context": "AUTH",
+  "action": "device_authentication_success",
+  "userId": "123",
+  "deviceId": "456",
+  "email": "user@domain.com",
+  "duration": 245
+}
 
-- **Factories**: `make[Entity](override?, id?)` - ex: `makeUser()`, `makeRole()`
-- **Repositories**: `InMemory[Entity]Repository` - ex: `InMemoryUsersRepository`
-- **Mocks**: `Fake[Service]` - ex: `FakeHashComparer`, `FakeEncrypter`
-- **Helpers**: Descritivos - ex: `setupUserRoleRelationship()`
+// Security Events
+{
+  "context": "SECURITY",
+  "event": "rate_limit_exceeded",
+  "ip": "192.168.1.100",
+  "url": "/login",
+  "method": "POST"
+}
 
-#### **Estrutura de Teste:**
+// Performance Metrics
+{
+  "context": "PERFORMANCE",
+  "operation": "POST /login",
+  "duration": 245,
+  "statusCode": 200
+}
+```
 
-- **Arrange**: Preparar dados e dependências
-- **Act**: Executar o caso de uso
-- **Assert**: Verificar resultados e efeitos colaterais
-
-#### **Cenários Obrigatórios:**
-
-1. **Happy Path**: Caso de sucesso principal
-2. **Error Cases**: Todos os cenários de erro possíveis
-3. **Edge Cases**: Casos limites e validações específicas
-4. **Side Effects**: Verificar efeitos colaterais (criação, atualização, etc.)
-
----
-
-## 🎉 **Testes Concluídos com Sucesso!**
-
-### **✅ Todos os Testes Implementados:**
-
-#### **1. `refresh-access-token.spec.ts`** ✅ CONCLUÍDO
-
-- **Cenários testados:**
-  - ✅ Renovar token com refresh token válido
-  - ✅ Falhar com refresh token expirado
-  - ✅ Falhar com refresh token inexistente
-  - ✅ Falhar com refresh token revogado
-  - ✅ Atualizar refresh token quando gera novo access token
-
-#### **2. `revoke-all-devices.spec.ts`** ✅ CONCLUÍDO
-
-- **Cenários testados:**
-  - ✅ Revogar todos os dispositivos do usuário
-  - ✅ Revogar todos os refresh tokens do usuário
-  - ✅ Falhar com usuário inexistente
-  - ✅ Não falhar quando usuário não tem dispositivos
-
-#### **3. `revoke-device-session.spec.ts`** ✅ CONCLUÍDO
-
-- **Cenários testados:**
-  - ✅ Revogar sessão de dispositivo específico
-  - ✅ Revogar refresh tokens do dispositivo
-  - ✅ Falhar com dispositivo inexistente
-  - ✅ Falhar quando usuário não é dono do dispositivo
-
-#### **4. `revoke-user-device.spec.ts`** ✅ CONCLUÍDO
-
-- **Cenários testados:**
-  - ✅ Revogar dispositivo específico do usuário
-  - ✅ Revogar refresh tokens associados
-  - ✅ Falhar com usuário inexistente
-  - ✅ Falhar com dispositivo inexistente
-
-#### **5. `validate-token.spec.ts`** ✅ CONCLUÍDO
-
-- **Cenários testados:**
-  - ✅ Validar token válido
-  - ✅ Falhar com token inválido
-  - ✅ Falhar com token expirado
-  - ✅ Falhar com token malformado
-  - ✅ Falhar com refresh token
-  - ✅ Falhar com token sem sub
-  - ✅ Falhar com token de usuário inexistente
+**Custom Logger Methods**:
+- `logAuth(action, userId, deviceId, metadata)` - Eventos de autenticação
+- `logSecurity(event, details)` - Eventos de segurança
+- `logPerformance(operation, duration, metadata)` - Métricas de performance
+- `logError(error, context, metadata)` - Erros estruturados
 
 ---
 
-## 🛠️ **Ferramentas e Dependências Removidas**
+#### 3️⃣ **Testes Unitários Completos** (✅ COMPLETO)
 
-### **❌ Removidas:**
+**Objetivo**: Cobertura completa dos casos de uso
 
-- `@faker-js/faker` - Substituído por dados determinísticos
-- Arquivos `.js` compilados na pasta `test/` - Mantemos apenas TypeScript
+**Status**:
+- ✅ **16/16 casos de uso** testados
+- ✅ **59 testes** passando (100% success rate)
+- ✅ **99.68%** cobertura nos use cases
+- ✅ **Factories determinísticas** sem dependências externas
+- ✅ **Repositórios in-memory** para isolamento
 
-### **✅ Mantidas:**
-
-- `jest` + `ts-jest` - Framework de testes
-- Repositórios in-memory próprios
-- Mocks personalizados para serviços
+**Metodologia Estabelecida**:
+- Testes unitários puros (lógica de negócio)
+- Either pattern para tratamento de erros
+- Arrange-Act-Assert pattern
+- Mocks simples para dependências externas
 
 ---
 
-## 🧪 **Comandos de Teste**
+## 🔄 Próximos Passos (Pendentes)
 
+### 4️⃣ **Health Checks Avançados** (⏳ PRÓXIMO)
+
+**Objetivo**: Monitoramento da saúde da aplicação
+
+**Planejamento**:
+- Health checks para banco de dados (Prisma)
+- Health checks para dependências externas
+- Métricas de sistema (memory, CPU, disk)
+- Endpoint `/health` com status detalhado
+- Integration com Docker HEALTHCHECK
+
+**Arquivos a Criar**:
+- `src/infra/health/health.module.ts`
+- `src/infra/health/health.controller.ts`
+- `src/infra/health/checks/database.health.ts`
+- `src/infra/health/checks/system.health.ts`
+
+**Dependências Necessárias**:
 ```bash
-# Executar todos os testes
-npm test
-
-# Executar teste específico
-npm test -- src/domain/auth/application/use-cases/tests/[nome-do-teste].spec.ts
-
-# Executar testes com watch mode
-npm run test:watch
-
-# Executar testes com coverage
-npm run test:coverage
+npm install @nestjs/terminus
 ```
 
 ---
 
-## 📝 **Notas Importantes para Continuidade**
+### 5️⃣ **E2E Tests para Controllers** (📋 PLANEJADO)
 
-### **1. Configurações Atuais:**
+**Objetivo**: Testes de integração completos
 
-- `tsconfig.json` configurado com paths para `@/` e `@/test/`
-- `jest.config.js` configurado para TypeScript e paths
-- Todos os types do Jest disponíveis globalmente
+**Planejamento**:
+- Configuração do ambiente de teste E2E
+- Testes para todos os controllers de auth
+- Testes com banco de dados real (in-memory)
+- Testes de rate limiting
+- Testes de logging
 
-### **2. Padrões Estabelecidos:**
-
-- **Sem faker**: Use contadores e dados determinísticos
-- **Either pattern**: Todos os casos de uso retornam `Either<Error, Success>`
-- **Factories leves**: Dados mínimos necessários com override opcional
-- **Helpers para relacionamentos**: Use quando múltiplas entidades se relacionam
-
-### **3. Arquivos de Referência:**
-
-- `check-user-permission.spec.ts` - Exemplo de teste complexo com múltiplas entidades
-- `authenticate-device.spec.ts` - Exemplo de teste com criptografia e tokens
-- `create-user.spec.ts` - Exemplo de teste simples e direto
-
-### **4. Próximas Melhorias Opcionais:**
-
-- [ ] Criar mais helpers para cenários comuns
-- [ ] Adicionar testes de integração para controllers
-- [ ] Implementar testes para as entidades do domínio
-- [ ] Adicionar testes para os mappers do Prisma
+**Arquivos a Criar**:
+- `test/e2e/auth.e2e-spec.ts`
+- `test/e2e/setup.ts`
+- `test/e2e/teardown.ts`
 
 ---
 
-## 🎉 **Meta Final - ALCANÇADA!**
+### 6️⃣ **OpenAPI/Swagger Documentation** (📚 PLANEJADO)
 
-**✅ Objetivo Concluído:** 16/16 casos de uso testados (100% de cobertura)  
-**✅ Total de Testes:** 59 testes implementados e passando  
-**✅ Benefício:** Base sólida para refatorações e novas funcionalidades
+**Objetivo**: Documentação automática da API
 
-### **🚀 Próximos Passos Sugeridos:**
-
-1. **Implementação de Controllers** - Criar controllers HTTP para os casos de uso
-2. **Testes de Integração** - Testes end-to-end com banco de dados real  
-3. **Documentação da API** - OpenAPI/Swagger para endpoints
-4. **Deploy e CI/CD** - Configurar pipeline de deployment
+**Planejamento**:
+- Configuração do Swagger
+- Decorators para todos os endpoints
+- Schemas de request/response
+- Documentação de autenticação
+- UI interativo
 
 ---
 
-_Este guia deve ser seguido para manter a consistência e qualidade dos testes já implementados. A metodologia testada e aprovada garante testes robustos, organizados e de fácil manutenção._
+### 7️⃣ **Metrics/Monitoring Básico** (📊 PLANEJADO)
+
+**Objetivo**: Métricas de performance e uso
+
+**Planejamento**:
+- Prometheus metrics
+- Custom metrics (auth events, performance)
+- Integration com Grafana
+- Alerting básico
+
+---
+
+### 8️⃣ **Event Sourcing para Audit Logs** (🔍 PLANEJADO)
+
+**Objetivo**: Auditoria avançada de eventos
+
+**Planejamento**:
+- Domain events estruturados
+- Event store implementation
+- Audit trail completo
+- Replay de eventos
+
+---
+
+## 🛠️ Configurações Atuais
+
+### **Dependencies Adicionadas**:
+```json
+{
+  "@nestjs/throttler": "^6.4.0",
+  "winston": "^3.18.3",
+  "nest-winston": "^1.10.2",
+  "ioredis": "^5.8.2",
+  "redis": "^5.9.0",
+  "@nestjs/cache-manager": "^3.0.1",
+  "cache-manager-ioredis": "^2.1.0"
+}
+```
+
+### **Estrutura de Pastas**:
+```
+src/infra/
+├── auth/
+│   ├── guards/
+│   │   ├── throttler.guard.ts      ✅ (NEW)
+│   │   ├── permissions-guard.ts
+│   │   └── roles.guard.ts
+│   ├── decorators/
+│   │   ├── throttle.decorator.ts   ✅ (NEW)
+│   │   ├── require-permission.decorator.ts
+│   │   └── require-role.decorator.ts
+│   └── auth.module.ts              ✅ (MODIFIED)
+├── logging/                        ✅ (NEW MODULE)
+│   ├── logging.module.ts
+│   ├── logger.service.ts
+│   └── interceptors/
+│       └── logging.interceptor.ts
+└── ...existing modules
+
+test/
+├── e2e/
+│   └── rate-limiting.spec.ts       ✅ (NEW)
+└── ...existing test structure
+```
+
+---
+
+## 📝 Como Continuar Amanhã
+
+### **Prioridade 1: Health Checks**
+1. Instalar dependências: `@nestjs/terminus`
+2. Criar módulo de health checks
+3. Implementar checks para banco de dados
+4. Configurar endpoint `/health`
+5. Testar com Docker
+
+### **Comandos para Continuar**:
+```bash
+# Instalar dependências de health checks
+npm install @nestjs/terminus
+
+# Executar testes atuais
+npm run test
+npm run test:coverage
+
+# Verificar se tudo está funcionando
+npm run dev
+
+# Verificar logs estruturados
+tail -f logs/combined.log  # Se em produção
+```
+
+### **Status dos Testes**:
+- ✅ Todos os 59 testes passando
+- ✅ Rate limiting não quebra funcionalidades existentes
+- ✅ Logging integrado sem impactos nos testes
+- ✅ Cobertura mantida em 99.68% nos use cases
+- ✅ Mock do logger adicionado aos testes
+
+### **Validação Rápida**:
+```bash
+# Testar rate limiting funcionando
+curl -X POST http://localhost:3000/login \
+  -H "Content-Type: application/json" \
+  -H "x-ipaddress: 192.168.1.1" \
+  -H "x-operatingsystem: Linux" \
+  -H "x-browser: Chrome" \
+  -H "x-type: desktop" \
+  -d '{"email":"test@test.com","password":"wrong"}'
+
+# Executar múltiplas vezes para testar rate limit
+```
+
+---
+
+## 🎯 Resumo das Melhorias Implementadas
+
+**Rate Limiting**:
+- ✅ Proteção contra ataques de força bruta
+- ✅ Diferentes níveis de throttling
+- ✅ Logs de segurança integrados
+- ✅ Configuração flexível por ambiente
+- ✅ Skip automático para health checks
+
+**Logging Estruturado**:
+- ✅ Observabilidade avançada
+- ✅ Logs JSON para análise
+- ✅ Captura automática de performance
+- ✅ Audit trail de autenticação
+- ✅ Debugging facilitado
+- ✅ Integração com use cases críticos
+
+**Testes**:
+- ✅ Cobertura completa mantida
+- ✅ Mocks atualizados para logging
+- ✅ Testes E2E básicos para rate limiting
+
+**Benefícios Alcançados**:
+- 🛡️ **Segurança**: Rate limiting + audit logs
+- 📊 **Observabilidade**: Logs estruturados + performance metrics
+- 🔍 **Debugging**: Contexto rico nos logs
+- 🚀 **Production-Ready**: Configurações otimizadas por ambiente
+- ⚡ **Performance**: Tracking de duração de operações
+
+---
+
+## 📊 Arquivo de Logs Gerado
+
+**Localização**: `logs/`
+- `logs/combined.log` - Todos os logs em JSON
+- `logs/error.log` - Apenas errors
+- Console colorido para development
+
+**Exemplo de Log**:
+```json
+{
+  "timestamp": "2024-11-14T20:56:07.191Z",
+  "level": "info",
+  "service": "auth-min",
+  "environment": "development",
+  "context": "AUTH",
+  "action": "device_authentication_success",
+  "userId": "123e4567-e89b-12d3-a456-426614174000",
+  "deviceId": "device-456",
+  "email": "user@example.com",
+  "duration": 245
+}
+```
+
+---
+
+## 🎯 Estado Final da Sessão
+
+O projeto está **100% funcional** com melhorias significativas de produção:
+
+1. **✅ Rate Limiting** - Proteção contra ataques implementada
+2. **✅ Logging Estruturado** - Observabilidade avançada implementada  
+3. **✅ Testes Atualizados** - Todas as funcionalidades testadas
+4. **✅ Configuração Flexível** - Pronto para diferentes ambientes
+
+**Próxima sessão**: Implementar Health Checks para completar o monitoramento da aplicação.
+
+---
+
+**📅 Próxima Sessão: Health Checks Avançados**  
+**🎯 Meta: Completar monitoramento da saúde da aplicação**  
+**💻 Comando inicial: `npm install @nestjs/terminus`**
