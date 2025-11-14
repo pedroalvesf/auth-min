@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, Inject } from "@nestjs/common";
 import { Either, left, right } from "@/core/either";
 import { Device } from "../../enterprise/entities/device";
 import { RefreshToken } from "../../enterprise/entities/refresh-token";
@@ -7,6 +7,8 @@ import { User } from "../../enterprise/entities/user";
 import { HashComparer } from "../cryptography/hash-comparer";
 import { Encrypter } from "../cryptography/encrypter";
 import { UniqueEntityID } from "@/core/entities/unique-entity-id";
+import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
+import { Logger } from 'winston';
 
 import { DevicesRepository } from "../repositories/devices-repository";
 import { UsersRepository } from "../repositories/users-repository";
@@ -33,15 +35,39 @@ export class AuthenticateDeviceUseCase {
     private usersRepository: UsersRepository,
     private refreshTokenRepository: RefreshTokenRepository,
     private hashComparer: HashComparer,
-    private encrypter: Encrypter
+    private encrypter: Encrypter,
+    @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger
   ) {}
 
   async execute({
     password,
     device,
   }: AuthenticateDeviceUseCaseRequest): Promise<AuthenticateDeviceUseCaseResponse> {
-    const user = await this.usersRepository.findById(device.userId.toString());
+    const startTime = Date.now();
+    const userId = device.userId.toString();
+
+    this.logger.info('Authentication attempt started', {
+      context: 'AUTH',
+      action: 'device_authentication_start',
+      userId,
+      deviceInfo: {
+        type: device.type,
+        browser: device.browser,
+        os: device.operatingSystem,
+        ip: device.ipAddress,
+        location: device.location
+      }
+    });
+
+    const user = await this.usersRepository.findById(userId);
     if (!user) {
+      this.logger.warn('Authentication failed - user not found', {
+        context: 'AUTH',
+        action: 'device_authentication_failed',
+        userId,
+        reason: 'user_not_found',
+        duration: Date.now() - startTime
+      });
       return left(new WrongCredentialsError());
     }
 
@@ -51,10 +77,28 @@ export class AuthenticateDeviceUseCase {
     );
 
     if (!isPasswordValid) {
+      this.logger.warn('Authentication failed - invalid password', {
+        context: 'AUTH',
+        action: 'device_authentication_failed',
+        userId,
+        email: user.email,
+        reason: 'invalid_password',
+        duration: Date.now() - startTime
+      });
       return left(new WrongCredentialsError());
     }
 
     const result = await this.authenticateUser(user, device);
+    
+    this.logger.info('Authentication successful', {
+      context: 'AUTH',
+      action: 'device_authentication_success',
+      userId,
+      deviceId: result.refreshToken.deviceId.toString(),
+      email: user.email,
+      duration: Date.now() - startTime
+    });
+
     return right(result);
   }
 

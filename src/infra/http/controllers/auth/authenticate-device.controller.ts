@@ -13,6 +13,7 @@ import {
 import { AuthenticateDeviceDto } from "../dto/authenticate-device-dto";
 import { Device } from "@/domain/auth/enterprise/entities/device";
 import { Public } from "@/infra/auth/public";
+import { ThrottleAuth } from "@/infra/auth/decorators/throttle.decorator";
 import { UsersRepository } from "@/domain/auth/application/repositories/users-repository";
 import geoip from "geoip-lite";
 
@@ -26,6 +27,7 @@ export class AuthenticateDeviceController {
 
   @Post()
   @HttpCode(201)
+  @ThrottleAuth()
   async handle(
     @Body() body: AuthenticateDeviceDto,
     @Headers() headers: Record<string, string>

@@ -13,6 +13,7 @@ let devicesRepository: InMemoryDevicesRepository;
 let refreshTokenRepository: InMemoryRefreshTokenRepository;
 let hashComparer: FakeHashComparer;
 let encrypter: FakeEncrypter;
+let mockLogger: any;
 let sut: AuthenticateDeviceUseCase;
 
 describe("Authenticate Device", () => {
@@ -22,12 +23,19 @@ describe("Authenticate Device", () => {
     refreshTokenRepository = new InMemoryRefreshTokenRepository();
     hashComparer = new FakeHashComparer();
     encrypter = new FakeEncrypter();
+    mockLogger = {
+      info: jest.fn(),
+      warn: jest.fn(),
+      error: jest.fn(),
+      debug: jest.fn()
+    };
     sut = new AuthenticateDeviceUseCase(
       devicesRepository,
       usersRepository,
       refreshTokenRepository,
       hashComparer,
-      encrypter
+      encrypter,
+      mockLogger
     );
   });
 

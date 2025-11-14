@@ -8,12 +8,12 @@ import {
   Post,
 } from "@nestjs/common";
 import { CreateUserUseCase } from "@/domain/auth/application/use-cases/create-user";
-// import { UserAlreadyExistsError } from '@/domain/auth/application/use-cases/errors/user-already-exists-error'
 import { CreateUserDto } from "../dto/create-user-dto";
 import { ListUserPresenter } from "../../presenters/list-user-presenter";
 import { UserAlreadyExistsError } from "@/domain/auth/application/use-cases/errors/user-already-exists-error";
 import { AuthenticateDeviceUseCase } from "@/domain/auth/application/use-cases/authenticate-device";
 import { UniqueEntityID } from "@/core/entities/unique-entity-id";
+import { ThrottleModerate } from "@/infra/auth/decorators/throttle.decorator";
 import geoip from "geoip-lite";
 import { Device } from "@/domain/auth/enterprise/entities/device";
 import { ApiOperation, ApiResponse } from "@nestjs/swagger";
@@ -27,6 +27,7 @@ export class CreateUserController {
 
   @Post()
   @HttpCode(201)
+  @ThrottleModerate()
   @ApiOperation({ summary: "Create new user" })
   @ApiResponse({ status: 201, description: "User created successfully" })
   @ApiResponse({ status: 400, description: "Invalid input data" })
