@@ -13,11 +13,21 @@ import { ListUserPresenter } from "../../presenters/list-user-presenter";
 import { UserAlreadyExistsError } from "@/domain/auth/application/use-cases/errors/user-already-exists-error";
 import { AuthenticateDeviceUseCase } from "@/domain/auth/application/use-cases/authenticate-device";
 import { UniqueEntityID } from "@/core/entities/unique-entity-id";
-import { ThrottleModerate } from "@/infra/auth/decorators/throttle.decorator";
 import geoip from "geoip-lite";
 import { Device } from "@/domain/auth/enterprise/entities/device";
-import { ApiOperation, ApiResponse } from "@nestjs/swagger";
+import { 
+  ApiOperation, 
+  ApiResponse, 
+  ApiTags, 
+  ApiHeader,
+  ApiBody,
+  ApiBadRequestResponse,
+  ApiConflictResponse,
+  ApiCreatedResponse 
+} from "@nestjs/swagger";
+import { AuthResponseDto, ErrorResponseDto } from "../dto/auth-response-dto";
 
+@ApiTags('Authentication')
 @Controller("auth/user")
 export class CreateUserController {
   constructor(
@@ -27,23 +37,48 @@ export class CreateUserController {
 
   @Post()
   @HttpCode(201)
-  @ThrottleModerate()
-  @ApiOperation({ summary: "Create new user" })
-  @ApiResponse({ status: 201, description: "User created successfully" })
-  @ApiResponse({ status: 400, description: "Invalid input data" })
-  @ApiResponse({ status: 409, description: "User already exists" })
-  @ApiResponse({ status: 403, description: "Insufficient permissions" })
-  @ApiResponse({ status: 404, description: "User not found" })
-  @ApiResponse({ status: 500, description: "Internal server error" })
-  @ApiResponse({ status: 503, description: "Service unavailable" })
-  @ApiResponse({ status: 504, description: "Gateway timeout" })
-  @ApiResponse({ status: 505, description: "HTTP version not supported" })
-  @ApiResponse({ status: 506, description: "Variant also negotiates" })
-  @ApiResponse({ status: 507, description: "Insufficient storage" })
-  @ApiResponse({ status: 508, description: "Loop detected" })
-  @ApiResponse({ status: 509, description: "Bandwidth limit exceeded" })
-  @ApiResponse({ status: 510, description: "Not extended" })
-  @ApiResponse({ status: 511, description: "Network authentication required" })
+  @ApiOperation({ 
+    summary: "Create new user", 
+    description: "Creates a new user account and automatically authenticates the device, returning access and refresh tokens."
+  })
+  @ApiBody({ type: CreateUserDto })
+  @ApiHeader({
+    name: 'x-ipaddress',
+    description: 'Client IP address for device tracking',
+    required: true,
+    example: '192.168.1.1'
+  })
+  @ApiHeader({
+    name: 'x-operatingsystem',
+    description: 'Operating system information',
+    required: true,
+    example: 'Windows 10'
+  })
+  @ApiHeader({
+    name: 'x-browser',
+    description: 'Browser information',
+    required: true,
+    example: 'Chrome 120.0'
+  })
+  @ApiHeader({
+    name: 'x-type',
+    description: 'Device type',
+    required: true,
+    example: 'desktop',
+    schema: { enum: ['desktop', 'mobile', 'tablet'] }
+  })
+  @ApiCreatedResponse({ 
+    description: "User created successfully and device authenticated", 
+    type: AuthResponseDto
+  })
+  @ApiBadRequestResponse({ 
+    description: "Invalid input data or missing required headers", 
+    type: ErrorResponseDto
+  })
+  @ApiConflictResponse({ 
+    description: "User already exists", 
+    type: ErrorResponseDto
+  })
   async handle(
     @Body() body: CreateUserDto,
     @Headers() headers: Record<string, string>

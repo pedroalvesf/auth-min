@@ -13,6 +13,11 @@ export class PrismaService
   }
 
   async onModuleInit() {
+    // Skip database connection for development/documentation testing
+    if (process.env.SKIP_DB_CONNECT === 'true') {
+      console.log('Skipping database connection...');
+      return;
+    }
     await this.$connect();
   }
 

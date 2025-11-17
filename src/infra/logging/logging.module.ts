@@ -1,11 +1,14 @@
 import { Module } from '@nestjs/common'
 import { WinstonModule } from 'nest-winston'
 import * as winston from 'winston'
+import { EnvModule } from '../env/env.module'
 import { EnvService } from '../env/env.service'
 
 @Module({
   imports: [
+    EnvModule,
     WinstonModule.forRootAsync({
+      imports: [EnvModule],
       inject: [EnvService],
       useFactory: (envService: EnvService) => {
         const isDevelopment = process.env.NODE_ENV === 'development'
