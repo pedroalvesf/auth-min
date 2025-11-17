@@ -16,7 +16,7 @@ export function addRoleToUserRepository(
     slug: role.slug,
     description: role.description || null,
     level: role.level,
-    assignableRoles: role.assignableRoles,
+    assignableRoles: role.assignableRoles.join(",") || "",
     createdAt: new Date(),
     updatedAt: new Date(),
   });

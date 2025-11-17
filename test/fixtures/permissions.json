@@ -1,0 +1,98 @@
+[
+  {
+    "id": "perm-users-create",
+    "name": "Create Users",
+    "slug": "users.create", 
+    "resource": "users",
+    "action": "create",
+    "description": "Allows creating new users"
+  },
+  {
+    "id": "perm-users-read",
+    "name": "Read Users",
+    "slug": "users.read",
+    "resource": "users", 
+    "action": "read",
+    "description": "Allows viewing user information"
+  },
+  {
+    "id": "perm-users-update",
+    "name": "Update Users", 
+    "slug": "users.update",
+    "resource": "users",
+    "action": "update",
+    "description": "Allows updating user information"
+  },
+  {
+    "id": "perm-users-delete",
+    "name": "Delete Users",
+    "slug": "users.delete",
+    "resource": "users",
+    "action": "delete", 
+    "description": "Allows deleting users"
+  },
+  {
+    "id": "perm-roles-create",
+    "name": "Create Roles",
+    "slug": "roles.create",
+    "resource": "roles",
+    "action": "create",
+    "description": "Allows creating new roles"
+  },
+  {
+    "id": "perm-roles-read", 
+    "name": "Read Roles",
+    "slug": "roles.read",
+    "resource": "roles",
+    "action": "read",
+    "description": "Allows viewing role information"
+  },
+  {
+    "id": "perm-roles-assign",
+    "name": "Assign Roles",
+    "slug": "roles.assign", 
+    "resource": "roles",
+    "action": "assign",
+    "description": "Allows assigning roles to users"
+  },
+  {
+    "id": "perm-permissions-create",
+    "name": "Create Permissions",
+    "slug": "permissions.create",
+    "resource": "permissions",
+    "action": "create",
+    "description": "Allows creating new permissions"
+  },
+  {
+    "id": "perm-permissions-read",
+    "name": "Read Permissions", 
+    "slug": "permissions.read",
+    "resource": "permissions",
+    "action": "read",
+    "description": "Allows viewing permission information"
+  },
+  {
+    "id": "perm-content-create",
+    "name": "Create Content",
+    "slug": "content.create",
+    "resource": "content",
+    "action": "create",
+    "description": "Allows creating content"
+  },
+  {
+    "id": "perm-content-read",
+    "name": "Read Content",
+    "slug": "content.read", 
+    "resource": "content",
+    "action": "read",
+    "description": "Allows viewing content"
+  },
+  {
+    "id": "perm-content-update",
+    "name": "Update Content",
+    "slug": "content.update",
+    "resource": "content",
+    "action": "update",
+    "description": "Allows updating content"
+  }
+]

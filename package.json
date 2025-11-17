@@ -11,12 +11,20 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
+    "test:e2e": "jest --config ./test/jest-e2e.json",
+    "test:e2e:watch": "npm run test:e2e -- --watch",
+    "test:e2e:coverage": "npm run test:e2e -- --coverage",
+    "test:e2e:ci": "npm run test:e2e -- --ci --forceExit",
+    "test:all": "npm run test && npm run test:e2e",
     "prisma:generate": "prisma generate",
+    "prisma:generate:test": "prisma generate --schema=./test/prisma/schema.prisma",
     "prisma:migrate": "prisma migrate dev",
+    "prisma:migrate:test": "prisma migrate dev --schema=./test/prisma/schema.prisma",
     "prisma:studio": "prisma studio",
     "prisma:seed": "ts-node prisma/seed.ts",
     "db:seed": "npm run prisma:generate && npm run prisma:seed",
-    "db:reset": "npm run prisma:migrate reset && npm run db:seed"
+    "db:reset": "npm run prisma:migrate reset && npm run db:seed",
+    "db:setup:test": "npm run prisma:generate:test && npm run prisma:migrate:test"
   },
   "prisma": {
     "seed": "ts-node prisma/seed.ts"
@@ -67,6 +75,7 @@
     "@types/supertest": "^6.0.3",
     "jest": "^30.2.0",
     "nodemon": "^3.1.10",
+    "sqlite3": "^5.1.7",
     "supertest": "^7.1.4",
     "ts-jest": "^29.4.5",
     "ts-node": "^10.9.2",

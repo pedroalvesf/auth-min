@@ -83,6 +83,18 @@ export class CreateUserController {
     @Body() body: CreateUserDto,
     @Headers() headers: Record<string, string>
   ) {
+    // Validate required device headers
+    const ipAddress = headers["x-ipaddress"];
+    const operatingSystem = headers["x-operatingsystem"];
+    const browser = headers["x-browser"];
+    const deviceType = headers["x-type"];
+
+    if (!ipAddress || !operatingSystem || !browser || !deviceType) {
+      throw new BadRequestException(
+        "Headers obrigatórios ausentes: x-ipaddress, x-operatingsystem, x-browser, x-type"
+      );
+    }
+
     const { email, password, name } = body;
     const result = await this.createUser.execute({
       email,
@@ -101,16 +113,16 @@ export class CreateUserController {
       }
     }
 
-    const geo = await geoip.lookup(headers["x-ipaddress"]);
+    const geo = geoip.lookup(ipAddress);
     const location = geo ? `${geo.city}, ${geo.country}` : "unknown";
 
     const deviceEntity = Device.create({
       userId: new UniqueEntityID(result.value.user.id.toString()),
-      name: `${headers["x-operatingsystem"]} - ${headers["x-browser"]}`,
-      type: headers["x-type"],
-      operatingSystem: headers["x-operatingsystem"],
-      ipAddress: headers["x-ipaddress"],
-      browser: headers["x-browser"],
+      name: `${operatingSystem} - ${browser}`,
+      type: deviceType,
+      operatingSystem,
+      ipAddress,
+      browser,
       location: location,
       lastLogin: new Date(),
       createdAt: new Date(),

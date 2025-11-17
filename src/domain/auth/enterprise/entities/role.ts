@@ -73,7 +73,9 @@ export class Role extends Entity<RoleProps> {
   }
 
   hasPermission(permissionSlug: string): boolean {
-    return this.props.permissions.getItems().some(permission => permission.slug === permissionSlug);
+    return this.props.permissions
+      .getItems()
+      .some((permission) => permission.slug === permissionSlug);
   }
 
   private touch() {

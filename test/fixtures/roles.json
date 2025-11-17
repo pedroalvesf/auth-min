@@ -1,0 +1,34 @@
+[
+  {
+    "id": "role-admin",
+    "name": "Admin",
+    "slug": "admin", 
+    "level": 0,
+    "assignableRoles": ["manager", "user"],
+    "permissions": ["users.create", "users.read", "users.update", "users.delete", "roles.create", "roles.read", "roles.assign", "permissions.create", "permissions.read"]
+  },
+  {
+    "id": "role-manager",
+    "name": "Manager",
+    "slug": "manager",
+    "level": 1, 
+    "assignableRoles": ["user"],
+    "permissions": ["users.read", "users.update", "roles.read"]
+  },
+  {
+    "id": "role-user",
+    "name": "User", 
+    "slug": "user",
+    "level": 2,
+    "assignableRoles": [],
+    "permissions": ["users.read"]
+  },
+  {
+    "id": "role-editor",
+    "name": "Editor",
+    "slug": "editor",
+    "level": 3,
+    "assignableRoles": [],
+    "permissions": ["content.create", "content.read", "content.update"]
+  }
+]

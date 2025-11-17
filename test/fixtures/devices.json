@@ -1,0 +1,47 @@
+[
+  {
+    "id": "device-desktop-1",
+    "name": "MacBook Pro",
+    "type": "desktop",
+    "operatingSystem": "macOS Ventura",
+    "ipAddress": "192.168.1.100",
+    "browser": "Chrome 120.0",
+    "location": "San Francisco, CA, US"
+  },
+  {
+    "id": "device-mobile-1", 
+    "name": "iPhone 15",
+    "type": "mobile",
+    "operatingSystem": "iOS 17",
+    "ipAddress": "192.168.1.101",
+    "browser": "Safari Mobile", 
+    "location": "San Francisco, CA, US"
+  },
+  {
+    "id": "device-tablet-1",
+    "name": "iPad Air",
+    "type": "tablet", 
+    "operatingSystem": "iPadOS 17",
+    "ipAddress": "192.168.1.102",
+    "browser": "Safari", 
+    "location": "San Francisco, CA, US"
+  },
+  {
+    "id": "device-desktop-2",
+    "name": "Windows PC",
+    "type": "desktop",
+    "operatingSystem": "Windows 11",
+    "ipAddress": "10.0.0.50", 
+    "browser": "Edge 120.0",
+    "location": "New York, NY, US"
+  },
+  {
+    "id": "device-mobile-2",
+    "name": "Samsung Galaxy",
+    "type": "mobile",
+    "operatingSystem": "Android 14",
+    "ipAddress": "10.0.0.51",
+    "browser": "Chrome Mobile",
+    "location": "New York, NY, US"
+  }
+]
