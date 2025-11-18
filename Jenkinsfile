@@ -48,6 +48,15 @@ pipeline {
   }
   
   stages {
+    stage('Checkout') {
+      steps {
+        echo 'Checking out source code...'
+        checkout scm
+        sh 'git --version'
+        sh 'ls -la'
+      }
+    }
+    
     stage('Pre-build Setup') {
       steps {
         echo 'Setting up build environment...'
@@ -58,9 +67,9 @@ pipeline {
       }
     }
     
-    stage('Checkout & Cache') {
+    stage('Install Dependencies') {
       steps {
-        echo 'Checking out source code and setting up npm cache...'
+        echo 'Installing dependencies...'
         script {
           def nodeModulesExists = fileExists('node_modules')
           if (!nodeModulesExists) {
@@ -322,10 +331,7 @@ pipeline {
       script {
         if (env.BRANCH_NAME == 'main') {
           // Send success notification
-          slackSend(
-            color: 'good',
-            message: "✅ Production deployment successful for commit ${env.GIT_COMMIT[0..7]}"
-          )
+          echo "✅ Production deployment successful for commit ${env.GIT_COMMIT[0..7]}"
         }
       }
     }
@@ -333,19 +339,13 @@ pipeline {
       echo 'Pipeline failed!'
       script {
         // Send failure notification
-        slackSend(
-          color: 'danger',
-          message: "❌ Pipeline failed for branch ${env.BRANCH_NAME} at stage ${env.STAGE_NAME}"
-        )
+        echo "❌ Pipeline failed for branch ${env.BRANCH_NAME} at stage ${env.STAGE_NAME}"
       }
     }
     unstable {
       echo 'Pipeline completed with warnings!'
       script {
-        slackSend(
-          color: 'warning',
-          message: "⚠️ Pipeline completed with warnings for branch ${env.BRANCH_NAME}"
-        )
+        echo "⚠️ Pipeline completed with warnings for branch ${env.BRANCH_NAME}"
       }
     }
   }
