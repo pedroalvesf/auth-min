@@ -63,7 +63,7 @@
 
 ```bash
 # Execute este comando:
-./scripts/setup-github-webhook.sh
+# Webhook removido - polling ativo no Jenkins detecta mudanças automaticamente
 ```
 
 ### **Passo 6: Testar Pipeline**
