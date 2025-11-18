@@ -45,13 +45,26 @@ pipeline {
     IMAGE_NAME = 'auth-min'
     DATABASE_URL = 'postgresql://test_user:test_password@localhost:5432/test_db'
     JWT_SECRET = 'test-jwt-secret-key-for-ci'
+    GIT_SSL_NO_VERIFY = 'true'
+    GIT_TIMEOUT = '300'
   }
   
   stages {
     stage('Checkout') {
       steps {
         echo 'Checking out source code...'
-        checkout scm
+        script {
+          // Configurar git para resolver problemas de timeout/SSL
+          sh '''
+            git config --global http.timeout 300
+            git config --global http.lowSpeedLimit 0
+            git config --global http.lowSpeedTime 300
+            git config --global http.sslVerify false
+          '''
+        }
+        retry(3) {
+          checkout scm
+        }
         sh 'git --version'
         sh 'ls -la'
       }
