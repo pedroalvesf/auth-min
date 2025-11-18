@@ -17,7 +17,7 @@ services:
       retries: 3
 
   auth-min:
-    build: 
+    build:
       context: .
       dockerfile: Dockerfile
     container_name: auth-min

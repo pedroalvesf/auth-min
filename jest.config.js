@@ -34,4 +34,18 @@ module.exports = {
   moduleFileExtensions: ["ts", "tsx", "js", "jsx", "json", "node", "mjs"],
   setupFilesAfterEnv: ["<rootDir>/test/setup.ts"],
   transformIgnorePatterns: ["node_modules/"],
+  coverageDirectory: 'coverage',
+  coverageReporters: [
+    'text',
+    'lcov', 
+    'cobertura',
+    'html'
+  ],
+  reporters: [
+    'default',
+    ['jest-junit', {
+      outputDirectory: 'coverage',
+      outputName: 'junit.xml'
+    }]
+  ]
 };

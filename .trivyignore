@@ -1,0 +1,35 @@
+# Trivy ignore file
+# This file contains vulnerabilities that should be ignored during scans
+# Format: CVE-ID or package name
+
+# Example: Ignore specific CVE
+# CVE-2021-44228
+
+# Example: Ignore all vulnerabilities in a specific package
+# node_modules/some-package
+
+# Development dependencies (only used during build)
+node_modules/@types/
+node_modules/typescript
+node_modules/ts-jest
+node_modules/jest
+node_modules/@nestjs/testing
+
+# Test files and directories
+test/
+**/*.test.ts
+**/*.spec.ts
+coverage/
+
+# Build artifacts
+dist/
+build/
+
+# Documentation
+*.md
+docs/
+
+# Configuration files that might contain false positives
+.eslintrc.js
+jest.config.js
+*.config.js
