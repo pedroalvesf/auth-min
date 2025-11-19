@@ -13,7 +13,7 @@ npm run prisma:generate:test
 
 # Configurar banco de dados de teste
 echo "🗄️  Configurando banco de dados de teste..."
-DATABASE_URL="file:./test/test.db" npx prisma db push --schema=./test/schema.prisma --skip-generate
+DATABASE_URL="postgresql://auth_test_user:auth_test_password@localhost:8239/auth_test_db" npx prisma db push --skip-generate
 
 # Executar testes unitários
 echo "🧪 Executando testes unitários..."

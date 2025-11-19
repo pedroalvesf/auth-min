@@ -39,6 +39,8 @@ npm run ci:test
 
 ### **🔒 `security-scan.sh` - OPCIONAL**
 
+N
+
 ```bash
 ./scripts/security-scan.sh
 ```
