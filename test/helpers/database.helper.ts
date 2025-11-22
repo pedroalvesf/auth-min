@@ -43,21 +43,21 @@ export class DatabaseHelper {
           name: 'Admin',
           slug: 'admin',
           level: 0,
-          assignableRoles: '["manager", "user"]'
+          assignableRoles: ['manager', 'user']
         },
         {
           id: 'role-manager', 
           name: 'Manager',
           slug: 'manager',
           level: 1,
-          assignableRoles: '["user"]'
+          assignableRoles: ['user']
         },
         {
           id: 'role-user',
           name: 'User',
           slug: 'user',
           level: 2,
-          assignableRoles: '[]'
+          assignableRoles: []
         }
       ]
     });

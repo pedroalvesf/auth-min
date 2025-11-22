@@ -15,9 +15,7 @@ export class PrismaRoleMapper {
         slug: raw.slug,
         description: raw.description ?? undefined,
         level: raw.level,
-        assignableRoles: typeof raw.assignableRoles === 'string' 
-          ? JSON.parse(raw.assignableRoles) 
-          : raw.assignableRoles || [],
+        assignableRoles: raw.assignableRoles || [],
         permissions: new PermissionList(
           raw.permissions?.map((permission) =>
             PrismaPermissionMapper.toDomain(permission)
@@ -37,7 +35,7 @@ export class PrismaRoleMapper {
       slug: role.slug,
       description: role.description ?? null,
       level: role.level,
-      assignableRoles: JSON.stringify(role.assignableRoles || []),
+      assignableRoles: role.assignableRoles || [],
       createdAt: role.createdAt,
       updatedAt: role.updatedAt,
     };

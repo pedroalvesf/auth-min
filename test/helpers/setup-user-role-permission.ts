@@ -16,7 +16,7 @@ export function addRoleToUserRepository(
     slug: role.slug,
     description: role.description || null,
     level: role.level,
-    assignableRoles: JSON.stringify(role.assignableRoles || []),
+    assignableRoles: role.assignableRoles || [],
     createdAt: new Date(),
     updatedAt: new Date(),
   });

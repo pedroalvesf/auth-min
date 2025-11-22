@@ -32,7 +32,6 @@ module.exports = {
     "^@/(.*)$": "<rootDir>/src/$1",
   },
   moduleFileExtensions: ["ts", "tsx", "js", "jsx", "json", "node", "mjs"],
-  setupFilesAfterEnv: ["<rootDir>/test/setup.ts"],
   transformIgnorePatterns: ["node_modules/"],
   coverageDirectory: 'coverage',
   coverageReporters: [

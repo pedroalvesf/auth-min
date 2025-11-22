@@ -1,5 +1,5 @@
 import { Global, Module } from '@nestjs/common';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from '.prisma/test-client';
 import { PrismaService } from '@/infra/database/prisma/prisma.service';
 import { UsersRepository } from '@/domain/auth/application/repositories/users-repository';
 import { DevicesRepository } from '@/domain/auth/application/repositories/devices-repository';
@@ -16,14 +16,8 @@ class TestPrismaService {
   private client: PrismaClient;
 
   constructor() {
-    // Create SQLite client for testing
-    this.client = new PrismaClient({
-      datasources: {
-        db: {
-          url: 'file:./test/test.db'
-        }
-      }
-    });
+    // Create PostgreSQL client for testing using test DATABASE_URL
+    this.client = new PrismaClient();
   }
 
   get $connect() {
@@ -72,6 +66,19 @@ class TestPrismaService {
 
   async onModuleDestroy() {
     await this.$disconnect();
+  }
+
+  async cleanDatabase() {
+    await this.client.auditLog.deleteMany();
+    await this.client.rolePermission.deleteMany();
+    await this.client.userRole.deleteMany();
+    await this.client.refreshToken.deleteMany();
+    await this.client.accessToken.deleteMany();
+    await this.client.loginHistory.deleteMany();
+    await this.client.device.deleteMany();
+    await this.client.user.deleteMany();
+    await this.client.permission.deleteMany();
+    await this.client.role.deleteMany();
   }
 }
 

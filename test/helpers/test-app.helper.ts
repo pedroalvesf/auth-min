@@ -1,10 +1,15 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { config } from 'dotenv';
+import { join } from 'path';
 import { envSchema } from '../../src/infra/env/env';
 import { AppModule } from '../../src/app.module';
 import { TestDatabaseModule } from './test-database.module';
 import { DatabaseModule } from '../../src/infra/database/database.module';
+
+// Load test environment variables first, overriding any existing ones
+config({ path: join(__dirname, '..', '..', '.env.test'), override: true });
 
 export class TestAppHelper {
   private static app: INestApplication;
