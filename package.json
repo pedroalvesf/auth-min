@@ -36,7 +36,10 @@
     "verify": "npm run ci:test"
   },
   "prisma": {
-    "seed": "ts-node prisma/seed.ts"
+    "seed": "ts-node prisma/seed.ts",
+    "warnings": {
+      "warnEnvConflicts": false
+    }
   },
   "keywords": [],
   "author": "",
