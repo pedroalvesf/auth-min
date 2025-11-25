@@ -30,7 +30,6 @@ pipeline {
   
   options {
     timestamps()
-    ansiColor('xterm')
     durabilityHint('PERFORMANCE_OPTIMIZED')
     timeout(time: 30, unit: 'MINUTES')
     skipDefaultCheckout(false)

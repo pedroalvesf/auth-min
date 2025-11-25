@@ -15,3 +15,4 @@ ant
 gradle
 pipeline-github-lib
 pipeline-utility-steps
+ansicolor
