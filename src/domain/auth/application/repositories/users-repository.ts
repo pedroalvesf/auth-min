@@ -1,5 +1,5 @@
-import { User } from "@/domain/auth/enterprise/entities/user";
-import { Role } from "@prisma/client";
+import { User } from '@/domain/auth/enterprise/entities/user';
+import { Role } from '@prisma/client';
 
 export abstract class UsersRepository {
   abstract findById(id: string): Promise<User | null>;

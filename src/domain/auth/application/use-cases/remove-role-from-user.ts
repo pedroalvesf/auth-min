@@ -1,9 +1,9 @@
-import { Injectable } from "@nestjs/common";
-import { Either, left, right } from "@/core/either";
-import { UsersRepository } from "../repositories/users-repository";
-import { RolesRepository } from "../repositories/roles-repository";
-import { UserNotFoundError } from "./errors/user-not-found-error";
-import { RoleNotFoundError } from "./errors/role-not-found-error";
+import { Injectable } from '@nestjs/common';
+import { Either, left, right } from '@/core/either';
+import { UsersRepository } from '../repositories/users-repository';
+import { RolesRepository } from '../repositories/roles-repository';
+import { UserNotFoundError } from './errors/user-not-found-error';
+import { RoleNotFoundError } from './errors/role-not-found-error';
 
 interface RemoveRoleFromUserUseCaseRequest {
   userId: string;
@@ -41,9 +41,9 @@ export class RemoveRoleFromUserUseCase {
 
     await this.usersRepository.removeRole(userId, roleId);
 
-    return right({ 
+    return right({
       success: true,
-      message: "Role removed from user successfully"
+      message: 'Role removed from user successfully',
     });
   }
 }

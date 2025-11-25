@@ -1,14 +1,17 @@
-export function formatDate(date: Date | undefined, onlyDate: boolean = false): string | undefined {
+export function formatDate(
+  date: Date | undefined,
+  onlyDate: boolean = false
+): string | undefined {
   if (onlyDate) {
     return date
       ? date
           .toLocaleString('pt-BR', {
             day: '2-digit',
             month: '2-digit',
-            year: 'numeric'
+            year: 'numeric',
           })
           .replace(',', '/')
-      : undefined
+      : undefined;
   } else {
     return date
       ? date
@@ -18,9 +21,9 @@ export function formatDate(date: Date | undefined, onlyDate: boolean = false): s
             year: 'numeric',
             hour: '2-digit',
             minute: '2-digit',
-            hour12: false
+            hour12: false,
           })
           .replace(',', ' às')
-      : undefined
+      : undefined;
   }
 }

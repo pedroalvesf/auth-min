@@ -1,20 +1,20 @@
-import { InMemoryUsersRepository } from "@/test/repositories/in-memory-users-repository";
-import { InMemoryRefreshTokenRepository } from "@/test/repositories/in-memory-refresh-token-repository";
-import { FakeEncrypter } from "@/test/cryptography/fake-encrypter";
-import { makeUser } from "@/test/factories/make-user";
-import { makeRefreshToken } from "@/test/factories/make-refresh-token";
-import { RefreshAccessTokenUseCase } from "../refresh-access-token";
-import { RefreshTokenNotFoundError } from "../errors/refresh-token-not-found-error";
-import { RefreshTokenExpiredError } from "../errors/refresh-token-expired-error";
-import { UserNotFoundError } from "../errors/user-not-found-error";
-import { UniqueEntityID } from "@/core/entities/unique-entity-id";
+import { InMemoryUsersRepository } from '@/test/repositories/in-memory-users-repository';
+import { InMemoryRefreshTokenRepository } from '@/test/repositories/in-memory-refresh-token-repository';
+import { FakeEncrypter } from '@/test/cryptography/fake-encrypter';
+import { makeUser } from '@/test/factories/make-user';
+import { makeRefreshToken } from '@/test/factories/make-refresh-token';
+import { RefreshAccessTokenUseCase } from '../refresh-access-token';
+import { RefreshTokenNotFoundError } from '../errors/refresh-token-not-found-error';
+import { RefreshTokenExpiredError } from '../errors/refresh-token-expired-error';
+import { UserNotFoundError } from '../errors/user-not-found-error';
+import { UniqueEntityID } from '@/core/entities/unique-entity-id';
 
 let usersRepository: InMemoryUsersRepository;
 let refreshTokenRepository: InMemoryRefreshTokenRepository;
 let encrypter: FakeEncrypter;
 let sut: RefreshAccessTokenUseCase;
 
-describe("Refresh Access Token", () => {
+describe('Refresh Access Token', () => {
   beforeEach(() => {
     usersRepository = new InMemoryUsersRepository();
     refreshTokenRepository = new InMemoryRefreshTokenRepository();
@@ -26,11 +26,11 @@ describe("Refresh Access Token", () => {
     );
   });
 
-  it("should be able to refresh access token with valid refresh token", async () => {
+  it('should be able to refresh access token with valid refresh token', async () => {
     const user = makeUser();
     const refreshToken = makeRefreshToken({
       userId: user.id,
-      deviceId: new UniqueEntityID("device-1"),
+      deviceId: new UniqueEntityID('device-1'),
     });
 
     await usersRepository.create(user);
@@ -48,21 +48,21 @@ describe("Refresh Access Token", () => {
       });
       // FakeEncrypter returns JSON.stringify of the payload
       const payload = JSON.parse(result.value.accessToken);
-      expect(payload).toHaveProperty("sub", user.id.toString());
-      expect(payload).toHaveProperty("deviceId", "device-1");
+      expect(payload).toHaveProperty('sub', user.id.toString());
+      expect(payload).toHaveProperty('deviceId', 'device-1');
     }
   });
 
-  it("should not be able to refresh access token with non-existent refresh token", async () => {
+  it('should not be able to refresh access token with non-existent refresh token', async () => {
     const result = await sut.execute({
-      refreshToken: "non-existent-token",
+      refreshToken: 'non-existent-token',
     });
 
     expect(result.isLeft()).toBe(true);
     expect(result.value).toBeInstanceOf(RefreshTokenNotFoundError);
   });
 
-  it("should not be able to refresh access token with expired refresh token", async () => {
+  it('should not be able to refresh access token with expired refresh token', async () => {
     const user = makeUser();
     const expiredRefreshToken = makeRefreshToken({
       userId: user.id,
@@ -80,7 +80,7 @@ describe("Refresh Access Token", () => {
     expect(result.value).toBeInstanceOf(RefreshTokenExpiredError);
   });
 
-  it("should not be able to refresh access token with revoked refresh token", async () => {
+  it('should not be able to refresh access token with revoked refresh token', async () => {
     const user = makeUser();
     const refreshToken = makeRefreshToken({
       userId: user.id,
@@ -99,9 +99,9 @@ describe("Refresh Access Token", () => {
     expect(result.value).toBeInstanceOf(RefreshTokenExpiredError);
   });
 
-  it("should not be able to refresh access token when user does not exist", async () => {
+  it('should not be able to refresh access token when user does not exist', async () => {
     const refreshToken = makeRefreshToken({
-      userId: new UniqueEntityID("non-existent-user"),
+      userId: new UniqueEntityID('non-existent-user'),
     });
 
     await refreshTokenRepository.create(refreshToken);

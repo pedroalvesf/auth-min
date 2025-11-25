@@ -1,5 +1,5 @@
-import { Entity } from "@/core/entities/entity";
-import { UniqueEntityID } from "@/core/entities/unique-entity-id";
+import { Entity } from '@/core/entities/entity';
+import { UniqueEntityID } from '@/core/entities/unique-entity-id';
 
 export interface LoginHistoryProps {
   userId: UniqueEntityID;
@@ -31,7 +31,7 @@ export class LoginHistory extends Entity<LoginHistoryProps> {
   }
 
   static create(
-    props: Omit<LoginHistoryProps, "createdAt">,
+    props: Omit<LoginHistoryProps, 'createdAt'>,
     id?: UniqueEntityID
   ) {
     return new LoginHistory(

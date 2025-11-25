@@ -3,10 +3,13 @@ import { PrismaService } from '../../src/infra/database/prisma/prisma.service';
 export class DatabaseHelper {
   constructor(private prisma: PrismaService) {}
 
-  async createUserWithRole(userData: { email: string, password: string, name: string }, roleSlug: 'admin' | 'manager' | 'user' = 'user') {
+  async createUserWithRole(
+    userData: { email: string; password: string; name: string },
+    roleSlug: 'admin' | 'manager' | 'user' = 'user'
+  ) {
     // Create user first
     const user = await this.prisma.user.create({
-      data: userData
+      data: userData,
     });
 
     // Assign role to user
@@ -15,8 +18,8 @@ export class DatabaseHelper {
         userId: user.id,
         roleId: `role-${roleSlug}`,
         assignedAt: new Date(),
-        assignedBy: 'system' // For test purposes
-      }
+        assignedBy: 'system', // For test purposes
+      },
     });
 
     return user;
@@ -43,23 +46,23 @@ export class DatabaseHelper {
           name: 'Admin',
           slug: 'admin',
           level: 0,
-          assignableRoles: ['manager', 'user']
+          assignableRoles: ['manager', 'user'],
         },
         {
-          id: 'role-manager', 
+          id: 'role-manager',
           name: 'Manager',
           slug: 'manager',
           level: 1,
-          assignableRoles: ['user']
+          assignableRoles: ['user'],
         },
         {
           id: 'role-user',
           name: 'User',
           slug: 'user',
           level: 2,
-          assignableRoles: []
-        }
-      ]
+          assignableRoles: [],
+        },
+      ],
     });
 
     // Create basic permissions
@@ -70,30 +73,30 @@ export class DatabaseHelper {
           name: 'Read Users',
           slug: 'users.read',
           resource: 'users',
-          action: 'read'
+          action: 'read',
         },
         {
           id: 'perm-users-create',
-          name: 'Create Users', 
+          name: 'Create Users',
           slug: 'users.create',
           resource: 'users',
-          action: 'create'
+          action: 'create',
         },
         {
           id: 'perm-roles-read',
           name: 'Read Roles',
           slug: 'roles.read',
           resource: 'roles',
-          action: 'read'
+          action: 'read',
         },
         {
           id: 'perm-roles-create',
           name: 'Create Roles',
-          slug: 'roles.create', 
+          slug: 'roles.create',
           resource: 'roles',
-          action: 'create'
-        }
-      ]
+          action: 'create',
+        },
+      ],
     });
 
     // Assign permissions to roles
@@ -103,31 +106,31 @@ export class DatabaseHelper {
         {
           id: 'rp-admin-users-read',
           roleId: 'role-admin',
-          permissionId: 'perm-users-read'
+          permissionId: 'perm-users-read',
         },
         {
           id: 'rp-admin-users-create',
           roleId: 'role-admin',
-          permissionId: 'perm-users-create'
+          permissionId: 'perm-users-create',
         },
         {
           id: 'rp-admin-roles-read',
           roleId: 'role-admin',
-          permissionId: 'perm-roles-read'
+          permissionId: 'perm-roles-read',
         },
         {
           id: 'rp-admin-roles-create',
           roleId: 'role-admin',
-          permissionId: 'perm-roles-create'
+          permissionId: 'perm-roles-create',
         },
         // Manager gets limited permissions
         {
           id: 'rp-manager-users-read',
           roleId: 'role-manager',
-          permissionId: 'perm-users-read'
+          permissionId: 'perm-users-read',
         },
         // User gets minimal permissions (none for now)
-      ]
+      ],
     });
   }
 }

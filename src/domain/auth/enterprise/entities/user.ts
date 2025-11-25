@@ -1,8 +1,8 @@
-import { Entity } from "@/core/entities/entity";
-import { UniqueEntityID } from "@/core/entities/unique-entity-id";
-import { Optional } from "@/core/types/optional";
-import { RoleList } from "./role-list";
-import { Role } from "./role";
+import { Entity } from '@/core/entities/entity';
+import { UniqueEntityID } from '@/core/entities/unique-entity-id';
+import { Optional } from '@/core/types/optional';
+import { RoleList } from './role-list';
+import { Role } from './role';
 
 export interface UserProps {
   email: string;
@@ -84,7 +84,7 @@ export class User extends Entity<UserProps> {
   }
 
   hasRole(roleSlug: string): boolean {
-    return this.props.roles.getItems().some(role => role.slug === roleSlug);
+    return this.props.roles.getItems().some((role) => role.slug === roleSlug);
   }
 
   /**
@@ -104,7 +104,9 @@ export class User extends Entity<UserProps> {
    */
   hasAnyPermission(permissionSlugs: string[]): boolean {
     const allPermissions = this.getAllPermissions();
-    return permissionSlugs.some(permission => allPermissions.includes(permission));
+    return permissionSlugs.some((permission) =>
+      allPermissions.includes(permission)
+    );
   }
 
   /**
@@ -113,7 +115,9 @@ export class User extends Entity<UserProps> {
    */
   getAllPermissions(): string[] {
     return this.props.roles.getItems().reduce((acc: string[], role) => {
-      const rolePermissions = role.permissions.getItems().map(permission => permission.slug);
+      const rolePermissions = role.permissions
+        .getItems()
+        .map((permission) => permission.slug);
       return [...acc, ...rolePermissions];
     }, []);
   }
@@ -123,7 +127,7 @@ export class User extends Entity<UserProps> {
    * @returns Array com slugs de todas as roles
    */
   getAllRoles(): string[] {
-    return this.props.roles.getItems().map(role => role.slug);
+    return this.props.roles.getItems().map((role) => role.slug);
   }
 
   private touch() {
@@ -131,7 +135,10 @@ export class User extends Entity<UserProps> {
   }
 
   static create(
-    props: Optional<UserProps, "createdAt" | "updatedAt" | "roles" | "isActive">,
+    props: Optional<
+      UserProps,
+      'createdAt' | 'updatedAt' | 'roles' | 'isActive'
+    >,
     id?: UniqueEntityID
   ) {
     return new User(

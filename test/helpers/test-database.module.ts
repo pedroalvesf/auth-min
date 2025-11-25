@@ -87,28 +87,28 @@ class TestPrismaService {
   providers: [
     {
       provide: PrismaService,
-      useClass: TestPrismaService
+      useClass: TestPrismaService,
     },
     {
       provide: UsersRepository,
-      useClass: PrismaUsersRepository
+      useClass: PrismaUsersRepository,
     },
     {
       provide: DevicesRepository,
-      useClass: PrismaDevicesRepository
+      useClass: PrismaDevicesRepository,
     },
     {
       provide: RefreshTokenRepository,
-      useClass: PrismaRefreshTokenRepository
+      useClass: PrismaRefreshTokenRepository,
     },
     {
       provide: RolesRepository,
-      useClass: PrismaRolesRepository
+      useClass: PrismaRolesRepository,
     },
     {
       provide: PermissionsRepository,
-      useClass: PrismaPermissionsRepository
-    }
+      useClass: PrismaPermissionsRepository,
+    },
   ],
   exports: [
     PrismaService,
@@ -116,7 +116,7 @@ class TestPrismaService {
     DevicesRepository,
     RefreshTokenRepository,
     RolesRepository,
-    PermissionsRepository
-  ]
+    PermissionsRepository,
+  ],
 })
 export class TestDatabaseModule {}

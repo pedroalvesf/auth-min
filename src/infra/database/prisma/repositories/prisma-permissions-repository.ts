@@ -1,8 +1,8 @@
-import { Injectable } from "@nestjs/common";
-import { PrismaService } from "../prisma.service";
-import { PermissionsRepository } from "@/domain/auth/application/repositories/permissions-repository";
-import { Permission } from "@/domain/auth/enterprise/entities/permission";
-import { PrismaPermissionMapper } from "../mappers/prisma-permission-mapper";
+import { Injectable } from '@nestjs/common';
+import { PrismaService } from '../prisma.service';
+import { PermissionsRepository } from '@/domain/auth/application/repositories/permissions-repository';
+import { Permission } from '@/domain/auth/enterprise/entities/permission';
+import { PrismaPermissionMapper } from '../mappers/prisma-permission-mapper';
 
 @Injectable()
 export class PrismaPermissionsRepository implements PermissionsRepository {
@@ -55,7 +55,7 @@ export class PrismaPermissionsRepository implements PermissionsRepository {
 
   async findMany(): Promise<Permission[]> {
     const permissions = await this.prisma.permission.findMany({
-      orderBy: [{ resource: "asc" }, { action: "asc" }],
+      orderBy: [{ resource: 'asc' }, { action: 'asc' }],
     });
 
     return permissions.map(PrismaPermissionMapper.toDomain);

@@ -1,6 +1,9 @@
-import { Injectable } from '@nestjs/common'
-import { JwtService } from '@nestjs/jwt'
-import { TokenValidator, TokenPayload } from '@/domain/auth/application/cryptography/token-validator'
+import { Injectable } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
+import {
+  TokenValidator,
+  TokenPayload,
+} from '@/domain/auth/application/cryptography/token-validator';
 
 @Injectable()
 export class JwtTokenValidator implements TokenValidator {
@@ -8,16 +11,16 @@ export class JwtTokenValidator implements TokenValidator {
 
   async validate(token: string): Promise<TokenPayload | null> {
     try {
-      const decoded = await this.jwtService.verifyAsync(token)
-      
+      const decoded = await this.jwtService.verifyAsync(token);
+
       return {
         sub: decoded.sub,
         email: decoded.email,
         type: decoded.type,
-        deviceId: decoded.deviceId
-      }
+        deviceId: decoded.deviceId,
+      };
     } catch (error) {
-      return null
+      return null;
     }
   }
 }

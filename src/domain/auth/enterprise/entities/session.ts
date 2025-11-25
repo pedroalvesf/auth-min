@@ -1,5 +1,5 @@
-import { Entity } from "@/core/entities/entity";
-import { UniqueEntityID } from "@/core/entities/unique-entity-id";
+import { Entity } from '@/core/entities/entity';
+import { UniqueEntityID } from '@/core/entities/unique-entity-id';
 
 export interface SessionProps {
   userId: UniqueEntityID;
@@ -29,7 +29,7 @@ export class Session extends Entity<SessionProps> {
     return new Date() > this.props.expiresAt;
   }
 
-  static create(props: Omit<SessionProps, "createdAt">, id?: UniqueEntityID) {
+  static create(props: Omit<SessionProps, 'createdAt'>, id?: UniqueEntityID) {
     return new Session(
       {
         ...props,

@@ -1,4 +1,4 @@
-import { HashComparer } from "@/domain/auth/application/cryptography/hash-comparer";
+import { HashComparer } from '@/domain/auth/application/cryptography/hash-comparer';
 
 export class FakeHashComparer implements HashComparer {
   async compare(plain: string, hash: string): Promise<boolean> {

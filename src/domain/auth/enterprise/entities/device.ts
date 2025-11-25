@@ -1,6 +1,6 @@
-import { Entity } from "@/core/entities/entity";
-import { UniqueEntityID } from "@/core/entities/unique-entity-id";
-import { Optional } from "@/core/types/optional";
+import { Entity } from '@/core/entities/entity';
+import { UniqueEntityID } from '@/core/entities/unique-entity-id';
+import { Optional } from '@/core/types/optional';
 
 export interface DeviceProps {
   userId: UniqueEntityID;
@@ -81,13 +81,13 @@ export class Device extends Entity<DeviceProps> {
   }
 
   static create(
-    props: Optional<DeviceProps, "createdAt" | "lastLogin">,
+    props: Optional<DeviceProps, 'createdAt' | 'lastLogin'>,
     id?: UniqueEntityID
   ) {
     const device = new Device(
       {
         ...props,
-        location: props.location ?? "unknown",
+        location: props.location ?? 'unknown',
         createdAt: props.createdAt ?? new Date(),
         lastLogin: props.lastLogin ?? new Date(),
       },

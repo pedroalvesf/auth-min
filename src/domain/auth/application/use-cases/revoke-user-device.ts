@@ -1,9 +1,9 @@
-import { Injectable } from "@nestjs/common";
-import { Either, left, right } from "@/core/either";
-import { DevicesRepository } from "../repositories/devices-repository";
-import { RefreshTokenRepository } from "../repositories/refresh-token-repository";
-import { DeviceNotFoundError } from "./errors/device-not-found-error";
-import { UnauthorizedDeviceAccessError } from "./errors/unauthorized-device-access-error";
+import { Injectable } from '@nestjs/common';
+import { Either, left, right } from '@/core/either';
+import { DevicesRepository } from '../repositories/devices-repository';
+import { RefreshTokenRepository } from '../repositories/refresh-token-repository';
+import { DeviceNotFoundError } from './errors/device-not-found-error';
+import { UnauthorizedDeviceAccessError } from './errors/unauthorized-device-access-error';
 
 interface RevokeUserDeviceUseCaseRequest {
   userId: string;

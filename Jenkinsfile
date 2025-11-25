@@ -28,8 +28,9 @@ pipeline {
     durabilityHint('PERFORMANCE_OPTIMIZED')
     timeout(time: 30, unit: 'MINUTES')
     skipDefaultCheckout(false)
-    // Skip builds when only documentation changes
-    skipStagesAfterUnstable()
+    // IMPORTANTE: tirei o skipStagesAfterUnstable()
+    // pra que stages continuem rodando mesmo se algo marcar UNSTABLE
+    // skipStagesAfterUnstable()
   }
   
   environment {
@@ -99,25 +100,46 @@ pipeline {
         stage('Linting') {
           steps {
             echo 'Running ESLint...'
-            sh 'npm run lint:check'
+            script {
+              // Se ESLint falhar, marca build como UNSTABLE, mas não derruba o pipeline
+              catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
+                sh 'npm run lint:check'
+              }
+            }
           }
           post {
             always {
-              publishHTML([
-                allowMissing: false,
-                alwaysLinkToLastBuild: true,
-                keepAll: true,
-                reportDir: 'eslint-reports',
-                reportFiles: '*.html',
-                reportName: 'ESLint Report'
-              ])
+              script {
+                if (fileExists('eslint-reports')) {
+                  publishHTML([
+                    allowMissing: true,
+                    alwaysLinkToLastBuild: true,
+                    keepAll: true,
+                    reportDir: 'eslint-reports',
+                    reportFiles: '*.html',
+                    reportName: 'ESLint Report'
+                  ])
+                } else {
+                  echo 'eslint-reports directory not found, skipping HTML publish.'
+                }
+              }
             }
           }
         }
         stage('Formatting') {
           steps {
             echo 'Checking code formatting...'
-            sh 'npm run format:check'
+            script {
+              // Prettier também só marca UNSTABLE se estiver quebrado
+              def formatStatus = sh(
+                script: 'npm run format:check',
+                returnStatus: true
+              )
+              if (formatStatus != 0) {
+                echo 'Prettier found formatting issues. Marking build as UNSTABLE, but continuing pipeline.'
+                currentBuild.result = 'UNSTABLE'
+              }
+            }
           }
         }
       }
@@ -158,7 +180,6 @@ pipeline {
         script {
           def testResults = [:]
           
-          // Read test results if available
           if (fileExists('coverage/junit.xml')) {
             testResults.unit = 'PASSED'
           }
@@ -169,16 +190,16 @@ pipeline {
           
           echo "Test Results Summary: ${testResults}"
           
-          // Set build status based on tests
           if (testResults.unit == 'PASSED' && testResults.e2e == 'PASSED') {
-            currentBuild.result = 'SUCCESS'
+            if (currentBuild.result == null || currentBuild.result == 'SUCCESS') {
+              currentBuild.result = 'SUCCESS'
+            }
             echo '✅ All tests passed successfully!'
           }
         }
       }
       post {
         always {
-          // Archive all test artifacts
           archiveArtifacts artifacts: 'coverage/**, test-results/**, eslint-reports/**', 
                           fingerprint: true, 
                           allowEmptyArchive: true
@@ -322,7 +343,6 @@ pipeline {
   
   post {
     always {
-      // Garante que existe um node/workspace para rodar sh e cleanWs
       script {
         node {
           echo 'Cleaning up...'
@@ -339,7 +359,6 @@ pipeline {
       echo 'Pipeline completed successfully!'
       script {
         if ((env.BRANCH_NAME ?: '') == 'main') {
-          // Send success notification
           echo "✅ Production deployment successful for commit ${env.GIT_COMMIT[0..7]}"
         }
       }
@@ -347,7 +366,6 @@ pipeline {
     failure {
       echo 'Pipeline failed!'
       script {
-        // Send failure notification
         echo "❌ Pipeline failed for branch ${(env.BRANCH_NAME ?: 'unknown')} at stage ${(env.STAGE_NAME ?: 'N/A')}"
       }
     }

@@ -1,6 +1,6 @@
-import { Optional } from "@/core/types/optional";
-import { Entity } from "@/core/entities/entity";
-import { UniqueEntityID } from "@/core/entities/unique-entity-id";
+import { Optional } from '@/core/types/optional';
+import { Entity } from '@/core/entities/entity';
+import { UniqueEntityID } from '@/core/entities/unique-entity-id';
 
 export interface RefreshTokenProps {
   userId: UniqueEntityID;
@@ -54,7 +54,7 @@ export class RefreshToken extends Entity<RefreshTokenProps> {
   }
 
   static create(
-    props: Optional<RefreshTokenProps, "createdAt">,
+    props: Optional<RefreshTokenProps, 'createdAt'>,
     id?: UniqueEntityID
   ) {
     const refreshToken = new RefreshToken(

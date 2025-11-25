@@ -25,12 +25,12 @@ export class TestAppHelper {
         AppModule,
       ],
     })
-    .overrideModule(DatabaseModule)
-    .useModule(TestDatabaseModule)
-    .compile();
+      .overrideModule(DatabaseModule)
+      .useModule(TestDatabaseModule)
+      .compile();
 
     this.app = moduleFixture.createNestApplication();
-    
+
     // Configure validation pipe like in production
     this.app.useGlobalPipes(
       new ValidationPipe({

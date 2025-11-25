@@ -1,5 +1,5 @@
-import { WatchedList } from "@/core/entities/watched-list";
-import { Role } from "./role";
+import { WatchedList } from '@/core/entities/watched-list';
+import { Role } from './role';
 
 export class RoleList extends WatchedList<Role> {
   compareItems(a: Role, b: Role): boolean {

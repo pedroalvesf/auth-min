@@ -1,8 +1,8 @@
-import { Module } from '@nestjs/common'
-import { WinstonModule } from 'nest-winston'
-import * as winston from 'winston'
-import { EnvModule } from '../env/env.module'
-import { EnvService } from '../env/env.service'
+import { Module } from '@nestjs/common';
+import { WinstonModule } from 'nest-winston';
+import * as winston from 'winston';
+import { EnvModule } from '../env/env.module';
+import { EnvService } from '../env/env.service';
 
 @Module({
   imports: [
@@ -11,10 +11,10 @@ import { EnvService } from '../env/env.service'
       imports: [EnvModule],
       inject: [EnvService],
       useFactory: (envService: EnvService) => {
-        const isDevelopment = process.env.NODE_ENV === 'development'
-        const isTest = process.env.NODE_ENV === 'test'
+        const isDevelopment = process.env.NODE_ENV === 'development';
+        const isTest = process.env.NODE_ENV === 'test';
 
-        const transports = []
+        const transports = [];
 
         // Console transport for development
         if (isDevelopment || isTest) {
@@ -23,14 +23,18 @@ import { EnvService } from '../env/env.service'
               format: winston.format.combine(
                 winston.format.timestamp(),
                 winston.format.colorize(),
-                winston.format.printf(({ timestamp, level, message, context, ...meta }) => {
-                  return `${timestamp} [${context || 'Application'}] ${level}: ${message} ${
-                    Object.keys(meta).length ? JSON.stringify(meta) : ''
-                  }`
-                })
-              )
+                winston.format.printf(
+                  ({ timestamp, level, message, context, ...meta }) => {
+                    return `${timestamp} [${
+                      context || 'Application'
+                    }] ${level}: ${message} ${
+                      Object.keys(meta).length ? JSON.stringify(meta) : ''
+                    }`;
+                  }
+                )
+              ),
             })
-          )
+          );
         }
 
         // File transport for production
@@ -42,16 +46,16 @@ import { EnvService } from '../env/env.service'
               format: winston.format.combine(
                 winston.format.timestamp(),
                 winston.format.json()
-              )
+              ),
             }),
             new winston.transports.File({
               filename: 'logs/combined.log',
               format: winston.format.combine(
                 winston.format.timestamp(),
                 winston.format.json()
-              )
+              ),
             })
-          )
+          );
         }
 
         return {
@@ -61,12 +65,12 @@ import { EnvService } from '../env/env.service'
             winston.format.errors({ stack: true }),
             winston.format.json()
           ),
-          defaultMeta: { 
+          defaultMeta: {
             service: 'auth-min',
-            environment: process.env.NODE_ENV || 'development'
+            environment: process.env.NODE_ENV || 'development',
           },
           transports,
-        }
+        };
       },
     }),
   ],

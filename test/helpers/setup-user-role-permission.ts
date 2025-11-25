@@ -1,6 +1,6 @@
-import { InMemoryUsersRepository } from "@/test/repositories/in-memory-users-repository";
-import { User } from "@/domain/auth/enterprise/entities/user";
-import { Role } from "@/domain/auth/enterprise/entities/role";
+import { InMemoryUsersRepository } from '@/test/repositories/in-memory-users-repository';
+import { User } from '@/domain/auth/enterprise/entities/user';
+import { Role } from '@/domain/auth/enterprise/entities/role';
 
 /**
  * Helper function to add a domain role to the in-memory user repository

@@ -1,31 +1,36 @@
-import 'reflect-metadata'
-import 'dotenv/config'
-import { NestFactory } from '@nestjs/core'
-import { ValidationPipe } from '@nestjs/common'
-import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger'
-import { AppModule } from './app.module'
+import 'reflect-metadata';
+import 'dotenv/config';
+import { NestFactory } from '@nestjs/core';
+import { ValidationPipe } from '@nestjs/common';
+import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import { AppModule } from './app.module';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule)
-  
+  const app = await NestFactory.create(AppModule);
+
   // Enable global validation
-  app.useGlobalPipes(new ValidationPipe({
-    transform: true,
-    whitelist: true,
-    forbidNonWhitelisted: true,
-  }))
-  
+  app.useGlobalPipes(
+    new ValidationPipe({
+      transform: true,
+      whitelist: true,
+      forbidNonWhitelisted: true,
+    })
+  );
+
   // Enable CORS
   app.enableCors({
     origin: '*',
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
-    allowedHeaders: 'Content-Type, Authorization, x-ipaddress, x-operatingsystem, x-browser, x-type',
-  })
+    allowedHeaders:
+      'Content-Type, Authorization, x-ipaddress, x-operatingsystem, x-browser, x-type',
+  });
 
   // Swagger Documentation Setup
   const config = new DocumentBuilder()
     .setTitle('Auth Module API')
-    .setDescription('Comprehensive authentication and authorization module with role-based access control, device management, and audit logging')
+    .setDescription(
+      'Comprehensive authentication and authorization module with role-based access control, device management, and audit logging'
+    )
     .setVersion('1.0')
     .addTag('Authentication', 'User authentication and device management')
     .addTag('Authorization', 'Role and permission management')
@@ -40,7 +45,7 @@ async function bootstrap() {
         description: 'Enter JWT token',
         in: 'header',
       },
-      'JWT-auth',
+      'JWT-auth'
     )
     .addApiKey(
       {
@@ -49,7 +54,7 @@ async function bootstrap() {
         in: 'header',
         description: 'Client IP address for device tracking',
       },
-      'x-ipaddress',
+      'x-ipaddress'
     )
     .addApiKey(
       {
@@ -58,7 +63,7 @@ async function bootstrap() {
         in: 'header',
         description: 'Operating system information',
       },
-      'x-operatingsystem',
+      'x-operatingsystem'
     )
     .addApiKey(
       {
@@ -67,7 +72,7 @@ async function bootstrap() {
         in: 'header',
         description: 'Browser information',
       },
-      'x-browser',
+      'x-browser'
     )
     .addApiKey(
       {
@@ -76,29 +81,33 @@ async function bootstrap() {
         in: 'header',
         description: 'Device type (desktop, mobile, tablet)',
       },
-      'x-type',
+      'x-type'
     )
     .setContact('Auth Module Team', '', 'auth@company.com')
     .setLicense('MIT', 'https://opensource.org/licenses/MIT')
-    .build()
+    .build();
 
-  const document = SwaggerModule.createDocument(app, config)
+  const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document, {
     swaggerOptions: {
       persistAuthorization: true,
       tagsSorter: 'alpha',
       operationsSorter: 'alpha',
     },
-  })
+  });
 
-  const port = parseInt(process.env.PORT || '3000')
-  
-  await app.listen(port)
-  
-  console.log(`🚀 Auth service running on port ${port}`)
-  console.log(`📚 API Documentation available at http://localhost:${port}/api`)
-  console.log(`📦 NestJS DI configurado`)
-  console.log(`💾 Memory usage: ${Math.round(process.memoryUsage().heapUsed / 1024 / 1024)}MB`)
+  const port = parseInt(process.env.PORT || '3000');
+
+  await app.listen(port);
+
+  console.log(`🚀 Auth service running on port ${port}`);
+  console.log(`📚 API Documentation available at http://localhost:${port}/api`);
+  console.log(`📦 NestJS DI configurado`);
+  console.log(
+    `💾 Memory usage: ${Math.round(
+      process.memoryUsage().heapUsed / 1024 / 1024
+    )}MB`
+  );
 }
 
-bootstrap().catch(console.error)
+bootstrap().catch(console.error);

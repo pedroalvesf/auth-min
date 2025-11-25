@@ -1,4 +1,4 @@
-import { Role } from "../../enterprise/entities/role";
+import { Role } from '../../enterprise/entities/role';
 
 export abstract class RolesRepository {
   abstract create(role: Role): Promise<void>;

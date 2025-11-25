@@ -1,6 +1,6 @@
-import { RefreshToken as PrismaRefreshToken, Prisma } from "@prisma/client";
-import { RefreshToken } from "@/domain/auth/enterprise/entities/refresh-token";
-import { UniqueEntityID } from "@/core/entities/unique-entity-id";
+import { RefreshToken as PrismaRefreshToken, Prisma } from '@prisma/client';
+import { RefreshToken } from '@/domain/auth/enterprise/entities/refresh-token';
+import { UniqueEntityID } from '@/core/entities/unique-entity-id';
 
 export class PrismaRefreshTokenMapper {
   static toDomain(raw: PrismaRefreshToken): RefreshToken {

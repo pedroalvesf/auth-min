@@ -1,25 +1,25 @@
-import { InMemoryUsersRepository } from "../../../../../../test/repositories/in-memory-users-repository";
-import { InMemoryRolesRepository } from "../../../../../../test/repositories/in-memory-roles-repository";
-import { makeUser } from "../../../../../../test/factories/make-user";
-import { makeRole } from "../../../../../../test/factories/make-role";
-import { RemoveRoleFromUserUseCase } from "../remove-role-from-user";
-import { UserNotFoundError } from "../errors/user-not-found-error";
-import { RoleNotFoundError } from "../errors/role-not-found-error";
+import { InMemoryUsersRepository } from '../../../../../../test/repositories/in-memory-users-repository';
+import { InMemoryRolesRepository } from '../../../../../../test/repositories/in-memory-roles-repository';
+import { makeUser } from '../../../../../../test/factories/make-user';
+import { makeRole } from '../../../../../../test/factories/make-role';
+import { RemoveRoleFromUserUseCase } from '../remove-role-from-user';
+import { UserNotFoundError } from '../errors/user-not-found-error';
+import { RoleNotFoundError } from '../errors/role-not-found-error';
 
 let usersRepository: InMemoryUsersRepository;
 let rolesRepository: InMemoryRolesRepository;
 let sut: RemoveRoleFromUserUseCase;
 
-describe("Remove Role From User", () => {
+describe('Remove Role From User', () => {
   beforeEach(() => {
     usersRepository = new InMemoryUsersRepository();
     rolesRepository = new InMemoryRolesRepository();
     sut = new RemoveRoleFromUserUseCase(usersRepository, rolesRepository);
   });
 
-  it("should be able to remove role from user", async () => {
+  it('should be able to remove role from user', async () => {
     const user = makeUser();
-    const userRole = makeRole({ slug: "user", level: 0 });
+    const userRole = makeRole({ slug: 'user', level: 0 });
 
     await usersRepository.create(user);
     await rolesRepository.create(userRole);
@@ -37,7 +37,7 @@ describe("Remove Role From User", () => {
 
     expect(result.isRight()).toBe(true);
     if (result.isRight()) {
-      expect(result.value.message).toBe("Role removed from user successfully");
+      expect(result.value.message).toBe('Role removed from user successfully');
     }
 
     // Verify role was removed
@@ -47,13 +47,13 @@ describe("Remove Role From User", () => {
     expect(userRoles).toHaveLength(0);
   });
 
-  it("should not be able to remove role from non-existent user", async () => {
-    const userRole = makeRole({ slug: "user", level: 0 });
+  it('should not be able to remove role from non-existent user', async () => {
+    const userRole = makeRole({ slug: 'user', level: 0 });
 
     await rolesRepository.create(userRole);
 
     const result = await sut.execute({
-      userId: "non-existent-user-id",
+      userId: 'non-existent-user-id',
       roleId: userRole.id.toString(),
     });
 
@@ -61,23 +61,23 @@ describe("Remove Role From User", () => {
     expect(result.value).toBeInstanceOf(UserNotFoundError);
   });
 
-  it("should not be able to remove non-existent role", async () => {
+  it('should not be able to remove non-existent role', async () => {
     const user = makeUser();
 
     await usersRepository.create(user);
 
     const result = await sut.execute({
       userId: user.id.toString(),
-      roleId: "non-existent-role-id",
+      roleId: 'non-existent-role-id',
     });
 
     expect(result.isLeft()).toBe(true);
     expect(result.value).toBeInstanceOf(RoleNotFoundError);
   });
 
-  it("should remove role association even if user has no roles", async () => {
+  it('should remove role association even if user has no roles', async () => {
     const user = makeUser();
-    const userRole = makeRole({ slug: "user", level: 0 });
+    const userRole = makeRole({ slug: 'user', level: 0 });
 
     await usersRepository.create(user);
     await rolesRepository.create(userRole);
@@ -90,7 +90,7 @@ describe("Remove Role From User", () => {
 
     expect(result.isRight()).toBe(true);
     if (result.isRight()) {
-      expect(result.value.message).toBe("Role removed from user successfully");
+      expect(result.value.message).toBe('Role removed from user successfully');
     }
   });
 });

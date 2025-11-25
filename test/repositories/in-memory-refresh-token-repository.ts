@@ -1,5 +1,5 @@
-import { RefreshTokenRepository } from "@/domain/auth/application/repositories/refresh-token-repository";
-import { RefreshToken } from "@/domain/auth/enterprise/entities/refresh-token";
+import { RefreshTokenRepository } from '@/domain/auth/application/repositories/refresh-token-repository';
+import { RefreshToken } from '@/domain/auth/enterprise/entities/refresh-token';
 
 export class InMemoryRefreshTokenRepository implements RefreshTokenRepository {
   public items: RefreshToken[] = [];
@@ -27,7 +27,9 @@ export class InMemoryRefreshTokenRepository implements RefreshTokenRepository {
   }
 
   async save(refreshToken: RefreshToken): Promise<void> {
-    const itemIndex = this.items.findIndex((item) => item.id === refreshToken.id);
+    const itemIndex = this.items.findIndex(
+      (item) => item.id === refreshToken.id
+    );
 
     if (itemIndex >= 0) {
       this.items[itemIndex] = refreshToken;
@@ -47,6 +49,8 @@ export class InMemoryRefreshTokenRepository implements RefreshTokenRepository {
   }
 
   async deleteByDeviceId(deviceId: string): Promise<void> {
-    this.items = this.items.filter((item) => item.deviceId.toString() !== deviceId);
+    this.items = this.items.filter(
+      (item) => item.deviceId.toString() !== deviceId
+    );
   }
 }

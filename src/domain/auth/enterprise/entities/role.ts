@@ -1,8 +1,8 @@
-import { Entity } from "@/core/entities/entity";
-import { UniqueEntityID } from "@/core/entities/unique-entity-id";
-import { Optional } from "@/core/types/optional";
-import { PermissionList } from "./permission-list";
-import { Permission } from "./permission";
+import { Entity } from '@/core/entities/entity';
+import { UniqueEntityID } from '@/core/entities/unique-entity-id';
+import { Optional } from '@/core/types/optional';
+import { PermissionList } from './permission-list';
+import { Permission } from './permission';
 
 export interface RoleProps {
   name: string;
@@ -85,7 +85,7 @@ export class Role extends Entity<RoleProps> {
   static create(
     props: Optional<
       RoleProps,
-      "createdAt" | "updatedAt" | "level" | "assignableRoles" | "permissions"
+      'createdAt' | 'updatedAt' | 'level' | 'assignableRoles' | 'permissions'
     >,
     id?: UniqueEntityID
   ) {

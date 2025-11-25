@@ -1,7 +1,7 @@
-import { Injectable } from "@nestjs/common";
-import { Either, right } from "@/core/either";
-import { Role } from "../../enterprise/entities/role";
-import { RolesRepository } from "../repositories/roles-repository";
+import { Injectable } from '@nestjs/common';
+import { Either, right } from '@/core/either';
+import { Role } from '../../enterprise/entities/role';
+import { RolesRepository } from '../repositories/roles-repository';
 
 type ListRolesUseCaseResponse = Either<
   never,
@@ -20,4 +20,3 @@ export class ListRolesUseCase {
     return right({ roles });
   }
 }
-

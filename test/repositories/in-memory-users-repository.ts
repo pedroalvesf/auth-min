@@ -1,10 +1,11 @@
-import { UsersRepository } from "@/domain/auth/application/repositories/users-repository";
-import { User } from "@/domain/auth/enterprise/entities/user";
-import { Role } from "@prisma/client";
+import { UsersRepository } from '@/domain/auth/application/repositories/users-repository';
+import { User } from '@/domain/auth/enterprise/entities/user';
+import { Role } from '@prisma/client';
 
 export class InMemoryUsersRepository implements UsersRepository {
   public items: User[] = [];
-  public userRoles: { userId: string; roleId: string; assignedBy?: string }[] = [];
+  public userRoles: { userId: string; roleId: string; assignedBy?: string }[] =
+    [];
   public roles: Role[] = [];
 
   async findById(id: string): Promise<User | null> {
@@ -32,9 +33,7 @@ export class InMemoryUsersRepository implements UsersRepository {
   }
 
   async delete(id: string): Promise<void> {
-    const itemIndex = this.items.findIndex(
-      (item) => item.id.toString() === id
-    );
+    const itemIndex = this.items.findIndex((item) => item.id.toString() === id);
 
     if (itemIndex >= 0) {
       this.items.splice(itemIndex, 1);

@@ -1,8 +1,8 @@
-import { Injectable } from "@nestjs/common";
-import { PrismaService } from "../prisma.service";
-import { UserRolesRepository } from "@/domain/auth/application/repositories/user-roles-repository";
-import { UserRole } from "@/domain/auth/enterprise/entities/user-role";
-import { PrismaUserRoleMapper } from "../mappers/prisma-user-role-mapper";
+import { Injectable } from '@nestjs/common';
+import { PrismaService } from '../prisma.service';
+import { UserRolesRepository } from '@/domain/auth/application/repositories/user-roles-repository';
+import { UserRole } from '@/domain/auth/enterprise/entities/user-role';
+import { PrismaUserRoleMapper } from '../mappers/prisma-user-role-mapper';
 
 @Injectable()
 export class PrismaUserRolesRepository implements UserRolesRepository {
@@ -33,7 +33,7 @@ export class PrismaUserRolesRepository implements UserRolesRepository {
   async findByUserId(userId: string): Promise<UserRole[]> {
     const userRoles = await this.prisma.userRole.findMany({
       where: { userId },
-      orderBy: { assignedAt: "desc" },
+      orderBy: { assignedAt: 'desc' },
     });
 
     return userRoles.map(PrismaUserRoleMapper.toDomain);
@@ -42,13 +42,16 @@ export class PrismaUserRolesRepository implements UserRolesRepository {
   async findByRoleId(roleId: string): Promise<UserRole[]> {
     const userRoles = await this.prisma.userRole.findMany({
       where: { roleId },
-      orderBy: { assignedAt: "desc" },
+      orderBy: { assignedAt: 'desc' },
     });
 
     return userRoles.map(PrismaUserRoleMapper.toDomain);
   }
 
-  async findByUserAndRole(userId: string, roleId: string): Promise<UserRole | null> {
+  async findByUserAndRole(
+    userId: string,
+    roleId: string
+  ): Promise<UserRole | null> {
     const userRole = await this.prisma.userRole.findFirst({
       where: {
         userId,

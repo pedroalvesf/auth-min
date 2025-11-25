@@ -1,5 +1,8 @@
-import { UniqueEntityID } from "@/core/entities/unique-entity-id";
-import { Permission, PermissionProps } from "@/domain/auth/enterprise/entities/permission";
+import { UniqueEntityID } from '@/core/entities/unique-entity-id';
+import {
+  Permission,
+  PermissionProps,
+} from '@/domain/auth/enterprise/entities/permission';
 
 let permissionCounter = 0;
 
@@ -8,7 +11,7 @@ export function makePermission(
   id?: UniqueEntityID
 ) {
   permissionCounter++;
-  
+
   const permission = Permission.create(
     {
       name: `Test Permission ${permissionCounter}`,

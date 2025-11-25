@@ -1,6 +1,6 @@
-import { UniqueEntityID } from "@/core/entities/unique-entity-id";
-import { Role, RoleProps } from "@/domain/auth/enterprise/entities/role";
-import { PermissionList } from "@/domain/auth/enterprise/entities/permission-list";
+import { UniqueEntityID } from '@/core/entities/unique-entity-id';
+import { Role, RoleProps } from '@/domain/auth/enterprise/entities/role';
+import { PermissionList } from '@/domain/auth/enterprise/entities/permission-list';
 
 let roleCounter = 0;
 
@@ -9,7 +9,7 @@ export function makeRole(
   id?: UniqueEntityID
 ) {
   roleCounter++;
-  
+
   const role = Role.create(
     {
       name: `Test Role ${roleCounter}`,

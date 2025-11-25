@@ -1,5 +1,5 @@
-import { LoginHistory } from "../../enterprise/entities/login-history";
-import { UniqueEntityID } from "../../../../core/entities/unique-entity-id";
+import { LoginHistory } from '../../enterprise/entities/login-history';
+import { UniqueEntityID } from '../../../../core/entities/unique-entity-id';
 
 export interface LoginHistoryRepository {
   save(loginHistory: LoginHistory): Promise<void>;

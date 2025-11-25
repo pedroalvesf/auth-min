@@ -1,6 +1,6 @@
-import { UniqueEntityID } from "@/core/entities/unique-entity-id";
-import { RolePermission } from "@/domain/auth/enterprise/entities/role-permission";
-import { RolePermission as PrismaRolePermission } from "@prisma/client";
+import { UniqueEntityID } from '@/core/entities/unique-entity-id';
+import { RolePermission } from '@/domain/auth/enterprise/entities/role-permission';
+import { RolePermission as PrismaRolePermission } from '@prisma/client';
 
 export class PrismaRolePermissionMapper {
   static toDomain(raw: PrismaRolePermission): RolePermission {

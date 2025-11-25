@@ -1,8 +1,8 @@
-import { Injectable } from "@nestjs/common";
-import { PrismaService } from "../prisma.service";
-import { RefreshTokenRepository } from "@/domain/auth/application/repositories/refresh-token-repository";
-import { PrismaRefreshTokenMapper } from "../mappers/prisma-refresh-token-mapper";
-import { RefreshToken } from "@/domain/auth/enterprise/entities/refresh-token";
+import { Injectable } from '@nestjs/common';
+import { PrismaService } from '../prisma.service';
+import { RefreshTokenRepository } from '@/domain/auth/application/repositories/refresh-token-repository';
+import { PrismaRefreshTokenMapper } from '../mappers/prisma-refresh-token-mapper';
+import { RefreshToken } from '@/domain/auth/enterprise/entities/refresh-token';
 
 @Injectable()
 export class PrismaRefreshTokenRepository implements RefreshTokenRepository {

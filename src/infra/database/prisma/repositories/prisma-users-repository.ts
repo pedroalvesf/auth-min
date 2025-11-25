@@ -1,8 +1,8 @@
-import { PrismaUsersMapper } from "../mappers/prisma-users-mapper";
-import { UsersRepository } from "@/domain/auth/application/repositories/users-repository";
-import { Injectable } from "@nestjs/common";
-import { User } from "@/domain/auth/enterprise/entities/user";
-import { PrismaService } from "../prisma.service";
+import { PrismaUsersMapper } from '../mappers/prisma-users-mapper';
+import { UsersRepository } from '@/domain/auth/application/repositories/users-repository';
+import { Injectable } from '@nestjs/common';
+import { User } from '@/domain/auth/enterprise/entities/user';
+import { PrismaService } from '../prisma.service';
 
 @Injectable()
 export class PrismaUsersRepository implements UsersRepository {
@@ -28,13 +28,13 @@ export class PrismaUsersRepository implements UsersRepository {
     });
 
     if (!user) return null;
-    
+
     // Transforma a estrutura para o formato esperado pelo mapper
     const userWithRoles = {
       ...user,
-      roles: user.Roles.map(userRole => userRole.Role),
+      roles: user.Roles.map((userRole) => userRole.Role),
     };
-    
+
     return PrismaUsersMapper.toDomain(userWithRoles);
   }
 

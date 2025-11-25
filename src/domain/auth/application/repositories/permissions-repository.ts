@@ -1,4 +1,4 @@
-import { Permission } from "@/domain/auth/enterprise/entities/permission";
+import { Permission } from '@/domain/auth/enterprise/entities/permission';
 
 export abstract class PermissionsRepository {
   abstract create(permission: Permission): Promise<void>;

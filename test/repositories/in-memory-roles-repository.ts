@@ -1,5 +1,5 @@
-import { RolesRepository } from "@/domain/auth/application/repositories/roles-repository";
-import { Role } from "@/domain/auth/enterprise/entities/role";
+import { RolesRepository } from '@/domain/auth/application/repositories/roles-repository';
+import { Role } from '@/domain/auth/enterprise/entities/role';
 
 export class InMemoryRolesRepository implements RolesRepository {
   public items: Role[] = [];
@@ -38,9 +38,7 @@ export class InMemoryRolesRepository implements RolesRepository {
   }
 
   async delete(id: string): Promise<void> {
-    const itemIndex = this.items.findIndex(
-      (item) => item.id.toString() === id
-    );
+    const itemIndex = this.items.findIndex((item) => item.id.toString() === id);
 
     if (itemIndex >= 0) {
       this.items.splice(itemIndex, 1);

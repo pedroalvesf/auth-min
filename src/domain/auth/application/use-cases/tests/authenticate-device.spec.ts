@@ -1,12 +1,12 @@
-import { InMemoryUsersRepository } from "@/test/repositories/in-memory-users-repository";
-import { InMemoryDevicesRepository } from "@/test/repositories/in-memory-devices-repository";
-import { InMemoryRefreshTokenRepository } from "@/test/repositories/in-memory-refresh-token-repository";
-import { FakeHashComparer } from "@/test/cryptography/fake-hash-comparer";
-import { FakeEncrypter } from "@/test/cryptography/fake-encrypter";
-import { makeUser } from "@/test/factories/make-user";
-import { makeDevice } from "@/test/factories/make-device";
-import { AuthenticateDeviceUseCase } from "../authenticate-device";
-import { WrongCredentialsError } from "../errors/wrong-credentials-error";
+import { InMemoryUsersRepository } from '@/test/repositories/in-memory-users-repository';
+import { InMemoryDevicesRepository } from '@/test/repositories/in-memory-devices-repository';
+import { InMemoryRefreshTokenRepository } from '@/test/repositories/in-memory-refresh-token-repository';
+import { FakeHashComparer } from '@/test/cryptography/fake-hash-comparer';
+import { FakeEncrypter } from '@/test/cryptography/fake-encrypter';
+import { makeUser } from '@/test/factories/make-user';
+import { makeDevice } from '@/test/factories/make-device';
+import { AuthenticateDeviceUseCase } from '../authenticate-device';
+import { WrongCredentialsError } from '../errors/wrong-credentials-error';
 
 let usersRepository: InMemoryUsersRepository;
 let devicesRepository: InMemoryDevicesRepository;
@@ -16,7 +16,7 @@ let encrypter: FakeEncrypter;
 let mockLogger: any;
 let sut: AuthenticateDeviceUseCase;
 
-describe("Authenticate Device", () => {
+describe('Authenticate Device', () => {
   beforeEach(() => {
     usersRepository = new InMemoryUsersRepository();
     devicesRepository = new InMemoryDevicesRepository();
@@ -27,7 +27,7 @@ describe("Authenticate Device", () => {
       info: jest.fn(),
       warn: jest.fn(),
       error: jest.fn(),
-      debug: jest.fn()
+      debug: jest.fn(),
     };
     sut = new AuthenticateDeviceUseCase(
       devicesRepository,
@@ -39,12 +39,12 @@ describe("Authenticate Device", () => {
     );
   });
 
-  it("should be able to authenticate a device with valid credentials", async () => {
+  it('should be able to authenticate a device with valid credentials', async () => {
     const user = makeUser({
-      email: "john@example.com",
-      password: "123456", // Same length as the password we'll use
+      email: 'john@example.com',
+      password: '123456', // Same length as the password we'll use
     });
-    
+
     const device = makeDevice({
       userId: user.id,
     });
@@ -52,7 +52,7 @@ describe("Authenticate Device", () => {
     await usersRepository.create(user);
 
     const result = await sut.execute({
-      password: "123456", // Same length as user password (fake hash comparison)
+      password: '123456', // Same length as user password (fake hash comparison)
       device,
     });
 
@@ -66,17 +66,17 @@ describe("Authenticate Device", () => {
 
     // Verify device was created
     expect(devicesRepository.items).toHaveLength(1);
-    
+
     // Verify refresh token was saved
     expect(refreshTokenRepository.items).toHaveLength(1);
   });
 
-  it("should not authenticate with wrong password", async () => {
+  it('should not authenticate with wrong password', async () => {
     const user = makeUser({
-      email: "john@example.com", 
-      password: "123456",
+      email: 'john@example.com',
+      password: '123456',
     });
-    
+
     const device = makeDevice({
       userId: user.id,
     });
@@ -84,7 +84,7 @@ describe("Authenticate Device", () => {
     await usersRepository.create(user);
 
     const result = await sut.execute({
-      password: "wrongpass", // Different length = fake hash will fail
+      password: 'wrongpass', // Different length = fake hash will fail
       device,
     });
 
@@ -92,11 +92,11 @@ describe("Authenticate Device", () => {
     expect(result.value).toBeInstanceOf(WrongCredentialsError);
   });
 
-  it("should not authenticate non-existent user", async () => {
+  it('should not authenticate non-existent user', async () => {
     const device = makeDevice();
 
     const result = await sut.execute({
-      password: "123456",
+      password: '123456',
       device,
     });
 
@@ -104,71 +104,71 @@ describe("Authenticate Device", () => {
     expect(result.value).toBeInstanceOf(WrongCredentialsError);
   });
 
-  it("should reuse existing device if same browser and OS", async () => {
+  it('should reuse existing device if same browser and OS', async () => {
     const user = makeUser({
-      email: "john@example.com",
-      password: "123456",
+      email: 'john@example.com',
+      password: '123456',
     });
 
     const existingDevice = makeDevice({
       userId: user.id,
-      ipAddress: "192.168.1.100",
-      browser: "Chrome 120.0",
-      operatingSystem: "Windows 11",
+      ipAddress: '192.168.1.100',
+      browser: 'Chrome 120.0',
+      operatingSystem: 'Windows 11',
     });
 
     const newDevice = makeDevice({
       userId: user.id,
-      ipAddress: "192.168.1.100", // Same IP
-      browser: "Chrome 120.0", // Same browser
-      operatingSystem: "Windows 11", // Same OS
+      ipAddress: '192.168.1.100', // Same IP
+      browser: 'Chrome 120.0', // Same browser
+      operatingSystem: 'Windows 11', // Same OS
     });
 
     await usersRepository.create(user);
     await devicesRepository.create(existingDevice);
 
     const result = await sut.execute({
-      password: "123456",
+      password: '123456',
       device: newDevice,
     });
 
     expect(result.isRight()).toBe(true);
-    
+
     // Should still have only one device (reused existing)
     expect(devicesRepository.items).toHaveLength(1);
     expect(devicesRepository.items[0].lastLogin).toBeDefined();
   });
 
-  it("should create new device if browser or OS differs", async () => {
+  it('should create new device if browser or OS differs', async () => {
     const user = makeUser({
-      email: "john@example.com",
-      password: "123456",
+      email: 'john@example.com',
+      password: '123456',
     });
 
     const existingDevice = makeDevice({
       userId: user.id,
-      ipAddress: "192.168.1.100",
-      browser: "Chrome 120.0",
-      operatingSystem: "Windows 11",
+      ipAddress: '192.168.1.100',
+      browser: 'Chrome 120.0',
+      operatingSystem: 'Windows 11',
     });
 
     const newDevice = makeDevice({
       userId: user.id,
-      ipAddress: "192.168.1.100", // Same IP
-      browser: "Firefox 121.0", // Different browser
-      operatingSystem: "Windows 11",
+      ipAddress: '192.168.1.100', // Same IP
+      browser: 'Firefox 121.0', // Different browser
+      operatingSystem: 'Windows 11',
     });
 
     await usersRepository.create(user);
     await devicesRepository.create(existingDevice);
 
     const result = await sut.execute({
-      password: "123456",
+      password: '123456',
       device: newDevice,
     });
 
     expect(result.isRight()).toBe(true);
-    
+
     // Should have two devices now
     expect(devicesRepository.items).toHaveLength(2);
   });

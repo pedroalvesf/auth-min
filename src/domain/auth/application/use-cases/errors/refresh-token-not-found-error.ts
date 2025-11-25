@@ -1,5 +1,5 @@
 export class RefreshTokenNotFoundError extends Error {
   constructor() {
-    super("Refresh token not found");
+    super('Refresh token not found');
   }
 }

@@ -1,5 +1,5 @@
-import { PermissionsRepository } from "@/domain/auth/application/repositories/permissions-repository";
-import { Permission } from "@/domain/auth/enterprise/entities/permission";
+import { PermissionsRepository } from '@/domain/auth/application/repositories/permissions-repository';
+import { Permission } from '@/domain/auth/enterprise/entities/permission';
 
 export class InMemoryPermissionsRepository implements PermissionsRepository {
   public items: Permission[] = [];
@@ -14,7 +14,10 @@ export class InMemoryPermissionsRepository implements PermissionsRepository {
     return permission || null;
   }
 
-  async findByResourceAndAction(resource: string, action: string): Promise<Permission | null> {
+  async findByResourceAndAction(
+    resource: string,
+    action: string
+  ): Promise<Permission | null> {
     const permission = this.items.find(
       (item) => item.resource === resource && item.action === action
     );

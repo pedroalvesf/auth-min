@@ -1,11 +1,11 @@
-import { IsEmail, IsNotEmpty, IsString } from "class-validator";
-import { ApiProperty } from "@nestjs/swagger";
+import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class AuthenticateDeviceDto {
   @ApiProperty({
     description: 'User email address',
     example: 'john.doe@example.com',
-    format: 'email'
+    format: 'email',
   })
   @IsEmail()
   email!: string;
@@ -13,7 +13,7 @@ export class AuthenticateDeviceDto {
   @ApiProperty({
     description: 'User password',
     example: 'SecurePassword123!',
-    format: 'password'
+    format: 'password',
   })
   @IsString()
   @IsNotEmpty()

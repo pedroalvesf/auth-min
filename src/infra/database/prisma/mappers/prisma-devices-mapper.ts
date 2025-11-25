@@ -1,6 +1,6 @@
-import { Device as PrismaDevice, Prisma } from '@prisma/client'
-import { UniqueEntityID } from '@/core/entities/unique-entity-id'
-import { Device } from '@/domain/auth/enterprise/entities/device'
+import { Device as PrismaDevice, Prisma } from '@prisma/client';
+import { UniqueEntityID } from '@/core/entities/unique-entity-id';
+import { Device } from '@/domain/auth/enterprise/entities/device';
 
 export class PrismaDevicesMapper {
   static toDomain(raw: PrismaDevice): Device {
@@ -14,10 +14,10 @@ export class PrismaDevicesMapper {
         location: raw.location || 'unknown',
         lastLogin: raw.lastLogin,
         active: raw.active,
-        userId: new UniqueEntityID(raw.userId)
+        userId: new UniqueEntityID(raw.userId),
       },
       new UniqueEntityID(raw.id)
-    )
+    );
   }
 
   static toPrisma(device: Device): Prisma.DeviceCreateInput {
@@ -35,9 +35,9 @@ export class PrismaDevicesMapper {
       active: device.active,
       User: {
         connect: {
-          id: device.userId.toString()
-        }
-      }
-    }
+          id: device.userId.toString(),
+        },
+      },
+    };
   }
 }

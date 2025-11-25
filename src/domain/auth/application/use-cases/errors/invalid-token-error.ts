@@ -1,5 +1,5 @@
 export class InvalidTokenError extends Error {
   constructor() {
-    super('Invalid token')
+    super('Invalid token');
   }
 }

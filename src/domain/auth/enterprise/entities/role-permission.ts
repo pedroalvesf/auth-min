@@ -1,5 +1,5 @@
-import { Entity } from "@/core/entities/entity";
-import { UniqueEntityID } from "@/core/entities/unique-entity-id";
+import { Entity } from '@/core/entities/entity';
+import { UniqueEntityID } from '@/core/entities/unique-entity-id';
 
 export interface RolePermissionProps {
   roleId: UniqueEntityID;
@@ -15,10 +15,7 @@ export class RolePermission extends Entity<RolePermissionProps> {
     return this.props.permissionId;
   }
 
-  static create(
-    props: RolePermissionProps,
-    id?: UniqueEntityID
-  ) {
+  static create(props: RolePermissionProps, id?: UniqueEntityID) {
     return new RolePermission(props, id);
   }
 

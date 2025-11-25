@@ -1,7 +1,7 @@
-import { Injectable } from "@nestjs/common";
-import { Either, right } from "@/core/either";
-import { Permission } from "../../enterprise/entities/permission";
-import { PermissionsRepository } from "../repositories/permissions-repository";
+import { Injectable } from '@nestjs/common';
+import { Either, right } from '@/core/either';
+import { Permission } from '../../enterprise/entities/permission';
+import { PermissionsRepository } from '../repositories/permissions-repository';
 
 type ListPermissionsUseCaseResponse = Either<
   never,
@@ -20,4 +20,3 @@ export class ListPermissionsUseCase {
     return right({ permissions });
   }
 }
-

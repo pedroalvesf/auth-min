@@ -1,18 +1,18 @@
-import { InMemoryDevicesRepository } from "@/test/repositories/in-memory-devices-repository";
-import { InMemoryRefreshTokenRepository } from "@/test/repositories/in-memory-refresh-token-repository";
-import { makeUser } from "@/test/factories/make-user";
-import { makeDevice } from "@/test/factories/make-device";
-import { makeRefreshToken } from "@/test/factories/make-refresh-token";
-import { RevokeDeviceSessionUseCase } from "../revoke-device-session";
-import { RefreshTokenNotFoundError } from "../errors/refresh-token-not-found-error";
-import { DeviceNotFoundError } from "../errors/device-not-found-error";
-import { UniqueEntityID } from "@/core/entities/unique-entity-id";
+import { InMemoryDevicesRepository } from '@/test/repositories/in-memory-devices-repository';
+import { InMemoryRefreshTokenRepository } from '@/test/repositories/in-memory-refresh-token-repository';
+import { makeUser } from '@/test/factories/make-user';
+import { makeDevice } from '@/test/factories/make-device';
+import { makeRefreshToken } from '@/test/factories/make-refresh-token';
+import { RevokeDeviceSessionUseCase } from '../revoke-device-session';
+import { RefreshTokenNotFoundError } from '../errors/refresh-token-not-found-error';
+import { DeviceNotFoundError } from '../errors/device-not-found-error';
+import { UniqueEntityID } from '@/core/entities/unique-entity-id';
 
 let devicesRepository: InMemoryDevicesRepository;
 let refreshTokenRepository: InMemoryRefreshTokenRepository;
 let sut: RevokeDeviceSessionUseCase;
 
-describe("Revoke Device Session", () => {
+describe('Revoke Device Session', () => {
   beforeEach(() => {
     devicesRepository = new InMemoryDevicesRepository();
     refreshTokenRepository = new InMemoryRefreshTokenRepository();
@@ -22,7 +22,7 @@ describe("Revoke Device Session", () => {
     );
   });
 
-  it("should be able to revoke session of a specific device", async () => {
+  it('should be able to revoke session of a specific device', async () => {
     const user = makeUser();
     const device = makeDevice({ userId: user.id });
     const refreshToken1 = makeRefreshToken({
@@ -49,20 +49,22 @@ describe("Revoke Device Session", () => {
     }
 
     // Verify device is deactivated
-    const updatedDevice = await devicesRepository.findById(device.id.toString());
+    const updatedDevice = await devicesRepository.findById(
+      device.id.toString()
+    );
     expect(updatedDevice?.active).toBe(false);
 
     // Verify all refresh tokens are revoked
     const deviceRefreshTokens = await refreshTokenRepository.findByDeviceId(
       device.id.toString()
     );
-    deviceRefreshTokens.forEach(token => {
+    deviceRefreshTokens.forEach((token) => {
       expect(token.revoked).toBe(true);
       expect(token.revokedAt).toBeInstanceOf(Date);
     });
   });
 
-  it("should be able to revoke refresh tokens of the device", async () => {
+  it('should be able to revoke refresh tokens of the device', async () => {
     const user = makeUser();
     const device = makeDevice({ userId: user.id });
     const refreshToken = makeRefreshToken({
@@ -87,11 +89,11 @@ describe("Revoke Device Session", () => {
     expect(updatedToken?.revoked).toBe(true);
   });
 
-  it("should not be able to revoke session when device does not exist", async () => {
+  it('should not be able to revoke session when device does not exist', async () => {
     const user = makeUser();
-    
+
     const result = await sut.execute({
-      deviceId: "non-existent-device",
+      deviceId: 'non-existent-device',
       userId: user.id.toString(),
     });
 
@@ -99,7 +101,7 @@ describe("Revoke Device Session", () => {
     expect(result.value).toBeInstanceOf(RefreshTokenNotFoundError);
   });
 
-  it("should not be able to revoke session when user is not the device owner", async () => {
+  it('should not be able to revoke session when user is not the device owner', async () => {
     const user = makeUser();
     const anotherUser = makeUser();
     const device = makeDevice({ userId: anotherUser.id });
@@ -120,7 +122,9 @@ describe("Revoke Device Session", () => {
     expect(result.value).toBeInstanceOf(DeviceNotFoundError);
 
     // Verify device is not affected
-    const updatedDevice = await devicesRepository.findById(device.id.toString());
+    const updatedDevice = await devicesRepository.findById(
+      device.id.toString()
+    );
     expect(updatedDevice?.active).toBe(true);
   });
 });

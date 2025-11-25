@@ -1,7 +1,7 @@
-import { Injectable } from "@nestjs/common";
-import { Either, left, right } from "../../../../core/either";
-import { UsersRepository } from "@/domain/auth/application/repositories/users-repository";
-import { UserNotFoundError } from "./errors/user-not-found-error";
+import { Injectable } from '@nestjs/common';
+import { Either, left, right } from '../../../../core/either';
+import { UsersRepository } from '@/domain/auth/application/repositories/users-repository';
+import { UserNotFoundError } from './errors/user-not-found-error';
 
 interface DeleteUserUseCaseRequest {
   userId: string;
@@ -29,6 +29,6 @@ export class DeleteUserUseCase {
 
     await this.userRepository.delete(userId);
 
-    return right({ message: "User deleted successfully" });
+    return right({ message: 'User deleted successfully' });
   }
 }

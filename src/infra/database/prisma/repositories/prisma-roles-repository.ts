@@ -1,8 +1,8 @@
-import { Injectable } from "@nestjs/common";
-import { PrismaService } from "../prisma.service";
-import { RolesRepository } from "@/domain/auth/application/repositories/roles-repository";
-import { Role } from "@/domain/auth/enterprise/entities/role";
-import { PrismaRoleMapper } from "../mappers/prisma-role-mapper";
+import { Injectable } from '@nestjs/common';
+import { PrismaService } from '../prisma.service';
+import { RolesRepository } from '@/domain/auth/application/repositories/roles-repository';
+import { Role } from '@/domain/auth/enterprise/entities/role';
+import { PrismaRoleMapper } from '../mappers/prisma-role-mapper';
 
 @Injectable()
 export class PrismaRolesRepository implements RolesRepository {
@@ -43,13 +43,15 @@ export class PrismaRolesRepository implements RolesRepository {
     });
 
     if (!role) return null;
-    
+
     // Transforma a estrutura para o formato esperado pelo mapper
     const roleWithPermissions = {
       ...role,
-      permissions: role.Permissions.map(rolePermission => rolePermission.Permission),
+      permissions: role.Permissions.map(
+        (rolePermission) => rolePermission.Permission
+      ),
     };
-    
+
     return PrismaRoleMapper.toDomain(roleWithPermissions);
   }
 
@@ -73,7 +75,7 @@ export class PrismaRolesRepository implements RolesRepository {
 
   async findMany(): Promise<Role[]> {
     const roles = await this.prisma.role.findMany({
-      orderBy: { level: "asc" },
+      orderBy: { level: 'asc' },
     });
 
     return roles.map(PrismaRoleMapper.toDomain);

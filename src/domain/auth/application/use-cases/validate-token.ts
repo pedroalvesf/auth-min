@@ -1,8 +1,8 @@
-import { Injectable } from "@nestjs/common";
-import { Either, left, right } from "../../../../core/either";
-import { TokenValidator } from "../cryptography/token-validator";
-import { UsersRepository } from "@/domain/auth/application/repositories/users-repository";
-import { InvalidTokenError } from "./errors/invalid-token-error";
+import { Injectable } from '@nestjs/common';
+import { Either, left, right } from '../../../../core/either';
+import { TokenValidator } from '../cryptography/token-validator';
+import { UsersRepository } from '@/domain/auth/application/repositories/users-repository';
+import { InvalidTokenError } from './errors/invalid-token-error';
 
 export interface ValidateTokenResult {
   userId: string;
@@ -22,7 +22,7 @@ export class ValidateTokenUseCase {
   ): Promise<Either<InvalidTokenError, ValidateTokenResult>> {
     const payload = await this.tokenValidator.validate(token);
 
-    if (!payload || payload.type === "refresh") {
+    if (!payload || payload.type === 'refresh') {
       return left(new InvalidTokenError());
     }
 

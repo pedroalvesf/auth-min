@@ -1,4 +1,4 @@
-import { Role } from "@/domain/auth/enterprise/entities/role";
+import { Role } from '@/domain/auth/enterprise/entities/role';
 
 export class RolePresenter {
   static toHTTP(role: Role) {
@@ -18,4 +18,3 @@ export class RolePresenter {
     return roles.map((role) => this.toHTTP(role));
   }
 }
-

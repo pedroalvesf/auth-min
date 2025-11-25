@@ -1,19 +1,19 @@
-import { Injectable, Inject } from "@nestjs/common";
-import { Either, left, right } from "@/core/either";
-import { Device } from "../../enterprise/entities/device";
-import { RefreshToken } from "../../enterprise/entities/refresh-token";
-import { AccessToken } from "../../enterprise/entities/access-token";
-import { User } from "../../enterprise/entities/user";
-import { HashComparer } from "../cryptography/hash-comparer";
-import { Encrypter } from "../cryptography/encrypter";
-import { UniqueEntityID } from "@/core/entities/unique-entity-id";
+import { Injectable, Inject } from '@nestjs/common';
+import { Either, left, right } from '@/core/either';
+import { Device } from '../../enterprise/entities/device';
+import { RefreshToken } from '../../enterprise/entities/refresh-token';
+import { AccessToken } from '../../enterprise/entities/access-token';
+import { User } from '../../enterprise/entities/user';
+import { HashComparer } from '../cryptography/hash-comparer';
+import { Encrypter } from '../cryptography/encrypter';
+import { UniqueEntityID } from '@/core/entities/unique-entity-id';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
 
-import { DevicesRepository } from "../repositories/devices-repository";
-import { UsersRepository } from "../repositories/users-repository";
-import { RefreshTokenRepository } from "../repositories/refresh-token-repository";
-import { WrongCredentialsError } from "./errors/wrong-credentials-error";
+import { DevicesRepository } from '../repositories/devices-repository';
+import { UsersRepository } from '../repositories/users-repository';
+import { RefreshTokenRepository } from '../repositories/refresh-token-repository';
+import { WrongCredentialsError } from './errors/wrong-credentials-error';
 
 interface AuthenticateDeviceUseCaseRequest {
   password: string;
@@ -55,8 +55,8 @@ export class AuthenticateDeviceUseCase {
         browser: device.browser,
         os: device.operatingSystem,
         ip: device.ipAddress,
-        location: device.location
-      }
+        location: device.location,
+      },
     });
 
     const user = await this.usersRepository.findById(userId);
@@ -66,7 +66,7 @@ export class AuthenticateDeviceUseCase {
         action: 'device_authentication_failed',
         userId,
         reason: 'user_not_found',
-        duration: Date.now() - startTime
+        duration: Date.now() - startTime,
       });
       return left(new WrongCredentialsError());
     }
@@ -83,20 +83,20 @@ export class AuthenticateDeviceUseCase {
         userId,
         email: user.email,
         reason: 'invalid_password',
-        duration: Date.now() - startTime
+        duration: Date.now() - startTime,
       });
       return left(new WrongCredentialsError());
     }
 
     const result = await this.authenticateUser(user, device);
-    
+
     this.logger.info('Authentication successful', {
       context: 'AUTH',
       action: 'device_authentication_success',
       userId,
       deviceId: result.refreshToken.deviceId.toString(),
       email: user.email,
-      duration: Date.now() - startTime
+      duration: Date.now() - startTime,
     });
 
     return right(result);

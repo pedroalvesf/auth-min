@@ -1,12 +1,12 @@
-import { Either, left, right } from "@/core/either";
+import { Either, left, right } from '@/core/either';
 
-import { DevicesRepository } from "@/domain/auth/application/repositories/devices-repository";
-import { RefreshTokenRepository } from "@/domain/auth/application/repositories/refresh-token-repository";
-import { UsersRepository } from "@/domain/auth/application/repositories/users-repository";
+import { DevicesRepository } from '@/domain/auth/application/repositories/devices-repository';
+import { RefreshTokenRepository } from '@/domain/auth/application/repositories/refresh-token-repository';
+import { UsersRepository } from '@/domain/auth/application/repositories/users-repository';
 
-import { DeviceNotFoundError } from "./errors/device-not-found-error";
-import { UserNotFoundError } from "./errors/user-not-found-error";
-import { Injectable } from "@nestjs/common";
+import { DeviceNotFoundError } from './errors/device-not-found-error';
+import { UserNotFoundError } from './errors/user-not-found-error';
+import { Injectable } from '@nestjs/common';
 
 interface RevokeAllDevicesUseCaseRequest {
   userId: string;

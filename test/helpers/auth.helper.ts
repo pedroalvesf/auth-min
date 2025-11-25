@@ -28,17 +28,23 @@ export interface AuthTokens {
 export class AuthHelper {
   constructor(private app: INestApplication) {}
 
-  async createUserWithRole(userData: CreateUserData, roleSlug: 'admin' | 'manager' | 'user' = 'user', deviceHeaders?: DeviceHeaders): Promise<AuthTokens & { userId: string }> {
+  async createUserWithRole(
+    userData: CreateUserData,
+    roleSlug: 'admin' | 'manager' | 'user' = 'user',
+    deviceHeaders?: DeviceHeaders
+  ): Promise<AuthTokens & { userId: string }> {
     // First create regular user
     const tokens = await this.createUser(userData, deviceHeaders);
-    
+
     // Get PrismaService from app to assign role directly
-    const { PrismaService } = await import('../../src/infra/database/prisma/prisma.service');
+    const { PrismaService } = await import(
+      '../../src/infra/database/prisma/prisma.service'
+    );
     const prisma = this.app.get(PrismaService);
-    
+
     // Find the created user
     const user = await prisma.user.findUnique({
-      where: { email: userData.email }
+      where: { email: userData.email },
     });
 
     if (!user) {
@@ -51,13 +57,13 @@ export class AuthHelper {
         userId: user.id,
         roleId: `role-${roleSlug}`,
         assignedAt: new Date(),
-        assignedBy: 'system'
-      }
+        assignedBy: 'system',
+      },
     });
 
     return {
       ...tokens,
-      userId: user.id
+      userId: user.id,
     };
   }
 
@@ -66,22 +72,25 @@ export class AuthHelper {
       'x-ipaddress': '192.168.1.100',
       'x-operatingsystem': 'macOS Test',
       'x-browser': 'Chrome E2E',
-      'x-type': 'desktop'
+      'x-type': 'desktop',
     };
   }
 
   getMobileDeviceHeaders(): DeviceHeaders {
     return {
-      'x-ipaddress': '192.168.1.101', 
+      'x-ipaddress': '192.168.1.101',
       'x-operatingsystem': 'iOS 16',
       'x-browser': 'Safari Mobile',
-      'x-type': 'mobile'
+      'x-type': 'mobile',
     };
   }
 
-  async createUser(userData: CreateUserData, deviceHeaders?: DeviceHeaders): Promise<AuthTokens> {
+  async createUser(
+    userData: CreateUserData,
+    deviceHeaders?: DeviceHeaders
+  ): Promise<AuthTokens> {
     const headers = deviceHeaders || this.getDefaultDeviceHeaders();
-    
+
     const response = await request(this.app.getHttpServer())
       .post('/auth/user')
       .set(headers)
@@ -90,13 +99,16 @@ export class AuthHelper {
 
     return {
       accessToken: response.body.accessToken,
-      refreshToken: response.body.refreshToken
+      refreshToken: response.body.refreshToken,
     };
   }
 
-  async login(loginData: LoginData, deviceHeaders?: DeviceHeaders): Promise<AuthTokens> {
+  async login(
+    loginData: LoginData,
+    deviceHeaders?: DeviceHeaders
+  ): Promise<AuthTokens> {
     const headers = deviceHeaders || this.getDefaultDeviceHeaders();
-    
+
     const response = await request(this.app.getHttpServer())
       .post('/login')
       .set(headers)
@@ -105,12 +117,14 @@ export class AuthHelper {
 
     return {
       accessToken: response.body.accessToken,
-      refreshToken: response.body.refreshToken
+      refreshToken: response.body.refreshToken,
     };
   }
 
-
-  async revokeDeviceSession(deviceId: string, accessToken: string): Promise<void> {
+  async revokeDeviceSession(
+    deviceId: string,
+    accessToken: string
+  ): Promise<void> {
     await request(this.app.getHttpServer())
       .delete('/revoke-device-session')
       .set('Authorization', `Bearer ${accessToken}`)
@@ -125,14 +139,20 @@ export class AuthHelper {
       .expect(200);
   }
 
-  async makeAuthenticatedRequest(method: 'get' | 'post' | 'put' | 'delete', endpoint: string, accessToken: string, data?: any) {
-    const req = request(this.app.getHttpServer())[method](endpoint)
+  async makeAuthenticatedRequest(
+    method: 'get' | 'post' | 'put' | 'delete',
+    endpoint: string,
+    accessToken: string,
+    data?: any
+  ) {
+    const req = request(this.app.getHttpServer())
+      [method](endpoint)
       .set('Authorization', `Bearer ${accessToken}`);
-    
+
     if (data && (method === 'post' || method === 'put')) {
       req.send(data);
     }
-    
+
     return req;
   }
 }

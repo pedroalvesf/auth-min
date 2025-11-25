@@ -1,5 +1,5 @@
-import { DevicesRepository } from "@/domain/auth/application/repositories/devices-repository";
-import { Device } from "@/domain/auth/enterprise/entities/device";
+import { DevicesRepository } from '@/domain/auth/application/repositories/devices-repository';
+import { Device } from '@/domain/auth/enterprise/entities/device';
 
 export class InMemoryDevicesRepository implements DevicesRepository {
   public items: Device[] = [];
@@ -9,9 +9,13 @@ export class InMemoryDevicesRepository implements DevicesRepository {
     return device || null;
   }
 
-  async findByUserIdIp(userId: string, ipAddress: string): Promise<Device | null> {
+  async findByUserIdIp(
+    userId: string,
+    ipAddress: string
+  ): Promise<Device | null> {
     const device = this.items.find(
-      (item) => item.userId.toString() === userId && item.ipAddress === ipAddress
+      (item) =>
+        item.userId.toString() === userId && item.ipAddress === ipAddress
     );
     return device || null;
   }

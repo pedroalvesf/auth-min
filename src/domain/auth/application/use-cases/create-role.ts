@@ -1,8 +1,8 @@
-import { Injectable } from "@nestjs/common";
-import { Either, left, right } from "@/core/either";
-import { Role } from "../../enterprise/entities/role";
-import { RolesRepository } from "../repositories/roles-repository";
-import { RoleAlreadyExistsError } from "./errors/role-already-exists-error";
+import { Injectable } from '@nestjs/common';
+import { Either, left, right } from '@/core/either';
+import { Role } from '../../enterprise/entities/role';
+import { RolesRepository } from '../repositories/roles-repository';
+import { RoleAlreadyExistsError } from './errors/role-already-exists-error';
 
 interface CreateRoleUseCaseRequest {
   name: string;
@@ -28,7 +28,7 @@ export class CreateRoleUseCase {
     level,
     assignableRoles,
   }: CreateRoleUseCaseRequest): Promise<CreateRoleUseCaseResponse> {
-    const slug = name.toLowerCase().replace(/\s+/g, "-");
+    const slug = name.toLowerCase().replace(/\s+/g, '-');
 
     const roleWithSameName = await this.rolesRepository.findByName(name);
     if (roleWithSameName) {

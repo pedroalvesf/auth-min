@@ -1,9 +1,9 @@
-import { Injectable } from "@nestjs/common";
-import { Either, left, right } from "@/core/either";
-import { UsersRepository } from "../repositories/users-repository";
-import { PermissionsRepository } from "../repositories/permissions-repository";
-import { UserNotFoundError } from "./errors/user-not-found-error";
-import { Permission } from "../../enterprise/entities/permission";
+import { Injectable } from '@nestjs/common';
+import { Either, left, right } from '@/core/either';
+import { UsersRepository } from '../repositories/users-repository';
+import { PermissionsRepository } from '../repositories/permissions-repository';
+import { UserNotFoundError } from './errors/user-not-found-error';
+import { Permission } from '../../enterprise/entities/permission';
 
 interface CheckUserPermissionUseCaseRequest {
   userId: string;
@@ -41,7 +41,7 @@ export class CheckUserPermissionUseCase {
     if (userRoles.length === 0) {
       return right({
         hasPermission: false,
-        reason: "User has no roles assigned",
+        reason: 'User has no roles assigned',
       });
     }
 

@@ -1,6 +1,6 @@
-import { UniqueEntityID } from "@/core/entities/unique-entity-id";
-import { Permission } from "@/domain/auth/enterprise/entities/permission";
-import { Permission as PrismaPermission } from "@prisma/client";
+import { UniqueEntityID } from '@/core/entities/unique-entity-id';
+import { Permission } from '@/domain/auth/enterprise/entities/permission';
+import { Permission as PrismaPermission } from '@prisma/client';
 
 export class PrismaPermissionMapper {
   static toDomain(raw: PrismaPermission): Permission {

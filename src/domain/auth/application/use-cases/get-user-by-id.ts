@@ -1,8 +1,8 @@
-import { Either, left, right } from "@/core/either";
-import { Injectable } from "@nestjs/common";
-import { UsersRepository } from "../repositories/users-repository";
-import { UserNotFoundError } from "./errors/user-not-found-error";
-import { User } from "../../enterprise/entities/user";
+import { Either, left, right } from '@/core/either';
+import { Injectable } from '@nestjs/common';
+import { UsersRepository } from '../repositories/users-repository';
+import { UserNotFoundError } from './errors/user-not-found-error';
+import { User } from '../../enterprise/entities/user';
 
 interface GetUserByIdUseCaseRequest {
   userId: string;

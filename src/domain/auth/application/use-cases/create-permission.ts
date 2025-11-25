@@ -1,8 +1,8 @@
-import { Injectable } from "@nestjs/common";
-import { Either, left, right } from "@/core/either";
-import { Permission } from "../../enterprise/entities/permission";
-import { PermissionsRepository } from "../repositories/permissions-repository";
-import { PermissionAlreadyExistsError } from "./errors/permission-already-exists-error";
+import { Injectable } from '@nestjs/common';
+import { Either, left, right } from '@/core/either';
+import { Permission } from '../../enterprise/entities/permission';
+import { PermissionsRepository } from '../repositories/permissions-repository';
+import { PermissionAlreadyExistsError } from './errors/permission-already-exists-error';
 
 interface CreatePermissionUseCaseRequest {
   name: string;

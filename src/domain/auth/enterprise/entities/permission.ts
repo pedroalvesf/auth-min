@@ -1,6 +1,6 @@
-import { Entity } from "@/core/entities/entity";
-import { UniqueEntityID } from "@/core/entities/unique-entity-id";
-import { Optional } from "@/core/types/optional";
+import { Entity } from '@/core/entities/entity';
+import { UniqueEntityID } from '@/core/entities/unique-entity-id';
+import { Optional } from '@/core/types/optional';
 
 export interface PermissionProps {
   name: string;
@@ -48,12 +48,12 @@ export class Permission extends Entity<PermissionProps> {
 
   matches(resource: string, action: string): boolean {
     // Suporta wildcard: "users:*" matches "users:create", "users:read", etc.
-    if (this.props.action === "*" && this.props.resource === resource) {
+    if (this.props.action === '*' && this.props.resource === resource) {
       return true;
     }
 
     // Suporta super wildcard: "*:*" matches tudo
-    if (this.props.resource === "*" && this.props.action === "*") {
+    if (this.props.resource === '*' && this.props.action === '*') {
       return true;
     }
 
@@ -65,7 +65,7 @@ export class Permission extends Entity<PermissionProps> {
   }
 
   static create(
-    props: Optional<PermissionProps, "createdAt" | "updatedAt">,
+    props: Optional<PermissionProps, 'createdAt' | 'updatedAt'>,
     id?: UniqueEntityID
   ) {
     const now = new Date();

@@ -1,11 +1,13 @@
-import { Injectable } from "@nestjs/common";
-import { PrismaService } from "../prisma.service";
-import { RolePermissionsRepository } from "@/domain/auth/application/repositories/role-permissions-repository";
-import { RolePermission } from "@/domain/auth/enterprise/entities/role-permission";
-import { PrismaRolePermissionMapper } from "../mappers/prisma-role-permission-mapper";
+import { Injectable } from '@nestjs/common';
+import { PrismaService } from '../prisma.service';
+import { RolePermissionsRepository } from '@/domain/auth/application/repositories/role-permissions-repository';
+import { RolePermission } from '@/domain/auth/enterprise/entities/role-permission';
+import { PrismaRolePermissionMapper } from '../mappers/prisma-role-permission-mapper';
 
 @Injectable()
-export class PrismaRolePermissionsRepository implements RolePermissionsRepository {
+export class PrismaRolePermissionsRepository
+  implements RolePermissionsRepository
+{
   constructor(private prisma: PrismaService) {}
 
   async create(rolePermission: RolePermission): Promise<void> {
@@ -46,7 +48,10 @@ export class PrismaRolePermissionsRepository implements RolePermissionsRepositor
     return rolePermissions.map(PrismaRolePermissionMapper.toDomain);
   }
 
-  async findByRoleAndPermission(roleId: string, permissionId: string): Promise<RolePermission | null> {
+  async findByRoleAndPermission(
+    roleId: string,
+    permissionId: string
+  ): Promise<RolePermission | null> {
     const rolePermission = await this.prisma.rolePermission.findFirst({
       where: {
         roleId,

@@ -1,18 +1,18 @@
-import { InMemoryUsersRepository } from "@/test/repositories/in-memory-users-repository";
-import { makeUser } from "@/test/factories/make-user";
-import { DeleteUserUseCase } from "../delete-user";
-import { UserNotFoundError } from "../errors/user-not-found-error";
+import { InMemoryUsersRepository } from '@/test/repositories/in-memory-users-repository';
+import { makeUser } from '@/test/factories/make-user';
+import { DeleteUserUseCase } from '../delete-user';
+import { UserNotFoundError } from '../errors/user-not-found-error';
 
 let usersRepository: InMemoryUsersRepository;
 let sut: DeleteUserUseCase;
 
-describe("Delete User", () => {
+describe('Delete User', () => {
   beforeEach(() => {
     usersRepository = new InMemoryUsersRepository();
     sut = new DeleteUserUseCase(usersRepository);
   });
 
-  it("should be able to delete a user", async () => {
+  it('should be able to delete a user', async () => {
     const user = makeUser();
 
     await usersRepository.create(user);
@@ -23,7 +23,7 @@ describe("Delete User", () => {
 
     expect(result.isRight()).toBe(true);
     if (result.isRight()) {
-      expect(result.value.message).toBe("User deleted successfully");
+      expect(result.value.message).toBe('User deleted successfully');
     }
 
     // Verify user was deleted
@@ -31,23 +31,23 @@ describe("Delete User", () => {
     expect(deletedUser).toBeNull();
   });
 
-  it("should not be able to delete a non-existent user", async () => {
+  it('should not be able to delete a non-existent user', async () => {
     const result = await sut.execute({
-      userId: "non-existent-user-id",
+      userId: 'non-existent-user-id',
     });
 
     expect(result.isLeft()).toBe(true);
     expect(result.value).toBeInstanceOf(UserNotFoundError);
   });
 
-  it("should remove all user roles when deleting user", async () => {
+  it('should remove all user roles when deleting user', async () => {
     const user = makeUser();
 
     await usersRepository.create(user);
 
     // Add some mock roles to the user
-    await usersRepository.assignRole(user.id.toString(), "role-1");
-    await usersRepository.assignRole(user.id.toString(), "role-2");
+    await usersRepository.assignRole(user.id.toString(), 'role-1');
+    await usersRepository.assignRole(user.id.toString(), 'role-2');
 
     // Verify roles were assigned
     let userRoles = await usersRepository.findRolesByUserId(user.id.toString());

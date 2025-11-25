@@ -1,11 +1,11 @@
-import { UniqueEntityID } from "@/core/entities/unique-entity-id";
-import { Role } from "@/domain/auth/enterprise/entities/role";
-import { PermissionList } from "@/domain/auth/enterprise/entities/permission-list";
+import { UniqueEntityID } from '@/core/entities/unique-entity-id';
+import { Role } from '@/domain/auth/enterprise/entities/role';
+import { PermissionList } from '@/domain/auth/enterprise/entities/permission-list';
 import {
   Role as PrismaRole,
   Permission as PrismaPermission,
-} from "@prisma/client";
-import { PrismaPermissionMapper } from "./prisma-permission-mapper";
+} from '@prisma/client';
+import { PrismaPermissionMapper } from './prisma-permission-mapper';
 
 export class PrismaRoleMapper {
   static toDomain(raw: PrismaRoleWithPermissions): Role {

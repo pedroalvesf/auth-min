@@ -1,6 +1,6 @@
-import { Entity } from "@/core/entities/entity";
-import { UniqueEntityID } from "@/core/entities/unique-entity-id";
-import { Optional } from "@/core/types/optional";
+import { Entity } from '@/core/entities/entity';
+import { UniqueEntityID } from '@/core/entities/unique-entity-id';
+import { Optional } from '@/core/types/optional';
 
 export interface UserRoleProps {
   userId: UniqueEntityID;
@@ -27,7 +27,7 @@ export class UserRole extends Entity<UserRoleProps> {
   }
 
   static create(
-    props: Optional<UserRoleProps, "assignedAt">,
+    props: Optional<UserRoleProps, 'assignedAt'>,
     id?: UniqueEntityID
   ) {
     return new UserRole(

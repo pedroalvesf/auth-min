@@ -1,4 +1,4 @@
-import { Device } from "@/domain/auth/enterprise/entities/device";
+import { Device } from '@/domain/auth/enterprise/entities/device';
 
 export abstract class DevicesRepository {
   abstract create: (device: Device) => Promise<void>;

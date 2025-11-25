@@ -1,6 +1,6 @@
-import { UniqueEntityID } from "@/core/entities/unique-entity-id";
-import { UserRole } from "@/domain/auth/enterprise/entities/user-role";
-import { UserRole as PrismaUserRole } from "@prisma/client";
+import { UniqueEntityID } from '@/core/entities/unique-entity-id';
+import { UserRole } from '@/domain/auth/enterprise/entities/user-role';
+import { UserRole as PrismaUserRole } from '@prisma/client';
 
 export class PrismaUserRoleMapper {
   static toDomain(raw: PrismaUserRole): UserRole {
@@ -8,7 +8,9 @@ export class PrismaUserRoleMapper {
       {
         userId: new UniqueEntityID(raw.userId),
         roleId: new UniqueEntityID(raw.roleId),
-        assignedBy: raw.assignedBy ? new UniqueEntityID(raw.assignedBy) : undefined,
+        assignedBy: raw.assignedBy
+          ? new UniqueEntityID(raw.assignedBy)
+          : undefined,
         assignedAt: raw.assignedAt,
       },
       new UniqueEntityID(raw.id)

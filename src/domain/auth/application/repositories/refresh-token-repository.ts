@@ -1,4 +1,4 @@
-import { RefreshToken } from "@/domain/auth/enterprise/entities/refresh-token";
+import { RefreshToken } from '@/domain/auth/enterprise/entities/refresh-token';
 
 export abstract class RefreshTokenRepository {
   abstract create: (refreshToken: RefreshToken) => Promise<void>;

@@ -1,9 +1,9 @@
-import { Injectable } from "@nestjs/common";
-import { Either, left, right } from "@/core/either";
-import { RefreshTokenRepository } from "../repositories/refresh-token-repository";
-import { DevicesRepository } from "../repositories/devices-repository";
-import { RefreshTokenNotFoundError } from "./errors/refresh-token-not-found-error";
-import { DeviceNotFoundError } from "./errors/device-not-found-error";
+import { Injectable } from '@nestjs/common';
+import { Either, left, right } from '@/core/either';
+import { RefreshTokenRepository } from '../repositories/refresh-token-repository';
+import { DevicesRepository } from '../repositories/devices-repository';
+import { RefreshTokenNotFoundError } from './errors/refresh-token-not-found-error';
+import { DeviceNotFoundError } from './errors/device-not-found-error';
 
 interface RevokeDeviceSessionUseCaseRequest {
   deviceId: string;
@@ -29,7 +29,9 @@ export class RevokeDeviceSessionUseCase {
     userId,
   }: RevokeDeviceSessionUseCaseRequest): Promise<RevokeDeviceSessionUseCaseResponse> {
     // Buscar todos os refresh tokens do dispositivo
-    const refreshTokens = await this.refreshTokenRepository.findByDeviceId(deviceId);
+    const refreshTokens = await this.refreshTokenRepository.findByDeviceId(
+      deviceId
+    );
 
     if (refreshTokens.length === 0) {
       return left(new RefreshTokenNotFoundError());
