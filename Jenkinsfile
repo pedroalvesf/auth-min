@@ -1,10 +1,5 @@
 pipeline {
-  agent {
-    docker {
-      image 'node:20-alpine'
-      args '-u root --privileged -v /var/run/docker.sock:/var/run/docker.sock'
-    }
-  }
+  agent any
   
   triggers {
     // Trigger on git pushes/commits

@@ -9,6 +9,7 @@ RUN apt-get update && apt-get install -y \
     ca-certificates \
     gnupg \
     lsb-release \
+    sudo \
     && mkdir -p /etc/apt/keyrings \
     && curl -fsSL https://download.docker.com/linux/debian/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg \
     && echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/debian $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null \
@@ -16,8 +17,14 @@ RUN apt-get update && apt-get install -y \
     && apt-get install -y docker-ce-cli docker-buildx-plugin docker-compose-plugin \
     && rm -rf /var/lib/apt/lists/*
 
-# Add jenkins user to docker group
+# Install Node.js
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
+    && apt-get install -y nodejs
+
+# Add jenkins user to docker group with correct GID for macOS Docker Desktop  
 RUN groupadd -f docker && usermod -aG docker jenkins
+# Also add permission workaround for macOS Docker Desktop
+RUN echo "jenkins ALL=(ALL) NOPASSWD: /usr/bin/docker*" >> /etc/sudoers
 
 # Copy plugins list and install
 COPY plugins.txt /usr/share/jenkins/ref/plugins.txt
