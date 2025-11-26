@@ -176,14 +176,16 @@ pipeline {
             sudo docker stop auth-postgres-test || true
             sudo docker rm auth-postgres-test || true
             
-            # Start test database with explicit port binding
+            # Start test database with host networking for maximum compatibility
             sudo docker run -d \
               --name auth-postgres-test \
-              --publish 8239:5432 \
+              --network host \
               --env POSTGRES_USER=auth_test_user \
               --env POSTGRES_PASSWORD=auth_test_password \
               --env POSTGRES_DB=auth_test_db \
-              postgres:15-alpine
+              --env PGPORT=8239 \
+              postgres:15-alpine \
+              postgres -p 8239
             
             # Wait for database to be ready
             timeout 60 bash -c 'until sudo docker exec auth-postgres-test pg_isready -U auth_test_user -d auth_test_db; do sleep 2; done'
@@ -215,13 +217,24 @@ pipeline {
           sh '''
             # Ensure test database is accessible
             echo "Testing database connectivity before running tests..."
-            timeout 30 bash -c 'until sudo docker exec auth-postgres-test pg_isready -U auth_test_user -d auth_test_db; do echo "Waiting for database..."; sleep 2; done'
+            timeout 30 bash -c 'until sudo docker exec auth-postgres-test pg_isready -U auth_test_user -d auth_test_db -p 8239; do echo "Waiting for database..."; sleep 2; done'
             
-            # Export test environment variables
+            # Test localhost connectivity
+            echo "Testing localhost:8239 connectivity..."
+            timeout 10 bash -c 'until nc -z localhost 8239; do echo "Waiting for localhost:8239..."; sleep 1; done' || echo "Warning: localhost:8239 not accessible via nc"
+            
+            # Export test environment variables for Jenkins
             export NODE_ENV=test
-            if [ -f .env.test ]; then
-              export $(cat .env.test | grep -v "^#" | xargs)
-            fi
+            export DATABASE_URL="postgresql://auth_test_user:auth_test_password@localhost:8239/auth_test_db"
+            export JWT_SECRET=test-jwt-secret-key-with-32-characters-minimum
+            export PORT=3001
+            export SECRET_ENCRYPTION_KEY=test-encryption-key
+            
+            # Show environment for debugging
+            echo "Environment variables:"
+            echo "NODE_ENV: $NODE_ENV"
+            echo "DATABASE_URL: $DATABASE_URL"
+            echo "PORT: $PORT"
             
             # Run E2E tests
             npm run ci:test

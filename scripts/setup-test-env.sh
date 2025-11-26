@@ -14,9 +14,22 @@ npm run prisma:generate:test
 # Configurar banco de dados de teste
 echo "🗄️  Configurando banco de dados de teste..."
 export NODE_ENV=test
-if [ -f .env.test ]; then
-  export $(cat .env.test | grep -v '^#' | xargs)
+
+# Use DATABASE_URL from environment if set (for Jenkins), otherwise use .env.test
+if [ -n "$DATABASE_URL" ]; then
+  echo "📍 Using environment DATABASE_URL: $DATABASE_URL"
+  # Load other vars from .env.test except DATABASE_URL
+  if [ -f .env.test ]; then
+    export $(cat .env.test | grep -v '^#' | grep -v '^DATABASE_URL=' | xargs)
+  fi
+else
+  # Load all vars from .env.test including DATABASE_URL
+  if [ -f .env.test ]; then
+    export $(cat .env.test | grep -v '^#' | xargs)
+  fi
+  echo "📍 Using .env.test DATABASE_URL: $DATABASE_URL"
 fi
+
 npx prisma migrate dev --schema=test/schema.prisma
 
 # Executar testes unitários
