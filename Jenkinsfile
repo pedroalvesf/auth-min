@@ -176,11 +176,33 @@ pipeline {
             sudo docker stop auth-postgres-test || true
             sudo docker rm auth-postgres-test || true
             
-            # Start test database using docker-compose
-            sudo docker compose -f docker-compose.test.yml up -d postgres-test
+            # Start test database with explicit port binding
+            sudo docker run -d \
+              --name auth-postgres-test \
+              --publish 8239:5432 \
+              --env POSTGRES_USER=auth_test_user \
+              --env POSTGRES_PASSWORD=auth_test_password \
+              --env POSTGRES_DB=auth_test_db \
+              postgres:15-alpine
             
             # Wait for database to be ready
-            timeout 60 bash -c 'until sudo docker exec $(sudo docker ps -qf "name=auth-postgres-test") pg_isready -U auth_test_user; do sleep 2; done'
+            timeout 60 bash -c 'until sudo docker exec auth-postgres-test pg_isready -U auth_test_user -d auth_test_db; do sleep 2; done'
+            
+            # Get container network information
+            echo "Container network information:"
+            sudo docker inspect auth-postgres-test --format='{{.NetworkSettings.IPAddress}}'
+            sudo docker port auth-postgres-test 5432
+            
+            # Verify port is accessible from host
+            echo "Testing port connectivity..."
+            sudo netstat -ln | grep 8239 || true
+            
+            # Test direct database connection
+            sudo docker exec auth-postgres-test psql -U auth_test_user -d auth_test_db -c "SELECT 1;" || echo "Direct DB test failed"
+            
+            # Test connection from host using docker network
+            DB_IP=$(sudo docker inspect auth-postgres-test --format='{{.NetworkSettings.IPAddress}}')
+            echo "Database container IP: $DB_IP"
           '''
         }
       }
@@ -189,7 +211,22 @@ pipeline {
     stage('E2E Tests') {
       steps {
         echo 'Running E2E tests with test database...'
-        sh 'npm run ci:test'
+        script {
+          sh '''
+            # Ensure test database is accessible
+            echo "Testing database connectivity before running tests..."
+            timeout 30 bash -c 'until sudo docker exec auth-postgres-test pg_isready -U auth_test_user -d auth_test_db; do echo "Waiting for database..."; sleep 2; done'
+            
+            # Export test environment variables
+            export NODE_ENV=test
+            if [ -f .env.test ]; then
+              export $(cat .env.test | grep -v "^#" | xargs)
+            fi
+            
+            # Run E2E tests
+            npm run ci:test
+          '''
+        }
       }
       post {
         always {
@@ -379,7 +416,11 @@ pipeline {
               # Stop test database containers
               sudo docker stop auth-postgres-test || true
               sudo docker rm auth-postgres-test || true
-              sudo docker compose -f docker-compose.test.yml down || true
+              
+              # Try to bring down docker-compose if file exists
+              if [ -f docker-compose.test.yml ]; then
+                sudo docker compose -f docker-compose.test.yml down || true
+              fi
               
               # General cleanup
               sudo docker system prune -f || true
