@@ -258,7 +258,7 @@ describe('Authentication E2E', () => {
         name: 'Admin User',
       };
 
-      const { accessToken, userId } = await authHelper.createUserWithRole(
+      const { accessToken } = await authHelper.createUserWithRole(
         adminData,
         'admin'
       );
@@ -324,8 +324,7 @@ describe('Authentication E2E', () => {
       };
 
       // 1. Create user + auto-login
-      const { accessToken: token1, refreshToken: refresh1 } =
-        await authHelper.createUser(userData);
+      const { accessToken: token1 } = await authHelper.createUser(userData);
 
       // 2. Use access token for authenticated request (test endpoint that only needs authentication)
       const user = await prisma.user.findUnique({

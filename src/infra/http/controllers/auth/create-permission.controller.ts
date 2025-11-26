@@ -4,7 +4,6 @@ import {
   Body,
   UseGuards,
   HttpCode,
-  BadRequestException,
   ConflictException,
 } from '@nestjs/common';
 import {

@@ -6,7 +6,6 @@ import { makeRefreshToken } from '@/test/factories/make-refresh-token';
 import { RevokeDeviceSessionUseCase } from '../revoke-device-session';
 import { RefreshTokenNotFoundError } from '../errors/refresh-token-not-found-error';
 import { DeviceNotFoundError } from '../errors/device-not-found-error';
-import { UniqueEntityID } from '@/core/entities/unique-entity-id';
 
 let devicesRepository: InMemoryDevicesRepository;
 let refreshTokenRepository: InMemoryRefreshTokenRepository;

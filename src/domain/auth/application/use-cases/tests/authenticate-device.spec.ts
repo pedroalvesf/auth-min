@@ -13,7 +13,7 @@ let devicesRepository: InMemoryDevicesRepository;
 let refreshTokenRepository: InMemoryRefreshTokenRepository;
 let hashComparer: FakeHashComparer;
 let encrypter: FakeEncrypter;
-let mockLogger: any;
+let mockLogger: unknown;
 let sut: AuthenticateDeviceUseCase;
 
 describe('Authenticate Device', () => {
@@ -35,7 +35,7 @@ describe('Authenticate Device', () => {
       refreshTokenRepository,
       hashComparer,
       encrypter,
-      mockLogger
+      mockLogger as any // eslint-disable-line @typescript-eslint/no-explicit-any
     );
   });
 

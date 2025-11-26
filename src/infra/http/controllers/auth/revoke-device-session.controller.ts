@@ -30,7 +30,10 @@ export class RevokeDeviceSessionController {
   })
   @ApiResponse({ status: 400, description: 'Device session not found' })
   @ApiResponse({ status: 404, description: 'Device not found' })
-  async handle(@Body() body: RevokeDeviceSessionDto, @Request() request: any) {
+  async handle(
+    @Body() body: RevokeDeviceSessionDto,
+    @Request() request: { user: { sub: string } }
+  ) {
     const userId = request.user.sub;
 
     const result = await this.revokeDeviceSessionUseCase.execute({

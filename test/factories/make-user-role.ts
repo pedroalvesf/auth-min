@@ -4,14 +4,10 @@ import {
   UserRoleProps,
 } from '@/domain/auth/enterprise/entities/user-role';
 
-let userRoleCounter = 0;
-
 export function makeUserRole(
   override: Partial<UserRoleProps> = {},
   id?: UniqueEntityID
 ) {
-  userRoleCounter++;
-
   const userRole = UserRole.create(
     {
       userId: new UniqueEntityID('user-1'),

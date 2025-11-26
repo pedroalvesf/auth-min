@@ -29,7 +29,12 @@ export class CustomLogger implements LoggerService {
   }
 
   // Custom methods for structured logging
-  logAuth(action: string, userId: string, deviceId?: string, metadata?: any) {
+  logAuth(
+    action: string,
+    userId: string,
+    deviceId?: string,
+    metadata?: Record<string, unknown>
+  ) {
     this.logger.info('Authentication event', {
       context: 'AUTH',
       action,
@@ -39,7 +44,7 @@ export class CustomLogger implements LoggerService {
     });
   }
 
-  logSecurity(event: string, details: any) {
+  logSecurity(event: string, details: Record<string, unknown>) {
     this.logger.warn('Security event', {
       context: 'SECURITY',
       event,
@@ -47,7 +52,11 @@ export class CustomLogger implements LoggerService {
     });
   }
 
-  logPerformance(operation: string, duration: number, metadata?: any) {
+  logPerformance(
+    operation: string,
+    duration: number,
+    metadata?: Record<string, unknown>
+  ) {
     this.logger.info('Performance metric', {
       context: 'PERFORMANCE',
       operation,
@@ -56,7 +65,7 @@ export class CustomLogger implements LoggerService {
     });
   }
 
-  logError(error: Error, context: string, metadata?: any) {
+  logError(error: Error, context: string, metadata?: Record<string, unknown>) {
     this.logger.error(error.message, {
       context,
       stack: error.stack,

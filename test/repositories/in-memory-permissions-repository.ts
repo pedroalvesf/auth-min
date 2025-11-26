@@ -28,7 +28,7 @@ export class InMemoryPermissionsRepository implements PermissionsRepository {
     return this.items;
   }
 
-  async findByRoleId(roleId: string): Promise<Permission[]> {
+  async findByRoleId(_roleId: string): Promise<Permission[]> {
     // For this in-memory implementation, we'll return empty array
     // In a real implementation, this would query role-permission relationships
     return [];

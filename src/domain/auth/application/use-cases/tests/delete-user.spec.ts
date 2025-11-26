@@ -50,7 +50,9 @@ describe('Delete User', () => {
     await usersRepository.assignRole(user.id.toString(), 'role-2');
 
     // Verify roles were assigned
-    let userRoles = await usersRepository.findRolesByUserId(user.id.toString());
+    const userRoles = await usersRepository.findRolesByUserId(
+      user.id.toString()
+    );
     expect(userRoles).toHaveLength(0); // Will be 0 because roles don't exist in mock data
 
     // But userRoles association should exist

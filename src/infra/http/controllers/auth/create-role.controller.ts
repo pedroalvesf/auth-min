@@ -11,7 +11,6 @@ import { PermissionsGuard } from '@/infra/auth/guards/permissions-guard';
 import { CreateRoleUseCase } from '@/domain/auth/application/use-cases/create-role';
 import { CreateRoleDto } from '../dto/create-role-dto';
 import { RoleResponseDto } from '../dto/role-response-dto';
-import { BadRequestException, ForbiddenException } from '@nestjs/common';
 
 @ApiTags('Authorization')
 @Controller('roles')

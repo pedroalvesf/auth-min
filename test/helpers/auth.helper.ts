@@ -143,7 +143,7 @@ export class AuthHelper {
     method: 'get' | 'post' | 'put' | 'delete',
     endpoint: string,
     accessToken: string,
-    data?: any
+    data?: Record<string, unknown>
   ) {
     const req = request(this.app.getHttpServer())
       [method](endpoint)

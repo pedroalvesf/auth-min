@@ -10,7 +10,7 @@ import { EnvService } from '../env/env.service';
     WinstonModule.forRootAsync({
       imports: [EnvModule],
       inject: [EnvService],
-      useFactory: (envService: EnvService) => {
+      useFactory: (_envService: EnvService) => {
         const isDevelopment = process.env.NODE_ENV === 'development';
         const isTest = process.env.NODE_ENV === 'test';
 
