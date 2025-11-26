@@ -152,7 +152,7 @@ pipeline {
       }
       post {
         always {
-          publishTestResults testResultsPattern: 'coverage/junit.xml'
+          junit testResultsPattern: 'coverage/junit.xml'
           publishCoverage adapters: [
             istanbulCoberturaAdapter('coverage/cobertura-coverage.xml')
           ], sourceFileResolver: sourceFiles('STORE_LAST_BUILD')
@@ -169,7 +169,7 @@ pipeline {
       }
       post {
         always {
-          publishTestResults testResultsPattern: 'test-results/junit.xml'
+          junit testResultsPattern: 'test-results/junit.xml'
         }
       }
     }
