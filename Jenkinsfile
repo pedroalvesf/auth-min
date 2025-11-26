@@ -19,6 +19,7 @@ pipeline {
       token: 'auth-min-webhook-token',
       printContributedVariables: true,
       printPostContent: true,
+      
       silentResponse: false
     )
   }
@@ -166,9 +167,28 @@ pipeline {
       }
     }
     
+    stage('Setup Test Database') {
+      steps {
+        echo 'Starting PostgreSQL test database...'
+        script {
+          sh '''
+            # Stop any existing test containers
+            sudo docker stop auth-postgres-test || true
+            sudo docker rm auth-postgres-test || true
+            
+            # Start test database using docker-compose
+            sudo docker compose -f docker-compose.test.yml up -d postgres-test
+            
+            # Wait for database to be ready
+            timeout 60 bash -c 'until sudo docker exec $(sudo docker ps -qf "name=auth-postgres-test") pg_isready -U auth_test_user; do sleep 2; done'
+          '''
+        }
+      }
+    }
+    
     stage('E2E Tests') {
       steps {
-        echo 'Setting up test database and running E2E tests...'
+        echo 'Running E2E tests with test database...'
         sh 'npm run ci:test'
       }
       post {
@@ -355,7 +375,15 @@ pipeline {
         node {
           echo 'Cleaning up...'
           try {
-            sh 'sudo docker system prune -f || true'
+            sh '''
+              # Stop test database containers
+              sudo docker stop auth-postgres-test || true
+              sudo docker rm auth-postgres-test || true
+              sudo docker compose -f docker-compose.test.yml down || true
+              
+              # General cleanup
+              sudo docker system prune -f || true
+            '''
           } catch (Exception e) {
             echo "Docker cleanup failed: ${e.getMessage()}"
           }
