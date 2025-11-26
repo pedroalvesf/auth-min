@@ -31,7 +31,7 @@
     "db:reset": "npm run prisma:migrate reset && npm run db:seed",
     "db:setup:test": "npm run prisma:generate:test && npm run prisma:migrate:test",
     "test:setup": "./scripts/setup-test-env.sh",
-    "ci:test": "npm run test:setup",
+    "ci:test": "npm run db:setup:test && npm run test && npm run test:e2e:ci",
     "pre-commit": "npm run lint:check && npm run test:coverage && npm run test:e2e",
     "verify": "npm run ci:test"
   },
