@@ -25,8 +25,8 @@ pipeline {
   
   options {
     timestamps()
-    durabilityHint('PERFORMANCE_OPTIMIZED')
-    timeout(time: 30, unit: 'MINUTES')
+    durabilityHint('MAX_SURVIVABILITY')
+    timeout(time: 45, unit: 'MINUTES')
     skipDefaultCheckout(false)
     // IMPORTANTE: tirei o skipStagesAfterUnstable()
     // pra que stages continuem rodando mesmo se algo marcar UNSTABLE
