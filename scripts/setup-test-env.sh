@@ -14,8 +14,10 @@ npm run prisma:generate:test
 # Configurar banco de dados de teste
 echo "🗄️  Configurando banco de dados de teste..."
 export NODE_ENV=test
-source .env.test || echo "Arquivo .env.test não encontrado, usando variáveis inline"
-DATABASE_URL="postgresql://auth_test_user:auth_test_password@localhost:8239/auth_test_db" npx prisma db push --skip-generate --schema=test/schema.prisma
+if [ -f .env.test ]; then
+  export $(cat .env.test | grep -v '^#' | xargs)
+fi
+npx prisma migrate dev --schema=test/schema.prisma
 
 # Executar testes unitários
 echo "🧪 Executando testes unitários..."
