@@ -176,35 +176,36 @@ pipeline {
             sudo docker stop auth-postgres-test || true
             sudo docker rm auth-postgres-test || true
             
-            # Start test database with host networking for maximum compatibility
+            # Start test database with port mapping (more reliable than host networking)
             sudo docker run -d \
               --name auth-postgres-test \
-              --network host \
+              -p 8239:5432 \
               --env POSTGRES_USER=auth_test_user \
               --env POSTGRES_PASSWORD=auth_test_password \
               --env POSTGRES_DB=auth_test_db \
-              --env PGPORT=8239 \
-              postgres:15-alpine \
-              postgres -p 8239
+              postgres:15-alpine
             
-            # Wait for database to be ready
+            # Wait for database to be ready inside container
             timeout 60 bash -c 'until sudo docker exec auth-postgres-test pg_isready -U auth_test_user -d auth_test_db; do sleep 2; done'
             
-            # Get container network information
-            echo "Container network information:"
-            sudo docker inspect auth-postgres-test --format='{{.NetworkSettings.IPAddress}}'
-            sudo docker port auth-postgres-test 5432
-            
-            # Verify port is accessible from host
-            echo "Testing port connectivity..."
-            sudo netstat -ln | grep 8239 || true
-            
-            # Test direct database connection
+            # Test database connection from inside container
             sudo docker exec auth-postgres-test psql -U auth_test_user -d auth_test_db -c "SELECT 1;" || echo "Direct DB test failed"
             
-            # Test connection from host using docker network
-            DB_IP=$(sudo docker inspect auth-postgres-test --format='{{.NetworkSettings.IPAddress}}')
-            echo "Database container IP: $DB_IP"
+            # Check if port is accessible from host
+            echo "Testing host connectivity to container..."
+            for i in {1..30}; do
+              if sudo docker exec auth-postgres-test pg_isready -U auth_test_user -d auth_test_db; then
+                echo "✅ Database ready inside container"
+                break
+              fi
+              echo "Waiting for database ($i/30)..."
+              sleep 2
+            done
+            
+            # Get container info for debugging
+            echo "Container network info:"
+            sudo docker inspect auth-postgres-test --format='Container IP: {{.NetworkSettings.IPAddress}}'
+            sudo docker port auth-postgres-test 5432 || echo "No port mapping found"
           '''
         }
       }
@@ -215,28 +216,52 @@ pipeline {
         echo 'Running E2E tests with test database...'
         script {
           sh '''
-            # Ensure test database is accessible
-            echo "Testing database connectivity before running tests..."
-            timeout 30 bash -c 'until sudo docker exec auth-postgres-test pg_isready -U auth_test_user -d auth_test_db -p 8239; do echo "Waiting for database..."; sleep 2; done'
+            # Verify database is ready
+            echo "🔍 Verifying database connectivity..."
+            sudo docker exec auth-postgres-test pg_isready -U auth_test_user -d auth_test_db || {
+              echo "❌ Database not ready"
+              exit 1
+            }
             
-            # Test localhost connectivity
-            echo "Testing localhost:8239 connectivity..."
-            timeout 10 bash -c 'until nc -z localhost 8239; do echo "Waiting for localhost:8239..."; sleep 1; done' || echo "Warning: localhost:8239 not accessible via nc"
+            # Determine the best connection approach for this Jenkins environment
+            echo "🌐 Determining database connection method..."
             
-            # Export test environment variables for Jenkins
+            DB_URL=""
+            
+            # Method 1: Try localhost:8239
+            if timeout 5 bash -c "echo 'SELECT 1;' | sudo docker exec -i auth-postgres-test psql -h localhost -p 8239 -U auth_test_user -d auth_test_db >/dev/null 2>&1"; then
+              echo "✅ localhost:8239 works"
+              DB_URL="postgresql://auth_test_user:auth_test_password@localhost:8239/auth_test_db"
+            
+            # Method 2: Try container IP
+            elif CONTAINER_IP=$(sudo docker inspect auth-postgres-test --format='{{.NetworkSettings.IPAddress}}') && [ -n "$CONTAINER_IP" ]; then
+              echo "✅ Using container IP: $CONTAINER_IP"
+              DB_URL="postgresql://auth_test_user:auth_test_password@${CONTAINER_IP}:5432/auth_test_db"
+            
+            # Method 3: Try Docker host gateway
+            else
+              echo "✅ Using docker host gateway"
+              DB_URL="postgresql://auth_test_user:auth_test_password@host.docker.internal:8239/auth_test_db"
+            fi
+            
+            echo "📍 Using DATABASE_URL: $DB_URL"
+            
+            # Export environment variables
             export NODE_ENV=test
-            export DATABASE_URL="postgresql://auth_test_user:auth_test_password@localhost:8239/auth_test_db"
+            export DATABASE_URL="$DB_URL"
             export JWT_SECRET=test-jwt-secret-key-with-32-characters-minimum
             export PORT=3001
             export SECRET_ENCRYPTION_KEY=test-encryption-key
             
-            # Show environment for debugging
-            echo "Environment variables:"
-            echo "NODE_ENV: $NODE_ENV"
-            echo "DATABASE_URL: $DATABASE_URL"
-            echo "PORT: $PORT"
+            # Test the chosen connection method
+            echo "🧪 Testing database connection with chosen method..."
+            timeout 10 bash -c "npm run prisma:generate:test" || {
+              echo "❌ Prisma generate failed"
+              exit 1
+            }
             
             # Run E2E tests
+            echo "🚀 Running E2E tests..."
             npm run ci:test
           '''
         }
