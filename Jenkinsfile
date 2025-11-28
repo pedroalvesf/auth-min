@@ -13,14 +13,13 @@ pipeline {
     timestamps()
     durabilityHint('MAX_SURVIVABILITY')
     timeout(time: 30, unit: 'MINUTES')
-    skipDefaultCheckout(false)
   }
 
   environment {
     NODE_ENV = 'test'
     CI = 'true'
-    GIT_SSL_NO_VERIFY = 'true'
-    GIT_TIMEOUT = '300'
+    // GIT_SSL_NO_VERIFY = 'true' //checar se podemos retirar isso e testar
+    GIT_TIMEOUT = '120'
   }
 
   stages {
@@ -28,12 +27,12 @@ pipeline {
       steps {
         echo 'Checking out source code...'
         script {
-          sh '''
-            git config --global http.timeout 300
-            git config --global http.lowSpeedLimit 0
-            git config --global http.lowSpeedTime 300
-            git config --global http.sslVerify false
-          '''
+          // sh '''
+          //   git config --global http.timeout 300
+          //   git config --global http.lowSpeedLimit 0
+          //   git config --global http.lowSpeedTime 300
+          //   git config --global http.sslVerify false
+          // '''
         }
         retry(3) {
           checkout scm
