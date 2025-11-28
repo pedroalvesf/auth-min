@@ -26,14 +26,6 @@ pipeline {
     stage('Checkout') {
       steps {
         echo 'Checking out source code...'
-        script {
-          // sh '''
-          //   git config --global http.timeout 300
-          //   git config --global http.lowSpeedLimit 0
-          //   git config --global http.lowSpeedTime 300
-          //   git config --global http.sslVerify false
-          // '''
-        }
         retry(3) {
           checkout scm
         }
