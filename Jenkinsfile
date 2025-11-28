@@ -1,31 +1,42 @@
 pipeline {
   agent any
 
-  triggers {
-    // Trigger on git pushes/commits
-    githubPush()
-
-    // Poll SCM every 2 minutes for changes (fallback)
-    pollSCM('H/2 * * * *')
-  }
+  // TRIGGERS DESABILITADOS - Apenas builds manuais
+  // Descomentar quando estiver tudo estável
+  // triggers {
+  //   // Trigger on git pushes/commits
+  //   githubPush()
+  //
+  //   // Poll SCM every 2 minutes for changes (fallback)
+  //   pollSCM('H/2 * * * *')
+  // }
 
   options {
     timestamps()
     durabilityHint('MAX_SURVIVABILITY')
     timeout(time: 30, unit: 'MINUTES')
+    skipDefaultCheckout(false)
   }
 
   environment {
     NODE_ENV = 'test'
     CI = 'true'
-    // GIT_SSL_NO_VERIFY = 'true' //checar se podemos retirar isso e testar
-    GIT_TIMEOUT = '120'
+    GIT_SSL_NO_VERIFY = 'true'
+    GIT_TIMEOUT = '300'
   }
 
   stages {
     stage('Checkout') {
       steps {
         echo 'Checking out source code...'
+        script {
+          sh '''
+            git config --global http.timeout 300
+            git config --global http.lowSpeedLimit 0
+            git config --global http.lowSpeedTime 300
+            git config --global http.sslVerify false
+          '''
+        }
         retry(3) {
           checkout scm
         }
