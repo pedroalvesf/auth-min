@@ -182,6 +182,8 @@ pipeline {
 
     stage('E2E Tests') {
       steps {
+        echo 'Generating Prisma test client...'
+        sh 'npm run prisma:generate:test'
         echo 'Running E2E tests...'
         sh 'npm run test:e2e:ci'
       }
