@@ -126,10 +126,39 @@ pipeline {
         archiveArtifacts artifacts: 'dist/**/*', fingerprint: true
       }
     }
+
+    stage('Test Database Setup') {
+      steps {
+        echo 'Starting test database...'
+        sh 'docker-compose -f docker-compose.test.yml up -d postgres-test'
+        sh 'sleep 10'  // Wait for database to be ready
+        echo 'Setting up test database schema...'
+        sh 'npm run db:setup:test'
+      }
+    }
+
+    stage('E2E Tests') {
+      steps {
+        echo 'Running E2E tests...'
+        sh 'npm run test:e2e:ci'
+      }
+      post {
+        always {
+          script {
+            if (fileExists('test-results/junit.xml')) {
+              junit testResults: 'test-results/junit.xml'
+            }
+          }
+          archiveArtifacts artifacts: 'test-results/**/*', fingerprint: true, allowEmptyArchive: true
+        }
+      }
+    }
   }
 
   post {
     always {
+      echo 'Stopping test database...'
+      sh 'docker-compose -f docker-compose.test.yml down || true'
       echo 'Cleaning up workspace...'
       cleanWs()
     }
