@@ -130,7 +130,15 @@ pipeline {
     stage('Test Database Setup') {
       steps {
         echo 'Starting test database...'
-        sh 'docker-compose -f docker-compose.test.yml up -d postgres-test'
+        sh '''
+          docker run -d \
+            --name auth-postgres-test-${BUILD_NUMBER} \
+            -e POSTGRES_USER=auth_test_user \
+            -e POSTGRES_PASSWORD=auth_test_password \
+            -e POSTGRES_DB=auth_test_db \
+            -p 8239:5432 \
+            postgres:15-alpine
+        '''
         sh 'sleep 10'  // Wait for database to be ready
         echo 'Setting up test database schema...'
         sh 'npm run db:setup:test'
@@ -158,7 +166,8 @@ pipeline {
   post {
     always {
       echo 'Stopping test database...'
-      sh 'docker-compose -f docker-compose.test.yml down || true'
+      sh 'docker stop auth-postgres-test-${BUILD_NUMBER} || true'
+      sh 'docker rm auth-postgres-test-${BUILD_NUMBER} || true'
       echo 'Cleaning up workspace...'
       cleanWs()
     }
