@@ -146,9 +146,8 @@ pipeline {
             -e POSTGRES_USER=auth_test_user \
             -e POSTGRES_PASSWORD=auth_test_password \
             -e POSTGRES_DB=auth_test_db \
-            -e POSTGRES_HOST_AUTH_METHOD=trust \
-            postgres:15-alpine \
-            -p 8239
+            -e PGPORT=8239 \
+            postgres:15-alpine
         '''
         sh 'sleep 10'  // Wait for database to be ready
         echo 'Setting up test database schema...'
