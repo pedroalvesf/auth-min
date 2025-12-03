@@ -149,7 +149,17 @@ pipeline {
             -e PGPORT=8239 \
             postgres:15-alpine
         '''
-        sh 'sleep 10'  // Wait for database to be ready
+        echo 'Waiting for database to be ready...'
+        sh 'sleep 15'
+        echo 'Checking database connectivity...'
+        sh '''
+          # Check if container is running
+          sudo docker ps | grep auth-postgres-test-${BUILD_NUMBER}
+          # Check container logs
+          sudo docker logs auth-postgres-test-${BUILD_NUMBER}
+          # Try to connect to database
+          sudo docker exec auth-postgres-test-${BUILD_NUMBER} psql -U auth_test_user -d auth_test_db -c "SELECT 1" || echo "Connection failed"
+        '''
         echo 'Setting up test database schema...'
         sh 'npm run db:setup:test'
       }
