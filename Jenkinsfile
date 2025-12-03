@@ -142,11 +142,10 @@ pipeline {
         sh '''
           sudo docker run -d \
             --name auth-postgres-test-${BUILD_NUMBER} \
-            --network host \
+            -p 8239:5432 \
             -e POSTGRES_USER=auth_test_user \
             -e POSTGRES_PASSWORD=auth_test_password \
             -e POSTGRES_DB=auth_test_db \
-            -e PGPORT=8239 \
             postgres:15-alpine
         '''
         echo 'Waiting for database to be ready...'
@@ -171,7 +170,7 @@ pipeline {
             apk add --no-cache nodejs npm && \
             npm install -g prisma@6.19.0 && \
             cd /tmp && \
-            export DATABASE_URL='postgresql://auth_test_user:auth_test_password@localhost:8239/auth_test_db' && \
+            export DATABASE_URL='postgresql://auth_test_user:auth_test_password@localhost:5432/auth_test_db' && \
             prisma generate --schema=./schema.prisma && \
             prisma migrate deploy --schema=./schema.prisma || \
             prisma db push --schema=./schema.prisma --skip-generate --accept-data-loss
