@@ -161,7 +161,22 @@ pipeline {
           sudo docker exec auth-postgres-test-${BUILD_NUMBER} psql -U auth_test_user -d auth_test_db -c "SELECT 1" || echo "Connection failed"
         '''
         echo 'Setting up test database schema...'
-        sh 'npm run db:setup:test'
+        sh '''
+          # Copy schema and migrations to container
+          sudo docker cp test/schema.prisma auth-postgres-test-${BUILD_NUMBER}:/tmp/
+          sudo docker cp test/migrations auth-postgres-test-${BUILD_NUMBER}:/tmp/ || true
+
+          # Install Node.js and Prisma CLI in the container
+          sudo docker exec auth-postgres-test-${BUILD_NUMBER} sh -c "
+            apk add --no-cache nodejs npm && \
+            npm install -g prisma@6.19.0 && \
+            cd /tmp && \
+            export DATABASE_URL='postgresql://auth_test_user:auth_test_password@localhost:8239/auth_test_db' && \
+            prisma generate --schema=./schema.prisma && \
+            prisma migrate deploy --schema=./schema.prisma || \
+            prisma db push --schema=./schema.prisma --skip-generate --accept-data-loss
+          "
+        '''
       }
     }
 
