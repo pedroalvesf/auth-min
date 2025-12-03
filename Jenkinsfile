@@ -129,6 +129,15 @@ pipeline {
 
     stage('Test Database Setup') {
       steps {
+        echo 'Cleaning up any existing test database...'
+        sh '''
+          # Stop and remove any container using port 8239
+          sudo docker ps -a | grep 8239 | awk '{print $1}' | xargs -r sudo docker stop || true
+          sudo docker ps -a | grep 8239 | awk '{print $1}' | xargs -r sudo docker rm || true
+          # Also remove by name pattern if exists
+          sudo docker stop auth-postgres-test-${BUILD_NUMBER} || true
+          sudo docker rm auth-postgres-test-${BUILD_NUMBER} || true
+        '''
         echo 'Starting test database...'
         sh '''
           sudo docker run -d \
