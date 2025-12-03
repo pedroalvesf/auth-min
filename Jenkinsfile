@@ -131,7 +131,7 @@ pipeline {
       steps {
         echo 'Starting test database...'
         sh '''
-          docker run -d \
+          sudo docker run -d \
             --name auth-postgres-test-${BUILD_NUMBER} \
             -e POSTGRES_USER=auth_test_user \
             -e POSTGRES_PASSWORD=auth_test_password \
@@ -166,8 +166,8 @@ pipeline {
   post {
     always {
       echo 'Stopping test database...'
-      sh 'docker stop auth-postgres-test-${BUILD_NUMBER} || true'
-      sh 'docker rm auth-postgres-test-${BUILD_NUMBER} || true'
+      sh 'sudo docker stop auth-postgres-test-${BUILD_NUMBER} || true'
+      sh 'sudo docker rm auth-postgres-test-${BUILD_NUMBER} || true'
       echo 'Cleaning up workspace...'
       cleanWs()
     }
