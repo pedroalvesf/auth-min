@@ -142,11 +142,13 @@ pipeline {
         sh '''
           sudo docker run -d \
             --name auth-postgres-test-${BUILD_NUMBER} \
+            --network host \
             -e POSTGRES_USER=auth_test_user \
             -e POSTGRES_PASSWORD=auth_test_password \
             -e POSTGRES_DB=auth_test_db \
-            -p 8239:5432 \
-            postgres:15-alpine
+            -e POSTGRES_HOST_AUTH_METHOD=trust \
+            postgres:15-alpine \
+            -p 8239
         '''
         sh 'sleep 10'  // Wait for database to be ready
         echo 'Setting up test database schema...'
