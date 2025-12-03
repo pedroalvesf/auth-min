@@ -24,10 +24,12 @@ Authentication service built with **NestJS** + **DDD** + **Clean Architecture** 
 ## 🚀 Quick Start
 
 ### Prerequisites
+
 - Node.js 18+
 - Docker & Docker Compose
 
 ### 1. Clone & Install
+
 ```bash
 git clone <your-repo-url>
 cd auth-min
@@ -35,33 +37,40 @@ npm install
 ```
 
 ### 2. Setup Environment
+
 ```bash
 cp .env.example .env
 # Edit .env with your settings
 ```
 
 ### 3. Start with Docker
+
 ```bash
 docker-compose up -d
 ```
 
 ### 4. Run Migrations
+
 ```bash
 npm run prisma:migrate
 ```
 
 ### 5. Seed Database (Optional but Recommended)
+
 Populate database with test users, roles and permissions from centralized config:
+
 ```bash
 npm run db:seed
 ```
 
 This creates:
+
 - **23 permissions** (users, roles, devices, audit, permissions + wildcards)
 - **5 roles** with hierarchy (super-admin → admin → manager → editor → viewer)
 - **4 test users** with different access levels
 
 Test credentials:
+
 - `superadmin@authmin.com` / `senha123` (full access - `*:*`)
 - `admin@authmin.com` / `senha123` (admin access)
 - `manager@authmin.com` / `senha123` (manager access)
@@ -71,6 +80,7 @@ Test credentials:
 **📖 Full Guide:** See `prisma/README_PERMISSIONS.md`
 
 ### 6. Development
+
 ```bash
 npm run dev
 # Server running on http://localhost:3000
@@ -78,28 +88,20 @@ npm run dev
 
 ## 📖 API Endpoints
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/auth/register` | Register new user |
-| POST | `/auth/authenticate-device` | Device authentication |
-| POST | `/auth/refresh-token` | Refresh access token |
-| POST | `/auth/validate-token` | Validate JWT token |
-| POST | `/auth/revoke-device` | Revoke specific device |
-| POST | `/auth/revoke-all-devices` | Revoke all user devices |
-| GET | `/health` | Health check |
+| Method | Endpoint                    | Description             |
+| ------ | --------------------------- | ----------------------- |
+| POST   | `/auth/register`            | Register new user       |
+| POST   | `/auth/authenticate-device` | Device authentication   |
+| POST   | `/auth/refresh-token`       | Refresh access token    |
+| POST   | `/auth/validate-token`      | Validate JWT token      |
+| POST   | `/auth/revoke-device`       | Revoke specific device  |
+| POST   | `/auth/revoke-all-devices`  | Revoke all user devices |
+| GET    | `/health`                   | Health check            |
 
 ## 📚 Documentation
 
-### 🆕 New Planning Documents
-- **[QUICK_START.md](./QUICK_START.md)** - Start here! Quick overview and getting started
-- **[STRATEGIC_ROADMAP.md](./STRATEGIC_ROADMAP.md)** - Complete strategic planning and roadmap (6-12 months)
-- **[IMPLEMENTATION_GUIDE.md](./IMPLEMENTATION_GUIDE.md)** - Practical week-by-week implementation guide
-
-### Existing Technical Documentation
-- **[CRYPTOGRAPHY_DOCUMENTATION.md](./CRYPTOGRAPHY_DOCUMENTATION.md)** - Deep dive into security implementation
-- **[POSTMAN_TESTING_GUIDE.md](./POSTMAN_TESTING_GUIDE.md)** - API testing guide with Postman
-
 ### What's Covered
+
 - Complete architecture overview
 - Strategic roadmap (50+ planned features)
 - Step-by-step implementation guides

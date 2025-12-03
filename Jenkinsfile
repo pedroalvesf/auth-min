@@ -99,21 +99,22 @@ pipeline {
 
     stage('Unit Tests') {
       steps {
-        echo 'Running unit tests with coverage...'
-        sh 'npm run test:coverage'
+        echo 'Running unit tests...'
+        sh 'npm run test:ci'
       }
       post {
         always {
           script {
-            if (fileExists('coverage/junit.xml')) {
-              junit testResults: 'coverage/junit.xml'
+            if (fileExists('junit.xml')) {
+              junit testResults: 'junit.xml'
             }
           }
-          publishCoverage adapters: [
-            istanbulCoberturaAdapter('coverage/cobertura-coverage.xml')
-          ], sourceFileResolver: sourceFiles('STORE_LAST_BUILD')
-
-          archiveArtifacts artifacts: 'coverage/**/*', fingerprint: true, allowEmptyArchive: true
+          // Coverage desabilitado para otimizar tempo de build
+          // publishCoverage adapters: [
+          //   istanbulCoberturaAdapter('coverage/cobertura-coverage.xml')
+          // ], sourceFileResolver: sourceFiles('STORE_LAST_BUILD')
+          //
+          // archiveArtifacts artifacts: 'coverage/**/*', fingerprint: true, allowEmptyArchive: true
         }
       }
     }
