@@ -42,11 +42,10 @@ describe('Check User Permission', () => {
     await setupUserRoleRelationship(usersRepository, user, adminRole);
     await rolesRepository.create(adminRole);
     await permissionsRepository.create(readUsersPermission);
-
-    // Mock the permission repository to return permissions for the role
-    jest
-      .spyOn(permissionsRepository, 'findByRoleId')
-      .mockResolvedValue([readUsersPermission]);
+    permissionsRepository.addRolePermission(
+      adminRole.id.toString(),
+      readUsersPermission.id.toString()
+    );
 
     const result = await sut.execute({
       userId: user.id.toString(),
@@ -74,11 +73,10 @@ describe('Check User Permission', () => {
     await setupUserRoleRelationship(usersRepository, user, userRole);
     await rolesRepository.create(userRole);
     await permissionsRepository.create(writeUsersPermission);
-
-    // Mock to return different permission than what's being checked
-    jest
-      .spyOn(permissionsRepository, 'findByRoleId')
-      .mockResolvedValue([writeUsersPermission]);
+    permissionsRepository.addRolePermission(
+      userRole.id.toString(),
+      writeUsersPermission.id.toString()
+    );
 
     const result = await sut.execute({
       userId: user.id.toString(),
@@ -155,12 +153,14 @@ describe('Check User Permission', () => {
     await rolesRepository.create(editorRole);
     await permissionsRepository.create(readPermission);
     await permissionsRepository.create(writePermission);
-
-    // Mock to return permissions for both roles
-    jest
-      .spyOn(permissionsRepository, 'findByRoleId')
-      .mockResolvedValueOnce([readPermission]) // For admin role
-      .mockResolvedValueOnce([writePermission]); // For editor role
+    permissionsRepository.addRolePermission(
+      adminRole.id.toString(),
+      readPermission.id.toString()
+    );
+    permissionsRepository.addRolePermission(
+      editorRole.id.toString(),
+      writePermission.id.toString()
+    );
 
     const result = await sut.execute({
       userId: user.id.toString(),

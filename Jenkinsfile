@@ -1,13 +1,9 @@
 pipeline {
   agent any
 
-  // TRIGGERS DESABILITADOS - Apenas builds manuais
-  // Descomentar quando estiver tudo estável
+  // Triggers disabled - manual builds only
   // triggers {
-  //   // Trigger on git pushes/commits
   //   githubPush()
-  //
-  //   // Poll SCM every 2 minutes for changes (fallback)
   //   pollSCM('H/2 * * * *')
   // }
 
@@ -109,12 +105,6 @@ pipeline {
               junit testResults: 'junit.xml'
             }
           }
-          // Coverage desabilitado para otimizar tempo de build
-          // publishCoverage adapters: [
-          //   istanbulCoberturaAdapter('coverage/cobertura-coverage.xml')
-          // ], sourceFileResolver: sourceFiles('STORE_LAST_BUILD')
-          //
-          // archiveArtifacts artifacts: 'coverage/**/*', fingerprint: true, allowEmptyArchive: true
         }
       }
     }
@@ -131,10 +121,8 @@ pipeline {
       steps {
         echo 'Cleaning up any existing test database...'
         sh '''
-          # Stop and remove any container using port 8239
           sudo docker ps -a | grep 8239 | awk '{print $1}' | xargs -r sudo docker stop || true
           sudo docker ps -a | grep 8239 | awk '{print $1}' | xargs -r sudo docker rm || true
-          # Also remove by name pattern if exists
           sudo docker stop auth-postgres-test-${BUILD_NUMBER} || true
           sudo docker rm auth-postgres-test-${BUILD_NUMBER} || true
         '''
@@ -152,20 +140,15 @@ pipeline {
         sh 'sleep 15'
         echo 'Checking database connectivity...'
         sh '''
-          # Check if container is running
           sudo docker ps | grep auth-postgres-test-${BUILD_NUMBER}
-          # Check container logs
           sudo docker logs auth-postgres-test-${BUILD_NUMBER}
-          # Try to connect to database
           sudo docker exec auth-postgres-test-${BUILD_NUMBER} psql -U auth_test_user -d auth_test_db -c "SELECT 1" || echo "Connection failed"
         '''
         echo 'Setting up test database schema...'
         sh '''
-          # Copy schema and migrations to container
           sudo docker cp test/schema.prisma auth-postgres-test-${BUILD_NUMBER}:/tmp/
           sudo docker cp test/migrations auth-postgres-test-${BUILD_NUMBER}:/tmp/ || true
 
-          # Install Node.js and Prisma CLI in the container
           sudo docker exec auth-postgres-test-${BUILD_NUMBER} sh -c "
             apk add --no-cache nodejs npm && \
             npm install -g prisma@6.19.0 && \
@@ -180,9 +163,13 @@ pipeline {
     }
 
     stage('E2E Tests') {
+      environment {
+        DATABASE_URL = 'postgresql://auth_test_user:auth_test_password@localhost:8239/auth_test_db'
+      }
       steps {
         echo 'Generating Prisma test client...'
         sh 'npm run prisma:generate:test'
+        sh 'mkdir -p test-results'
         echo 'Running E2E tests...'
         sh 'npm run test:e2e:ci'
       }
@@ -208,16 +195,16 @@ pipeline {
       cleanWs()
     }
     success {
-      echo '✅ Pipeline completed successfully!'
+      echo 'Pipeline completed successfully!'
     }
     failure {
-      echo '❌ Pipeline failed!'
+      echo 'Pipeline failed!'
       script {
         echo "Failed at stage: ${(env.STAGE_NAME ?: 'N/A')}"
       }
     }
     unstable {
-      echo '⚠️ Pipeline completed with warnings!'
+      echo 'Pipeline completed with warnings!'
     }
   }
 }

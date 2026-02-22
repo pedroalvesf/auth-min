@@ -1,14 +1,17 @@
 import { LoginHistory } from '../../enterprise/entities/login-history';
 import { UniqueEntityID } from '../../../../core/entities/unique-entity-id';
 
-export interface LoginHistoryRepository {
-  save(loginHistory: LoginHistory): Promise<void>;
-  findByUserId(userId: UniqueEntityID, limit?: number): Promise<LoginHistory[]>;
-  findRecentFailedAttempts(
+export abstract class LoginHistoryRepository {
+  abstract save(loginHistory: LoginHistory): Promise<void>;
+  abstract findByUserId(
+    userId: UniqueEntityID,
+    limit?: number
+  ): Promise<LoginHistory[]>;
+  abstract findRecentFailedAttempts(
     ipAddress: string,
     minutesAgo: number
   ): Promise<LoginHistory[]>;
-  countByUserId(userId: UniqueEntityID): Promise<number>;
-  delete(id: UniqueEntityID): Promise<void>;
-  deleteOldRecords(daysAgo: number): Promise<void>;
+  abstract countByUserId(userId: UniqueEntityID): Promise<number>;
+  abstract delete(id: UniqueEntityID): Promise<void>;
+  abstract deleteOldRecords(daysAgo: number): Promise<void>;
 }

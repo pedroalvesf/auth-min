@@ -32,12 +32,12 @@ export class RevokeUserDeviceUseCase {
       return left(new DeviceNotFoundError(deviceId));
     }
 
-    // Verificar se o dispositivo pertence ao usuário
+    // Check if the device belongs to the user
     if (device.userId.toString() !== userId) {
       return left(new UnauthorizedDeviceAccessError());
     }
 
-    // Revogar todos os refresh tokens deste dispositivo
+    // Revoke all refresh tokens for this device
     const refreshTokens = await this.refreshTokenRepository.findByDeviceId(
       device.id.toString()
     );
@@ -49,9 +49,9 @@ export class RevokeUserDeviceUseCase {
       }
     }
 
-    // Access tokens são revogados automaticamente quando o refresh token é revogado
+    // Access tokens are automatically revoked when the refresh token is revoked
 
-    // Desativar o dispositivo
+    // Deactivate the device
     device.active = false;
     await this.devicesRepository.save(device);
 

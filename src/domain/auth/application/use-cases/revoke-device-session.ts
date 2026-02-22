@@ -28,7 +28,7 @@ export class RevokeDeviceSessionUseCase {
     deviceId,
     userId,
   }: RevokeDeviceSessionUseCaseRequest): Promise<RevokeDeviceSessionUseCaseResponse> {
-    // Buscar todos os refresh tokens do dispositivo
+    // Find all refresh tokens for the device
     const refreshTokens = await this.refreshTokenRepository.findByDeviceId(
       deviceId
     );
@@ -37,7 +37,7 @@ export class RevokeDeviceSessionUseCase {
       return left(new RefreshTokenNotFoundError());
     }
 
-    // Revogar todos os refresh tokens do dispositivo
+    // Revoke all refresh tokens for this device
     for (const refreshToken of refreshTokens) {
       if (!refreshToken.revoked) {
         refreshToken.revoke();
@@ -45,13 +45,13 @@ export class RevokeDeviceSessionUseCase {
       }
     }
 
-    // Verificar se o dispositivo pertence ao usuário e desativá-lo
+    // Check if the device belongs to the user and deactivate it
     const device = await this.devicesRepository.findById(deviceId);
     if (!device) {
       return left(new DeviceNotFoundError(deviceId));
     }
 
-    // Verificar se o dispositivo pertence ao usuário
+    // Check if the device belongs to the user
     if (device.userId.toString() !== userId) {
       return left(new DeviceNotFoundError(deviceId));
     }

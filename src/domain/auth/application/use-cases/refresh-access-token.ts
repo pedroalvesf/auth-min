@@ -44,7 +44,7 @@ export class RefreshAccessTokenUseCase {
       return left(new RefreshTokenNotFoundError());
     }
 
-    if (refreshTokenEntity.isExpired()) {
+    if (!refreshTokenEntity.isValid()) {
       return left(new RefreshTokenExpiredError());
     }
 

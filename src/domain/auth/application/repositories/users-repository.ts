@@ -1,5 +1,10 @@
 import { User } from '@/domain/auth/enterprise/entities/user';
-import { Role } from '@prisma/client';
+
+export interface RoleDTO {
+  id: string;
+  slug: string;
+  name: string;
+}
 
 export abstract class UsersRepository {
   abstract findById(id: string): Promise<User | null>;
@@ -13,5 +18,5 @@ export abstract class UsersRepository {
     assignedBy?: string
   ): Promise<void>;
   abstract removeRole(userId: string, roleId: string): Promise<void>;
-  abstract findRolesByUserId(userId: string): Promise<Role[]>;
+  abstract findRolesByUserId(userId: string): Promise<RoleDTO[]>;
 }

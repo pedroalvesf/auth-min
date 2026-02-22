@@ -46,11 +46,9 @@ export class PrismaDevicesRepository implements DevicesRepository {
 
   async findManyByUserId(userId: string): Promise<Device[]> {
     const devices = await this.prisma.device.findMany({
-      where: { userId },
+      where: { userId, active: true },
     });
 
-    const devicesDomain = devices.map(PrismaDevicesMapper.toDomain);
-
-    return devicesDomain.filter((device) => device.active);
+    return devices.map(PrismaDevicesMapper.toDomain);
   }
 }

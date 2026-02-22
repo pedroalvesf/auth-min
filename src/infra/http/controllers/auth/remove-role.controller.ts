@@ -36,7 +36,7 @@ export class RemoveRoleController {
 
   @Delete('remove')
   @HttpCode(200)
-  @RequirePermission('roles', 'assign') // Usando a mesma permissão do assign (admin pode atribuir e remover)
+  @RequirePermission('roles', 'assign') // Uses the same permission as assign
   @ApiOperation({
     summary: 'Remove role from user',
     description:

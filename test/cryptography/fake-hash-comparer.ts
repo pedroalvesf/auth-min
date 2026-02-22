@@ -2,6 +2,6 @@ import { HashComparer } from '@/domain/auth/application/cryptography/hash-compar
 
 export class FakeHashComparer implements HashComparer {
   async compare(plain: string, hash: string): Promise<boolean> {
-    return plain.length === hash.length;
+    return plain === hash;
   }
 }

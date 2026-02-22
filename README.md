@@ -1,27 +1,33 @@
-# 🔐 Auth-Min
+# Auth-Min
 
-Authentication service built with **NestJS** + **DDD** + **Clean Architecture** for scalable and maintainable systems.
+Authentication and authorization microservice built with **NestJS** + **DDD** + **Clean Architecture**.
 
-## ⚡ Features
+## Features
 
-- 🚀 **NestJS Framework**: Enterprise-grade Node.js framework
-- 🔐 **JWT Authentication**: Secure access & refresh token management
-- 📱 **Device-based Auth**: Device tracking and management
-- 🛡️ **Security**: Bcrypt password hashing + token validation
-- 🔄 **Token Refresh**: Automatic access token renewal
-- 🚫 **Token Revocation**: Device and user-level token management
-- 📝 **Clean Architecture**: DDD principles with dependency injection
+- **JWT Authentication** with access and refresh token management
+- **Device-based sessions** with tracking and per-device revocation
+- **Role-Based Access Control (RBAC)** with hierarchical roles
+- **Permission system** with resource/action granularity
+- **Clean Architecture** with domain, application, and infrastructure layers
+- **Either pattern** for typed error handling
+- **Repository pattern** for data access abstraction
 
-## 🏗️ Architecture
+## Architecture
 
-- **NestJS Framework** with modular design
-- **Domain Driven Design (DDD)**
-- **Clean Architecture** layers
-- **Dependency Injection** with @Injectable decorators
-- **Either Pattern** for error handling
-- **Repository Pattern** for data access
+```
+src/
+  core/           # Shared kernel (Entity, AggregateRoot, ValueObjects, Either)
+  domain/auth/
+    enterprise/   # Domain entities (User, Role, Permission, Device, Token)
+    application/  # Use cases, repository interfaces, cryptography interfaces
+  infra/
+    auth/         # JWT strategy, guards (auth, permissions, roles, throttler)
+    cryptography/ # Bcrypt, JWT, AES implementations
+    database/     # Prisma repositories and mappers
+    http/         # NestJS controllers, DTOs, presenters
+```
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Prerequisites
 
@@ -43,7 +49,7 @@ cp .env.example .env
 # Edit .env with your settings
 ```
 
-### 3. Start with Docker
+### 3. Start Database
 
 ```bash
 docker-compose up -d
@@ -55,29 +61,19 @@ docker-compose up -d
 npm run prisma:migrate
 ```
 
-### 5. Seed Database (Optional but Recommended)
-
-Populate database with test users, roles and permissions from centralized config:
+### 5. Seed Database (Optional)
 
 ```bash
 npm run db:seed
 ```
 
-This creates:
-
-- **23 permissions** (users, roles, devices, audit, permissions + wildcards)
-- **5 roles** with hierarchy (super-admin → admin → manager → editor → viewer)
-- **4 test users** with different access levels
+This creates roles, permissions, and test users. See `prisma/permissions.config.ts` to customize.
 
 Test credentials:
-
-- `superadmin@authmin.com` / `senha123` (full access - `*:*`)
+- `superadmin@authmin.com` / `senha123` (full access)
 - `admin@authmin.com` / `senha123` (admin access)
 - `manager@authmin.com` / `senha123` (manager access)
 - `user@authmin.com` / `senha123` (read-only access)
-
-**📋 Manage Permissions:** Edit `prisma/permissions.config.ts` and re-run seed.  
-**📖 Full Guide:** See `prisma/README_PERMISSIONS.md`
 
 ### 6. Development
 
@@ -86,68 +82,71 @@ npm run dev
 # Server running on http://localhost:3000
 ```
 
-## 📖 API Endpoints
+## API Endpoints
 
-| Method | Endpoint                    | Description             |
-| ------ | --------------------------- | ----------------------- |
-| POST   | `/auth/register`            | Register new user       |
-| POST   | `/auth/authenticate-device` | Device authentication   |
-| POST   | `/auth/refresh-token`       | Refresh access token    |
-| POST   | `/auth/validate-token`      | Validate JWT token      |
-| POST   | `/auth/revoke-device`       | Revoke specific device  |
-| POST   | `/auth/revoke-all-devices`  | Revoke all user devices |
-| GET    | `/health`                   | Health check            |
+### Authentication
 
-## 📚 Documentation
+| Method | Endpoint                  | Auth | Description                      |
+| ------ | ------------------------- | ---- | -------------------------------- |
+| POST   | `/auth/user`              | No   | Create user and auto-login       |
+| DELETE | `/auth/user/:id`          | Yes  | Delete user (requires `users:delete`) |
+| POST   | `/login`                  | No   | Authenticate with device headers |
+| POST   | `/logout/:userId`         | Yes  | Revoke all device sessions       |
+| DELETE | `/revoke-device-session`  | Yes  | Revoke a specific device session |
 
-### What's Covered
+### Roles
 
-- Complete architecture overview
-- Strategic roadmap (50+ planned features)
-- Step-by-step implementation guides
-- Security implementation details
-- Database schema and migrations
-- API documentation with examples
-- How to integrate with other projects
+| Method | Endpoint         | Auth | Description                           |
+| ------ | ---------------- | ---- | ------------------------------------- |
+| GET    | `/roles`         | Yes  | List all roles (requires `roles:read`) |
+| POST   | `/roles`         | Yes  | Create role (requires `roles:create`) |
+| POST   | `/roles/assign`  | Yes  | Assign role to user                   |
+| DELETE | `/roles/remove`  | Yes  | Remove role from user                 |
 
-## 🛠️ Tech Stack
+### Permissions
+
+| Method | Endpoint       | Auth | Description                                    |
+| ------ | -------------- | ---- | ---------------------------------------------- |
+| GET    | `/permissions` | Yes  | List permissions (requires `permissions:read`) |
+| POST   | `/permissions` | Yes  | Create permission                              |
+
+## Testing
+
+### Unit Tests
+
+```bash
+npm test
+```
+
+### E2E Tests
+
+Requires a running test database:
+
+```bash
+# Setup test database
+npm run db:setup:test
+
+# Run e2e tests
+npm run test:e2e
+```
+
+### All Tests
+
+```bash
+npm run test:all
+```
+
+## Tech Stack
 
 - **Framework**: NestJS
 - **Language**: TypeScript
 - **Database**: PostgreSQL + Prisma ORM
-- **Authentication**: JWT with refresh tokens
-- **Password**: Bcrypt hashing
-- **DI**: NestJS dependency injection
+- **Authentication**: JWT (HS256) with refresh tokens
+- **Password Hashing**: Bcrypt
+- **Validation**: Zod + class-validator
+- **Logging**: Winston
 - **Container**: Docker
 
-## 🎯 Key Dependencies
-
-- `@nestjs/common` - NestJS core framework
-- `@nestjs/core` - NestJS application core
-- `@prisma/client` - Database ORM
-- `bcrypt` - Password hashing
-- `jsonwebtoken` - JWT token handling
-- `reflect-metadata` - Decorator metadata
-
-## 📈 Performance
-
-- **Memory Usage**: ~135MB
-- **Response Time**: <5ms average
-- **Cold Start**: <100ms
-- **Build Size**: Ultra-lightweight
-
-## 🤝 Contributing
-
-1. Fork the project
-2. Create your feature branch
-3. Commit your changes
-4. Push to the branch
-5. Open a Pull Request
-
-## 📄 License
+## License
 
 MIT License - see [LICENSE](LICENSE) file for details.
-
----
-
-_Built with ❤️ for ultra-performance services_

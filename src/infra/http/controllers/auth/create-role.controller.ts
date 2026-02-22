@@ -1,4 +1,11 @@
-import { Controller, Post, Body, UseGuards, HttpCode } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  UseGuards,
+  HttpCode,
+  ConflictException,
+} from '@nestjs/common';
 import {
   ApiTags,
   ApiOperation,
@@ -59,7 +66,7 @@ export class CreateRoleController {
 
     if (result.isLeft()) {
       const error = result.value;
-      throw new Error(error.message);
+      throw new ConflictException(error.message);
     }
 
     const { role } = result.value;

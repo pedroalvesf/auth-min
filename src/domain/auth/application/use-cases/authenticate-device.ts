@@ -129,7 +129,7 @@ export class AuthenticateDeviceUseCase {
 
     await this.refreshTokenRepository.create(refreshTokenEntity);
 
-    user.sign();
+    user.updateLastLogin();
     await this.usersRepository.save(user);
 
     return {

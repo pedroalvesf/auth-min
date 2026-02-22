@@ -5,17 +5,23 @@ import {
   HttpCode,
   NotFoundException,
   Param,
+  UseGuards,
 } from '@nestjs/common';
 import { DeleteUserUseCase } from '@/domain/auth/application/use-cases/delete-user';
 import { UserNotFoundError } from '@/domain/auth/application/use-cases/errors/user-not-found-error';
 import { ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { JwtAuthGuard } from '@/infra/auth/jwt-auth.guard';
+import { PermissionsGuard } from '@/infra/auth/guards/permissions-guard';
+import { RequirePermission } from '@/infra/auth/decorators/require-permission.decorator';
 
 @Controller('auth/user')
+@UseGuards(JwtAuthGuard, PermissionsGuard)
 export class DeleteUserController {
   constructor(private deleteUser: DeleteUserUseCase) {}
 
   @Delete(':id')
   @HttpCode(200)
+  @RequirePermission('users', 'delete')
   @ApiOperation({ summary: 'Delete user by ID' })
   @ApiResponse({ status: 200, description: 'User deleted successfully' })
   @ApiResponse({ status: 400, description: 'Invalid input data' })

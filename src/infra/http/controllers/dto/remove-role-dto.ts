@@ -4,7 +4,7 @@ import { IsString, IsUUID } from 'class-validator';
 export class RemoveRoleDto {
   @ApiProperty({
     example: '550e8400-e29b-41d4-a716-446655440000',
-    description: 'ID do usuário que terá o role removido',
+    description: 'ID of the user to remove the role from',
   })
   @IsString()
   @IsUUID()

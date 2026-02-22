@@ -84,7 +84,7 @@ export class DomainEvents {
         try {
           handler(event);
         } catch (error) {
-          console.error('Erro ao executar o handler:', error);
+          console.error('Error executing event handler:', error);
         }
       }
     }

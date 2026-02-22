@@ -41,11 +41,16 @@ export class RefreshToken extends Entity<RefreshTokenProps> {
     return this.props.revokedAt;
   }
 
-  isExpired() {
-    if (this.props.revoked) {
-      return true;
-    }
+  isExpired(): boolean {
     return new Date() > this.props.expiresAt;
+  }
+
+  isRevoked(): boolean {
+    return this.props.revoked;
+  }
+
+  isValid(): boolean {
+    return !this.isRevoked() && !this.isExpired();
   }
 
   revoke() {

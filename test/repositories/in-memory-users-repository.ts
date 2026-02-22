@@ -1,12 +1,14 @@
-import { UsersRepository } from '@/domain/auth/application/repositories/users-repository';
+import {
+  UsersRepository,
+  RoleDTO,
+} from '@/domain/auth/application/repositories/users-repository';
 import { User } from '@/domain/auth/enterprise/entities/user';
-import { Role } from '@prisma/client';
 
 export class InMemoryUsersRepository implements UsersRepository {
   public items: User[] = [];
   public userRoles: { userId: string; roleId: string; assignedBy?: string }[] =
     [];
-  public roles: Role[] = [];
+  public roles: RoleDTO[] = [];
 
   async findById(id: string): Promise<User | null> {
     const user = this.items.find((item) => item.id.toString() === id);
@@ -37,7 +39,6 @@ export class InMemoryUsersRepository implements UsersRepository {
 
     if (itemIndex >= 0) {
       this.items.splice(itemIndex, 1);
-      // Remove roles associados ao usuário
       this.userRoles = this.userRoles.filter(
         (userRole) => userRole.userId !== id
       );
@@ -49,7 +50,6 @@ export class InMemoryUsersRepository implements UsersRepository {
     roleId: string,
     assignedBy?: string
   ): Promise<void> {
-    // Verifica se a associação já existe
     const existingAssignment = this.userRoles.find(
       (userRole) => userRole.userId === userId && userRole.roleId === roleId
     );
@@ -73,7 +73,7 @@ export class InMemoryUsersRepository implements UsersRepository {
     }
   }
 
-  async findRolesByUserId(userId: string): Promise<Role[]> {
+  async findRolesByUserId(userId: string): Promise<RoleDTO[]> {
     const userRoleIds = this.userRoles
       .filter((userRole) => userRole.userId === userId)
       .map((userRole) => userRole.roleId);
@@ -81,8 +81,7 @@ export class InMemoryUsersRepository implements UsersRepository {
     return this.roles.filter((role) => userRoleIds.includes(role.id));
   }
 
-  // Helper method para adicionar roles mock
-  addRole(role: Role): void {
+  addRole(role: RoleDTO): void {
     this.roles.push(role);
   }
 }

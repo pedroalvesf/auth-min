@@ -44,7 +44,7 @@ export class PrismaRolesRepository implements RolesRepository {
 
     if (!role) return null;
 
-    // Transforma a estrutura para o formato esperado pelo mapper
+    // Transform structure to the format expected by the mapper
     const roleWithPermissions = {
       ...role,
       permissions: role.Permissions.map(

@@ -1,6 +1,4 @@
 import { Module } from '@nestjs/common';
-import { JwtModule } from '@nestjs/jwt';
-import { ConfigModule, ConfigService } from '@nestjs/config';
 
 import { Encrypter } from '@/domain/auth/application/cryptography/encrypter';
 import { HashComparer } from '@/domain/auth/application/cryptography/hash-comparer';
@@ -14,18 +12,6 @@ import { AesSecretEncrypter } from './aes-secret-encrypter';
 import { JwtTokenValidator } from './jwt-token-validator';
 
 @Module({
-  imports: [
-    JwtModule.registerAsync({
-      imports: [ConfigModule],
-      useFactory: async (configService: ConfigService) => ({
-        secret: configService.get<string>('JWT_SECRET') || 'your-secret-key',
-        signOptions: {
-          algorithm: 'HS256',
-        },
-      }),
-      inject: [ConfigService],
-    }),
-  ],
   providers: [
     { provide: Encrypter, useClass: JwtEncrypter },
     { provide: HashComparer, useClass: BcryptHasher },

@@ -61,7 +61,10 @@ export class ListRolesController {
   async handle() {
     const result = await this.listRoles.execute();
 
-    // Como o use case sempre retorna right, podemos acessar direto
+    if (result.isLeft()) {
+      throw new Error('Failed to list roles');
+    }
+
     const { roles } = result.value;
 
     return {

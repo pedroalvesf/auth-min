@@ -134,9 +134,9 @@ export class AuthHelper {
 
   async logoutAll(userId: string, accessToken: string): Promise<void> {
     await request(this.app.getHttpServer())
-      .get(`/logout/${userId}`)
+      .post(`/logout/${userId}`)
       .set('Authorization', `Bearer ${accessToken}`)
-      .expect(200);
+      .expect(201);
   }
 
   async makeAuthenticatedRequest(

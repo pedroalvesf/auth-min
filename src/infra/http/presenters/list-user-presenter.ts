@@ -15,7 +15,7 @@ export class ListUserPresenter {
       id: user.id.toString(),
       name: user.name,
       email: user.email,
-      active: true,
+      active: user.isActive,
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
     };

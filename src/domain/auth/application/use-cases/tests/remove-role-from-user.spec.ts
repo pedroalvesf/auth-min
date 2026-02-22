@@ -1,7 +1,7 @@
-import { InMemoryUsersRepository } from '../../../../../../test/repositories/in-memory-users-repository';
-import { InMemoryRolesRepository } from '../../../../../../test/repositories/in-memory-roles-repository';
-import { makeUser } from '../../../../../../test/factories/make-user';
-import { makeRole } from '../../../../../../test/factories/make-role';
+import { InMemoryUsersRepository } from '@/test/repositories/in-memory-users-repository';
+import { InMemoryRolesRepository } from '@/test/repositories/in-memory-roles-repository';
+import { makeUser } from '@/test/factories/make-user';
+import { makeRole } from '@/test/factories/make-role';
 import { RemoveRoleFromUserUseCase } from '../remove-role-from-user';
 import { UserNotFoundError } from '../errors/user-not-found-error';
 import { RoleNotFoundError } from '../errors/role-not-found-error';

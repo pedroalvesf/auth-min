@@ -29,7 +29,7 @@ export class PrismaUsersRepository implements UsersRepository {
 
     if (!user) return null;
 
-    // Transforma a estrutura para o formato esperado pelo mapper
+    // Transform structure to the format expected by the mapper
     const userWithRoles = {
       ...user,
       roles: user.Roles.map((userRole) => userRole.Role),
@@ -52,7 +52,7 @@ export class PrismaUsersRepository implements UsersRepository {
   }
 
   async save(user: User): Promise<void> {
-    const data = PrismaUsersMapper.toPrisma(user);
+    const data = PrismaUsersMapper.toPrismaUpdate(user);
     await this.prisma.user.update({ where: { id: user.id.toString() }, data });
   }
 
@@ -90,6 +90,10 @@ export class PrismaUsersRepository implements UsersRepository {
       where: { userId },
       include: { Role: true },
     });
-    return userRoles.map((userRole) => userRole.Role);
+    return userRoles.map((userRole) => ({
+      id: userRole.Role.id,
+      slug: userRole.Role.slug,
+      name: userRole.Role.name,
+    }));
   }
 }

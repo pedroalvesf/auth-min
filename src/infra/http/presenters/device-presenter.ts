@@ -1,4 +1,4 @@
-import { formatDate } from '@/core/utils/format-date';
+import { formatDate } from '@/infra/utils/format-date';
 import { Device } from '@/domain/auth/enterprise/entities/device';
 
 export class DevicePresenter {
@@ -7,9 +7,7 @@ export class DevicePresenter {
       id: device.id.toString(),
       deviceType: device.type,
       location:
-        device.location === 'unknown'
-          ? 'Localização desconhecida'
-          : device.location,
+        device.location === 'unknown' ? 'Unknown location' : device.location,
       lastLogin: formatDate(device.lastLogin),
       browser: device.browser,
       os: device.operatingSystem,

@@ -1,5 +1,5 @@
 export abstract class WatchedList<T> {
-  public currentItems: T[];
+  private currentItems: T[];
   private initial: T[];
   private new: T[];
   private removed: T[];

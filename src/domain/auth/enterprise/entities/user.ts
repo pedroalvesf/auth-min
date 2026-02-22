@@ -1,4 +1,4 @@
-import { Entity } from '@/core/entities/entity';
+import { AggregateRoot } from '@/core/entities/aggregate-root';
 import { UniqueEntityID } from '@/core/entities/unique-entity-id';
 import { Optional } from '@/core/types/optional';
 import { RoleList } from './role-list';
@@ -15,7 +15,7 @@ export interface UserProps {
   updatedAt?: Date;
 }
 
-export class User extends Entity<UserProps> {
+export class User extends AggregateRoot<UserProps> {
   get email() {
     return this.props.email;
   }
@@ -68,11 +68,6 @@ export class User extends Entity<UserProps> {
     this.touch();
   }
 
-  sign() {
-    this.props.lastLoginAt = new Date();
-    this.touch();
-  }
-
   addRole(role: Role) {
     this.props.roles.add(role);
     this.touch();
@@ -87,21 +82,11 @@ export class User extends Entity<UserProps> {
     return this.props.roles.getItems().some((role) => role.slug === roleSlug);
   }
 
-  /**
-   * Verifica se o usuário possui uma permissão específica
-   * @param permissionSlug - Slug da permissão a verificar
-   * @returns true se o usuário possui a permissão
-   */
   hasPermission(permissionSlug: string): boolean {
     const allPermissions = this.getAllPermissions();
     return allPermissions.includes(permissionSlug);
   }
 
-  /**
-   * Verifica se o usuário possui qualquer uma das permissões listadas
-   * @param permissionSlugs - Array de slugs de permissões
-   * @returns true se o usuário possui pelo menos uma das permissões
-   */
   hasAnyPermission(permissionSlugs: string[]): boolean {
     const allPermissions = this.getAllPermissions();
     return permissionSlugs.some((permission) =>
@@ -109,23 +94,16 @@ export class User extends Entity<UserProps> {
     );
   }
 
-  /**
-   * Retorna todas as permissões do usuário (através de suas roles)
-   * @returns Array com slugs de todas as permissões
-   */
   getAllPermissions(): string[] {
-    return this.props.roles.getItems().reduce((acc: string[], role) => {
-      const rolePermissions = role.permissions
-        .getItems()
-        .map((permission) => permission.slug);
-      return [...acc, ...rolePermissions];
-    }, []);
+    const permissionSet = new Set<string>();
+    for (const role of this.props.roles.getItems()) {
+      for (const permission of role.permissions.getItems()) {
+        permissionSet.add(permission.slug);
+      }
+    }
+    return [...permissionSet];
   }
 
-  /**
-   * Retorna todas as roles do usuário
-   * @returns Array com slugs de todas as roles
-   */
   getAllRoles(): string[] {
     return this.props.roles.getItems().map((role) => role.slug);
   }

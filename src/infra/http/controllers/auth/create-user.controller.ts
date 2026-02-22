@@ -90,7 +90,7 @@ export class CreateUserController {
 
     if (!ipAddress || !operatingSystem || !browser || !deviceType) {
       throw new BadRequestException(
-        'Headers obrigatórios ausentes: x-ipaddress, x-operatingsystem, x-browser, x-type'
+        'Required headers missing: x-ipaddress, x-operatingsystem, x-browser, x-type'
       );
     }
 

@@ -1,7 +1,7 @@
 import {
   BadRequestException,
   Controller,
-  Get,
+  Post,
   Param,
   UseGuards,
 } from '@nestjs/common';
@@ -16,7 +16,7 @@ import { JwtAuthGuard } from '@/infra/auth/jwt-auth.guard';
 export class RevokeAllDevicesController {
   constructor(private readonly revokeAllDevices: RevokeAllDevicesUseCase) {}
 
-  @Get()
+  @Post()
   @ApiOperation({ summary: 'Revoke all devices for a user' })
   @ApiResponse({ status: 200, description: 'All devices revoked successfully' })
   @ApiResponse({ status: 400, description: 'Device session not found' })

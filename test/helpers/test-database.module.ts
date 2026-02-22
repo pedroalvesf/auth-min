@@ -6,11 +6,15 @@ import { DevicesRepository } from '@/domain/auth/application/repositories/device
 import { RefreshTokenRepository } from '@/domain/auth/application/repositories/refresh-token-repository';
 import { RolesRepository } from '@/domain/auth/application/repositories/roles-repository';
 import { PermissionsRepository } from '@/domain/auth/application/repositories/permissions-repository';
+import { UserRolesRepository } from '@/domain/auth/application/repositories/user-roles-repository';
+import { RolePermissionsRepository } from '@/domain/auth/application/repositories/role-permissions-repository';
 import { PrismaUsersRepository } from '@/infra/database/prisma/repositories/prisma-users-repository';
 import { PrismaDevicesRepository } from '@/infra/database/prisma/repositories/prisma-devices-repository';
 import { PrismaRefreshTokenRepository } from '@/infra/database/prisma/repositories/prisma-refresh-token-repository';
 import { PrismaRolesRepository } from '@/infra/database/prisma/repositories/prisma-roles-repository';
 import { PrismaPermissionsRepository } from '@/infra/database/prisma/repositories/prisma-permissions-repository';
+import { PrismaUserRolesRepository } from '@/infra/database/prisma/repositories/prisma-user-roles-repository';
+import { PrismaRolePermissionsRepository } from '@/infra/database/prisma/repositories/prisma-role-permissions-repository';
 
 class TestPrismaService {
   private client: PrismaClient;
@@ -109,6 +113,14 @@ class TestPrismaService {
       provide: PermissionsRepository,
       useClass: PrismaPermissionsRepository,
     },
+    {
+      provide: UserRolesRepository,
+      useClass: PrismaUserRolesRepository,
+    },
+    {
+      provide: RolePermissionsRepository,
+      useClass: PrismaRolePermissionsRepository,
+    },
   ],
   exports: [
     PrismaService,
@@ -117,6 +129,8 @@ class TestPrismaService {
     RefreshTokenRepository,
     RolesRepository,
     PermissionsRepository,
+    UserRolesRepository,
+    RolePermissionsRepository,
   ],
 })
 export class TestDatabaseModule {}

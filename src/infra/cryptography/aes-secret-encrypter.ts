@@ -13,8 +13,10 @@ export class AesSecretEncrypter implements SecretEncrypter {
   private readonly secretKey: Buffer;
 
   constructor() {
-    const key =
-      process.env.SECRET_ENCRYPTION_KEY || 'default-secret-key-for-2fa';
+    const key = process.env.SECRET_ENCRYPTION_KEY;
+    if (!key) {
+      throw new Error('SECRET_ENCRYPTION_KEY environment variable is required');
+    }
     this.secretKey = createHash('sha256').update(key).digest();
   }
 

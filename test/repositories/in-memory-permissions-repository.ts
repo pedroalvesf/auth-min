@@ -3,6 +3,7 @@ import { Permission } from '@/domain/auth/enterprise/entities/permission';
 
 export class InMemoryPermissionsRepository implements PermissionsRepository {
   public items: Permission[] = [];
+  public rolePermissions: { roleId: string; permissionId: string }[] = [];
 
   async findById(id: string): Promise<Permission | null> {
     const permission = this.items.find((item) => item.id.toString() === id);
@@ -28,10 +29,18 @@ export class InMemoryPermissionsRepository implements PermissionsRepository {
     return this.items;
   }
 
-  async findByRoleId(_roleId: string): Promise<Permission[]> {
-    // For this in-memory implementation, we'll return empty array
-    // In a real implementation, this would query role-permission relationships
-    return [];
+  async findByRoleId(roleId: string): Promise<Permission[]> {
+    const permissionIds = this.rolePermissions
+      .filter((rp) => rp.roleId === roleId)
+      .map((rp) => rp.permissionId);
+
+    return this.items.filter((item) =>
+      permissionIds.includes(item.id.toString())
+    );
+  }
+
+  addRolePermission(roleId: string, permissionId: string): void {
+    this.rolePermissions.push({ roleId, permissionId });
   }
 
   async create(permission: Permission): Promise<void> {

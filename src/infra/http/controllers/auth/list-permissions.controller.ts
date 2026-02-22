@@ -76,7 +76,6 @@ export class ListPermissionsController {
 
     const { permissions } = result.value;
 
-    // Filtrar por resource se especificado
     let filteredPermissions = permissions;
     if (resource) {
       filteredPermissions = permissions.filter(
@@ -84,7 +83,6 @@ export class ListPermissionsController {
       );
     }
 
-    // Agrupar por resource para estatísticas
     const groupedByResource = filteredPermissions.reduce((acc, permission) => {
       const res = permission.resource;
       acc[res] = (acc[res] || 0) + 1;

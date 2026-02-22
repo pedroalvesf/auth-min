@@ -47,12 +47,12 @@ export class RevokeDeviceSessionController {
       switch (error.constructor) {
         case RefreshTokenNotFoundError:
           throw new HttpException(
-            'Nenhum token de refresh encontrado para este dispositivo',
+            'No refresh tokens found for this device',
             HttpStatus.NOT_FOUND
           );
         case DeviceNotFoundError:
           throw new HttpException(
-            'Dispositivo não encontrado ou não pertence ao usuário',
+            'Device not found or does not belong to the user',
             HttpStatus.NOT_FOUND
           );
         default:
@@ -64,7 +64,7 @@ export class RevokeDeviceSessionController {
     }
 
     return {
-      message: 'Sessão do dispositivo revogada com sucesso',
+      message: 'Device session revoked successfully',
       success: result.value.success,
     };
   }

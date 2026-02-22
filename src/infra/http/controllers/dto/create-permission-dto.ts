@@ -4,7 +4,7 @@ import { IsString, IsOptional, MinLength } from 'class-validator';
 export class CreatePermissionDto {
   @ApiProperty({
     example: 'Create Post',
-    description: 'Nome legível da permissão',
+    description: 'Human-readable permission name',
   })
   @IsString()
   @MinLength(3)
@@ -12,7 +12,7 @@ export class CreatePermissionDto {
 
   @ApiProperty({
     example: 'posts',
-    description: 'Recurso da permissão (ex: users, posts, devices)',
+    description: 'Permission resource (e.g., users, posts, devices)',
   })
   @IsString()
   @MinLength(2)
@@ -20,7 +20,7 @@ export class CreatePermissionDto {
 
   @ApiProperty({
     example: 'create',
-    description: 'Ação da permissão (ex: create, read, update, delete, *)',
+    description: 'Permission action (e.g., create, read, update, delete, *)',
   })
   @IsString()
   @MinLength(1)
@@ -28,7 +28,7 @@ export class CreatePermissionDto {
 
   @ApiProperty({
     example: 'Permite criar novos posts no sistema',
-    description: 'Descrição detalhada da permissão',
+    description: 'Detailed permission description',
     required: false,
   })
   @IsString()

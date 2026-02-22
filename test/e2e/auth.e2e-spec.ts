@@ -211,7 +211,7 @@ describe('Authentication E2E', () => {
     });
   });
 
-  describe('GET /logout/:userId', () => {
+  describe('POST /logout/:userId', () => {
     it('should revoke all user device sessions', async () => {
       const userData = {
         email: 'logout@example.com',
@@ -231,9 +231,9 @@ describe('Authentication E2E', () => {
       expect(user!.Devices.filter((d) => d.active)).toHaveLength(1);
 
       await request(app.getHttpServer())
-        .get(`/logout/${userId}`)
+        .post(`/logout/${userId}`)
         .set('Authorization', `Bearer ${accessToken}`)
-        .expect(200);
+        .expect(201);
 
       // Verify all devices are inactive
       const updatedUser = await prisma.user.findUnique({
@@ -245,7 +245,7 @@ describe('Authentication E2E', () => {
 
     it('should fail without authentication', async () => {
       await request(app.getHttpServer())
-        .get('/logout/some-user-id')
+        .post('/logout/some-user-id')
         .expect(401);
     });
   });
@@ -332,9 +332,9 @@ describe('Authentication E2E', () => {
       });
 
       const protectedResponse = await request(app.getHttpServer())
-        .get(`/logout/${user!.id}`)
+        .post(`/logout/${user!.id}`)
         .set('Authorization', `Bearer ${token1}`)
-        .expect(200);
+        .expect(201);
 
       expect(protectedResponse.body.success).toBe(true);
 

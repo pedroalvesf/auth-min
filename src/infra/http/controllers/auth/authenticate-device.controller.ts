@@ -97,7 +97,7 @@ export class AuthenticateDeviceController {
 
     if (!ipAddress || !operatingSystem || !browser || !deviceType) {
       throw new HttpException(
-        'Headers obrigatórios ausentes: x-ipaddress, x-operatingsystem, x-browser, x-type',
+        'Required headers missing: x-ipaddress, x-operatingsystem, x-browser, x-type',
         HttpStatus.BAD_REQUEST
       );
     }
