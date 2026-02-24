@@ -1,8 +1,8 @@
 module.exports = {
   preset: "ts-jest",
   testEnvironment: "node",
-  roots: ["<rootDir>/src", "<rootDir>/test"],
-  testMatch: ["**/__tests__/**/*.spec.ts", "**/tests/**/*.spec.ts", "**/e2e/**/*.spec.ts"],
+  roots: ["<rootDir>/src"],
+  testMatch: ["**/__tests__/**/*.spec.ts", "**/*.spec.ts"],
   transform: {
     "^.+\\.ts$": [
       "ts-jest",
@@ -10,7 +10,7 @@ module.exports = {
         tsconfig: {
           types: ["jest", "node"],
         },
-      },
+        diagnostics: false      },
     ],
     "^.+\\.mjs$": [
       "ts-jest",
@@ -18,6 +18,7 @@ module.exports = {
         tsconfig: {
           types: ["jest", "node"],
         },
+        diagnostics: false,
       },
     ],
   },
@@ -32,7 +33,7 @@ module.exports = {
     "^@/(.*)$": "<rootDir>/src/$1",
   },
   moduleFileExtensions: ["ts", "tsx", "js", "jsx", "json", "node", "mjs"],
-  transformIgnorePatterns: ["node_modules/"],
+  transformIgnorePatterns: ["node_modules/(?!(safe-stable-stringify|logform)/)"],
   coverageDirectory: 'coverage',
   coverageReporters: [
     'text',
