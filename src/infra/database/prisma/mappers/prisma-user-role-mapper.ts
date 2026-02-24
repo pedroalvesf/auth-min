@@ -1,6 +1,6 @@
 import { UniqueEntityID } from '@/core/entities/unique-entity-id';
 import { UserRole } from '@/domain/auth/enterprise/entities/user-role';
-import { UserRole as PrismaUserRole } from '@prisma/client';
+import { UserRole as PrismaUserRole } from '@/generated/prisma/client';
 
 export class PrismaUserRoleMapper {
   static toDomain(raw: PrismaUserRole): UserRole {

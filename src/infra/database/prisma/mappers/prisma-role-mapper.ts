@@ -4,7 +4,7 @@ import { PermissionList } from '@/domain/auth/enterprise/entities/permission-lis
 import {
   Role as PrismaRole,
   Permission as PrismaPermission,
-} from '@prisma/client';
+} from '@/generated/prisma/client';
 import { PrismaPermissionMapper } from './prisma-permission-mapper';
 
 export class PrismaRoleMapper {

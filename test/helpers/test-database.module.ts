@@ -1,5 +1,6 @@
 import { Global, Module } from '@nestjs/common';
-import { PrismaClient } from '.prisma/test-client';
+import { PrismaClient } from '@/generated/prisma-test/client';
+import { PrismaPg } from '@prisma/adapter-pg';
 import { PrismaService } from '@/infra/database/prisma/prisma.service';
 import { UsersRepository } from '@/domain/auth/application/repositories/users-repository';
 import { DevicesRepository } from '@/domain/auth/application/repositories/devices-repository';
@@ -20,8 +21,8 @@ class TestPrismaService {
   private client: PrismaClient;
 
   constructor() {
-    // Create PostgreSQL client for testing using test DATABASE_URL
-    this.client = new PrismaClient();
+    const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
+    this.client = new PrismaClient({ adapter });
   }
 
   get $connect() {

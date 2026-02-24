@@ -14,7 +14,6 @@ import { AuthenticateDeviceDto } from '../dto/authenticate-device-dto';
 import { Device } from '@/domain/auth/enterprise/entities/device';
 import { Public } from '@/infra/auth/public';
 import { UsersRepository } from '@/domain/auth/application/repositories/users-repository';
-import geoip from 'geoip-lite';
 import {
   ApiTags,
   ApiOperation,
@@ -102,8 +101,7 @@ export class AuthenticateDeviceController {
       );
     }
 
-    const geo = geoip.lookup(ipAddress);
-    const location = geo ? `${geo.city}, ${geo.country}` : 'unknown';
+    const location = 'unknown';
 
     const device = Device.create({
       userId: new UniqueEntityID(user.id.toString()),

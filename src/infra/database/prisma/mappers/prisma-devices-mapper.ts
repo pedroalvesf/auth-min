@@ -1,4 +1,4 @@
-import { Device as PrismaDevice, Prisma } from '@prisma/client';
+import { Device as PrismaDevice, Prisma } from '@/generated/prisma/client';
 import { UniqueEntityID } from '@/core/entities/unique-entity-id';
 import { Device } from '@/domain/auth/enterprise/entities/device';
 

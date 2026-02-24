@@ -12,7 +12,6 @@ import { CreateUserDto } from '../dto/create-user-dto';
 import { UserAlreadyExistsError } from '@/domain/auth/application/use-cases/errors/user-already-exists-error';
 import { AuthenticateDeviceUseCase } from '@/domain/auth/application/use-cases/authenticate-device';
 import { UniqueEntityID } from '@/core/entities/unique-entity-id';
-import geoip from 'geoip-lite';
 import { Device } from '@/domain/auth/enterprise/entities/device';
 import {
   ApiOperation,
@@ -112,8 +111,7 @@ export class CreateUserController {
       }
     }
 
-    const geo = geoip.lookup(ipAddress);
-    const location = geo ? `${geo.city}, ${geo.country}` : 'unknown';
+    const location = 'unknown';
 
     const deviceEntity = Device.create({
       userId: new UniqueEntityID(result.value.user.id.toString()),
