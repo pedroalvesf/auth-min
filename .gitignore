@@ -3,7 +3,7 @@ node_modules
 .env
 /dist
 /node_modules
-/generated/prisma
+src/generated/
 
 # Test coverage reports
 coverage/

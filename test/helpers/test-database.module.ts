@@ -21,7 +21,9 @@ class TestPrismaService {
   private client: PrismaClient;
 
   constructor() {
-    const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
+    const adapter = new PrismaPg({
+      connectionString: process.env.DATABASE_URL,
+    });
     this.client = new PrismaClient({ adapter });
   }
 

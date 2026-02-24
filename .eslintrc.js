@@ -22,6 +22,7 @@ module.exports = {
   ignorePatterns: [
     'dist',
     'node_modules',
+    'src/generated',
     // Arquivos JS gerados
     '*.js',
   ],

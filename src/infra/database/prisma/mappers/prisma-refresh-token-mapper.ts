@@ -1,4 +1,7 @@
-import { RefreshToken as PrismaRefreshToken, Prisma } from '@/generated/prisma/client';
+import {
+  RefreshToken as PrismaRefreshToken,
+  Prisma,
+} from '@/generated/prisma/client';
 import { RefreshToken } from '@/domain/auth/enterprise/entities/refresh-token';
 import { UniqueEntityID } from '@/core/entities/unique-entity-id';
 

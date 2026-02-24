@@ -69,7 +69,11 @@ describe('Authentication E2E', () => {
       const response = await request(app.getHttpServer())
         .post('/auth/user')
         .set(authHelper.getDefaultDeviceHeaders())
-        .send({ email: 'safe@example.com', password: 'Password123!', name: 'Safe User' })
+        .send({
+          email: 'safe@example.com',
+          password: 'Password123!',
+          name: 'Safe User',
+        })
         .expect(201);
 
       const bodyStr = JSON.stringify(response.body);
@@ -100,7 +104,11 @@ describe('Authentication E2E', () => {
     it('should fail with 400 when all device headers are missing', async () => {
       await request(app.getHttpServer())
         .post('/auth/user')
-        .send({ email: 'test@example.com', password: 'Password123!', name: 'User' })
+        .send({
+          email: 'test@example.com',
+          password: 'Password123!',
+          name: 'User',
+        })
         .expect(400);
     });
 
@@ -112,7 +120,11 @@ describe('Authentication E2E', () => {
       await request(app.getHttpServer())
         .post('/auth/user')
         .set(headersWithoutIp)
-        .send({ email: 'test@example.com', password: 'Password123!', name: 'User' })
+        .send({
+          email: 'test@example.com',
+          password: 'Password123!',
+          name: 'User',
+        })
         .expect(400);
     });
   });
@@ -122,7 +134,11 @@ describe('Authentication E2E', () => {
   // ─────────────────────────────────────────────
   describe('POST /login', () => {
     it('should return valid tokens on correct credentials', async () => {
-      const userData = { email: 'login@example.com', password: 'Password123!', name: 'Login User' };
+      const userData = {
+        email: 'login@example.com',
+        password: 'Password123!',
+        name: 'Login User',
+      };
       await authHelper.createUser(userData);
 
       const response = await request(app.getHttpServer())
@@ -137,7 +153,11 @@ describe('Authentication E2E', () => {
     });
 
     it('should create an independent device session per login', async () => {
-      const userData = { email: 'multidevice@example.com', password: 'Password123!', name: 'Multi User' };
+      const userData = {
+        email: 'multidevice@example.com',
+        password: 'Password123!',
+        name: 'Multi User',
+      };
       await authHelper.createUser(userData);
 
       await request(app.getHttpServer())
@@ -163,7 +183,11 @@ describe('Authentication E2E', () => {
     });
 
     it('should fail with 401 on wrong password', async () => {
-      const userData = { email: 'valid@example.com', password: 'Password123!', name: 'Valid User' };
+      const userData = {
+        email: 'valid@example.com',
+        password: 'Password123!',
+        name: 'Valid User',
+      };
       await authHelper.createUser(userData);
 
       await request(app.getHttpServer())
@@ -187,7 +211,11 @@ describe('Authentication E2E', () => {
   // ─────────────────────────────────────────────
   describe('DELETE /revoke-device-session', () => {
     it('should deactivate the device and revoke its refresh token', async () => {
-      const userData = { email: 'revoke@example.com', password: 'Password123!', name: 'Revoke User' };
+      const userData = {
+        email: 'revoke@example.com',
+        password: 'Password123!',
+        name: 'Revoke User',
+      };
       const { accessToken } = await authHelper.createUser(userData);
 
       const user = await prisma.user.findUnique({
@@ -196,7 +224,9 @@ describe('Authentication E2E', () => {
       });
       const deviceId = user!.Devices[0].id;
 
-      const tokenBefore = await prisma.refreshToken.findFirst({ where: { deviceId } });
+      const tokenBefore = await prisma.refreshToken.findFirst({
+        where: { deviceId },
+      });
       expect(tokenBefore).toBeTruthy();
       expect(tokenBefore!.revoked).toBe(false);
 
@@ -208,10 +238,14 @@ describe('Authentication E2E', () => {
 
       expect(response.body.success).toBe(true);
 
-      const device = await prisma.device.findUnique({ where: { id: deviceId } });
+      const device = await prisma.device.findUnique({
+        where: { id: deviceId },
+      });
       expect(device!.active).toBe(false);
 
-      const tokenAfter = await prisma.refreshToken.findFirst({ where: { deviceId } });
+      const tokenAfter = await prisma.refreshToken.findFirst({
+        where: { deviceId },
+      });
       expect(tokenAfter!.revoked).toBe(true);
     });
 
@@ -223,8 +257,16 @@ describe('Authentication E2E', () => {
     });
 
     it('should return 404 when trying to revoke another users device', async () => {
-      const userA = { email: 'userA@example.com', password: 'Password123!', name: 'User A' };
-      const userB = { email: 'userB@example.com', password: 'Password123!', name: 'User B' };
+      const userA = {
+        email: 'userA@example.com',
+        password: 'Password123!',
+        name: 'User A',
+      };
+      const userB = {
+        email: 'userB@example.com',
+        password: 'Password123!',
+        name: 'User B',
+      };
 
       await authHelper.createUser(userA);
       const { accessToken: tokenB } = await authHelper.createUser(userB);
@@ -262,7 +304,11 @@ describe('Authentication E2E', () => {
   // ─────────────────────────────────────────────
   describe('POST /logout/:userId', () => {
     it('should deactivate all devices and revoke all refresh tokens', async () => {
-      const userData = { email: 'logout@example.com', password: 'Password123!', name: 'Logout User' };
+      const userData = {
+        email: 'logout@example.com',
+        password: 'Password123!',
+        name: 'Logout User',
+      };
       const { accessToken } = await authHelper.createUser(userData);
 
       await request(app.getHttpServer())
@@ -285,11 +331,15 @@ describe('Authentication E2E', () => {
       expect(response.body.success).toBe(true);
       expect(response.body.message).toBeDefined();
 
-      const updatedDevices = await prisma.device.findMany({ where: { userId: user!.id } });
+      const updatedDevices = await prisma.device.findMany({
+        where: { userId: user!.id },
+      });
       const activeDevices = updatedDevices.filter((d) => d.active);
       expect(activeDevices).toHaveLength(0);
 
-      const refreshTokens = await prisma.refreshToken.findMany({ where: { userId: user!.id } });
+      const refreshTokens = await prisma.refreshToken.findMany({
+        where: { userId: user!.id },
+      });
       const activeTokens = refreshTokens.filter((t) => !t.revoked);
       expect(activeTokens).toHaveLength(0);
     });
@@ -323,7 +373,11 @@ describe('Authentication E2E', () => {
 
     it('should return 403 for user without roles:read on GET /roles', async () => {
       const { accessToken } = await authHelper.createUserWithRole(
-        { email: 'user@example.com', password: 'Password123!', name: 'Regular User' },
+        {
+          email: 'user@example.com',
+          password: 'Password123!',
+          name: 'Regular User',
+        },
         'user'
       );
 
@@ -335,7 +389,11 @@ describe('Authentication E2E', () => {
 
     it('should return 403 for manager without roles:read on GET /roles', async () => {
       const { accessToken } = await authHelper.createUserWithRole(
-        { email: 'manager@example.com', password: 'Password123!', name: 'Manager' },
+        {
+          email: 'manager@example.com',
+          password: 'Password123!',
+          name: 'Manager',
+        },
         'manager'
       );
 
@@ -346,14 +404,16 @@ describe('Authentication E2E', () => {
     });
 
     it('should return 401 for unauthenticated request on GET /roles', async () => {
-      await request(app.getHttpServer())
-        .get('/roles')
-        .expect(401);
+      await request(app.getHttpServer()).get('/roles').expect(401);
     });
 
     it('should return 201 for admin with roles:create on POST /roles', async () => {
       const { accessToken } = await authHelper.createUserWithRole(
-        { email: 'admin-create@example.com', password: 'Password123!', name: 'Admin Creator' },
+        {
+          email: 'admin-create@example.com',
+          password: 'Password123!',
+          name: 'Admin Creator',
+        },
         'admin'
       );
 
@@ -370,7 +430,11 @@ describe('Authentication E2E', () => {
 
     it('should return 403 for user without roles:create on POST /roles', async () => {
       const { accessToken } = await authHelper.createUserWithRole(
-        { email: 'user-create@example.com', password: 'Password123!', name: 'Regular User' },
+        {
+          email: 'user-create@example.com',
+          password: 'Password123!',
+          name: 'Regular User',
+        },
         'user'
       );
 
@@ -387,13 +451,19 @@ describe('Authentication E2E', () => {
   // ─────────────────────────────────────────────
   describe('Full Authentication Cycle', () => {
     it('should create user, access protected resource, and complete logout', async () => {
-      const userData = { email: 'cycle@example.com', password: 'Password123!', name: 'Cycle User' };
+      const userData = {
+        email: 'cycle@example.com',
+        password: 'Password123!',
+        name: 'Cycle User',
+      };
 
       // 1. Cadastro
       const { accessToken } = await authHelper.createUser(userData);
       expect(accessToken).toBeDefined();
 
-      const user = await prisma.user.findUnique({ where: { email: userData.email } });
+      const user = await prisma.user.findUnique({
+        where: { email: userData.email },
+      });
       expect(user).toBeTruthy();
 
       // 2. Login em outro device com as mesmas credenciais
@@ -407,7 +477,9 @@ describe('Authentication E2E', () => {
       expect(loginResponse.body.accessToken).not.toBe(accessToken);
 
       // 3. Verifica que existem 2 devices ativos
-      const devices = await prisma.device.findMany({ where: { userId: user!.id, active: true } });
+      const devices = await prisma.device.findMany({
+        where: { userId: user!.id, active: true },
+      });
       expect(devices).toHaveLength(2);
 
       // 4. Logout global com o token original
@@ -419,7 +491,9 @@ describe('Authentication E2E', () => {
       expect(logoutResponse.body.success).toBe(true);
 
       // 5. Verifica que todos os devices e tokens foram revogados
-      const activeDevices = await prisma.device.findMany({ where: { userId: user!.id, active: true } });
+      const activeDevices = await prisma.device.findMany({
+        where: { userId: user!.id, active: true },
+      });
       expect(activeDevices).toHaveLength(0);
 
       const activeTokens = await prisma.refreshToken.findMany({

@@ -118,13 +118,16 @@ pipeline {
     }
 
     stage('Test Database Setup') {
+      environment {
+        DATABASE_URL = 'postgresql://auth_test_user:auth_test_password@localhost:8239/auth_test_db'
+      }
       steps {
         echo 'Cleaning up any existing test database...'
         sh '''
-          sudo docker ps -a | grep 8239 | awk '{print $1}' | xargs -r sudo docker stop || true
-          sudo docker ps -a | grep 8239 | awk '{print $1}' | xargs -r sudo docker rm || true
           sudo docker stop auth-postgres-test-${BUILD_NUMBER} || true
           sudo docker rm auth-postgres-test-${BUILD_NUMBER} || true
+          sudo docker ps -a | grep ":8239->" | awk '{print $1}' | xargs -r sudo docker stop || true
+          sudo docker ps -a | grep ":8239->" | awk '{print $1}' | xargs -r sudo docker rm || true
         '''
         echo 'Starting test database...'
         sh '''
@@ -137,28 +140,18 @@ pipeline {
             postgres:15-alpine
         '''
         echo 'Waiting for database to be ready...'
-        sh 'sleep 15'
-        echo 'Checking database connectivity...'
         sh '''
-          sudo docker ps | grep auth-postgres-test-${BUILD_NUMBER}
-          sudo docker logs auth-postgres-test-${BUILD_NUMBER}
-          sudo docker exec auth-postgres-test-${BUILD_NUMBER} psql -U auth_test_user -d auth_test_db -c "SELECT 1" || echo "Connection failed"
+          for i in $(seq 1 30); do
+            if sudo docker exec auth-postgres-test-${BUILD_NUMBER} pg_isready -U auth_test_user -d auth_test_db -q; then
+              echo "Database is ready after ${i} attempts"
+              break
+            fi
+            echo "Waiting for database... attempt ${i}/30"
+            sleep 2
+          done
         '''
-        echo 'Setting up test database schema...'
-        sh '''
-          sudo docker cp test/schema.prisma auth-postgres-test-${BUILD_NUMBER}:/tmp/
-          sudo docker cp test/migrations auth-postgres-test-${BUILD_NUMBER}:/tmp/ || true
-
-          sudo docker exec auth-postgres-test-${BUILD_NUMBER} sh -c "
-            apk add --no-cache nodejs npm && \
-            npm install -g prisma@6.19.0 && \
-            cd /tmp && \
-            export DATABASE_URL='postgresql://auth_test_user:auth_test_password@localhost:5432/auth_test_db' && \
-            prisma generate --schema=./schema.prisma && \
-            prisma migrate deploy --schema=./schema.prisma || \
-            prisma db push --schema=./schema.prisma --skip-generate --accept-data-loss
-          "
-        '''
+        echo 'Pushing test schema to database...'
+        sh './node_modules/.bin/prisma db push --schema=./test/schema.prisma --force-reset'
       }
     }
 
@@ -168,7 +161,7 @@ pipeline {
       }
       steps {
         echo 'Generating Prisma test client...'
-        sh 'npm run prisma:generate:test'
+        sh './node_modules/.bin/prisma generate --schema=./test/schema.prisma'
         sh 'mkdir -p test-results'
         echo 'Running E2E tests...'
         sh 'npm run test:e2e:ci'
