@@ -13,20 +13,3 @@ services:
       interval: 10s
       timeout: 5s
       retries: 3
-
-  auth-min-test:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: auth-min-test
-    ports:
-      - "3001:3001"
-    depends_on:
-      postgres-test:
-        condition: service_healthy
-    environment:
-      NODE_ENV: test
-      DATABASE_URL: postgresql://auth_test_user:auth_test_password@postgres-test:5432/auth_test_db
-      JWT_SECRET: test-jwt-secret-key-with-32-characters-minimum
-      PORT: 3001
-      SECRET_ENCRYPTION_KEY: test-encryption-key

@@ -45,21 +45,21 @@ pipeline {
       steps {
         echo 'Setting up build environment...'
         sh 'node --version'
-        sh 'npm --version'
+        sh 'pnpm --version'
       }
     }
 
     stage('Install Dependencies') {
       steps {
         echo 'Installing dependencies...'
-        sh 'npm ci --cache /tmp/.npm'
+        sh 'pnpm install --frozen-lockfile'
       }
     }
 
     stage('Prisma Setup') {
       steps {
         echo 'Generating Prisma client...'
-        sh 'npm run prisma:generate'
+        sh 'pnpm prisma:generate'
       }
     }
 
@@ -70,7 +70,7 @@ pipeline {
             echo 'Running ESLint...'
             script {
               catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
-                sh 'npm run lint:check'
+                sh 'pnpm lint:check'
               }
             }
           }
@@ -80,7 +80,7 @@ pipeline {
             echo 'Checking code formatting...'
             script {
               def formatStatus = sh(
-                script: 'npm run format:check',
+                script: 'pnpm format:check',
                 returnStatus: true
               )
               if (formatStatus != 0) {
@@ -96,7 +96,7 @@ pipeline {
     stage('Unit Tests') {
       steps {
         echo 'Running unit tests...'
-        sh 'npm run test:ci'
+        sh 'pnpm test:ci'
       }
       post {
         always {
@@ -112,7 +112,7 @@ pipeline {
     stage('Build Application') {
       steps {
         echo 'Building application...'
-        sh 'npm run build'
+        sh 'pnpm build'
         archiveArtifacts artifacts: 'dist/**/*', fingerprint: true
       }
     }
@@ -161,10 +161,10 @@ pipeline {
       }
       steps {
         echo 'Generating Prisma test client...'
-        sh './node_modules/.bin/prisma generate --schema=./test/schema.prisma'
+        sh 'pnpm prisma:generate:test'
         sh 'mkdir -p test-results'
         echo 'Running E2E tests...'
-        sh 'npm run test:e2e:ci'
+        sh 'pnpm test:e2e:ci'
       }
       post {
         always {
