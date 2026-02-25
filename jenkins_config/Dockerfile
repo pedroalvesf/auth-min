@@ -17,9 +17,10 @@ RUN apt-get update && apt-get install -y \
     && apt-get install -y docker-ce-cli docker-buildx-plugin docker-compose-plugin \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Node.js
+# Install Node.js and pnpm
 RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
-    && apt-get install -y nodejs
+    && apt-get install -y nodejs \
+    && npm install -g pnpm
 
 # Add jenkins user to docker group with correct GID for macOS Docker Desktop  
 RUN groupadd -f docker && usermod -aG docker jenkins
