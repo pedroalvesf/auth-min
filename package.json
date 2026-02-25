@@ -30,7 +30,7 @@
     "prisma:seed": "ts-node prisma/seed.ts",
     "db:seed": "npm run prisma:generate && npm run prisma:seed",
     "db:reset": "npm run prisma:migrate reset && npm run db:seed",
-    "db:setup:test": "export $(cat .env.test | grep -v '^#' | xargs) && prisma db push --schema=./test/schema.prisma --force-reset",
+    "db:setup:test": "export $(cat .env.test | grep -v '^#' | xargs) && prisma db push --schema=./test/schema.prisma --force-reset && npm run prisma:generate:test",
     "test:setup": "./scripts/setup-test-env.sh",
     "ci:test": "npm run db:setup:test && npm run test && npm run test:e2e:ci",
     "pre-commit": "npm run lint:check && npm run test:coverage && npm run test:e2e",
@@ -64,6 +64,9 @@
     "rxjs": "^7.8.1",
     "winston": "^3.18.3",
     "zod": "^4.1.12"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": ["@nestjs/core", "@prisma/engines", "bcrypt", "prisma", "unrs-resolver"]
   },
   "devDependencies": {
     "@nestjs/cli": "^10.0.0",
