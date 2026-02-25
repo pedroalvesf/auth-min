@@ -119,7 +119,7 @@ pipeline {
 
     stage('Test Database Setup') {
       environment {
-        DATABASE_URL = 'postgresql://auth_test_user:auth_test_password@localhost:8239/auth_test_db'
+        DATABASE_URL = 'postgresql://auth_test_user:auth_test_password@host.docker.internal:8239/auth_test_db'
       }
       steps {
         echo 'Cleaning up any existing test database...'
@@ -151,13 +151,13 @@ pipeline {
           done
         '''
         echo 'Pushing test schema to database...'
-        sh './node_modules/.bin/prisma db push --schema=./test/schema.prisma --force-reset'
+        sh 'pnpm dlx prisma db push --schema=./test/schema.prisma --force-reset'
       }
     }
 
     stage('E2E Tests') {
       environment {
-        DATABASE_URL = 'postgresql://auth_test_user:auth_test_password@localhost:8239/auth_test_db'
+        DATABASE_URL = 'postgresql://auth_test_user:auth_test_password@host.docker.internal:8239/auth_test_db'
       }
       steps {
         echo 'Generating Prisma test client...'
