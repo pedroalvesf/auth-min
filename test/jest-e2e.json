@@ -24,6 +24,7 @@
     "^@/infra/(.*)$": "<rootDir>/src/infra/$1",
     "^@/test/(.*)$": "<rootDir>/test/$1"
   },
+  "setupFiles": ["<rootDir>/test/setup-env.ts"],
   "testTimeout": 30000,
   "maxWorkers": 1,
   "verbose": true,
