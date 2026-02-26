@@ -1,0 +1,138 @@
+name: CI
+
+on:
+  push:
+    branches: ['**']       # todo push em qualquer branch
+  pull_request:
+    branches: [main]       # todo PR apontando pra main
+
+  env:
+    NODE_ENV: test
+    CI: true
+
+  jobs:
+    # ─────────────────────────────────────────
+    # STAGES: lint + format (paralelo, igual ao Jenkins)
+    # ─────────────────────────────────────────
+    code-quality:
+      name: Code Quality
+      runs-on: ubuntu-latest
+      steps:
+        - uses: actions/checkout@v4                    # stage: Checkout
+
+        - uses: pnpm/action-setup@v4                   # equivale ao pnpm já instalado no Jenkins
+          with:
+            version: latest
+
+        - uses: actions/setup-node@v4
+          with:
+            node-version: '20'
+            cache: 'pnpm'
+
+        - name: Install dependencies                   # stage: Install Dependencies
+          run: pnpm install --frozen-lockfile
+
+        - name: Prisma generate                        # stage: Prisma Setup
+          run: pnpm prisma:generate
+
+        - name: Lint                                   # stage: Code Quality → Linting
+          run: pnpm lint:check
+
+        - name: Format check                           # stage: Code Quality → Formatting
+          run: pnpm format:check
+
+    # ─────────────────────────────────────────
+    # STAGES: unit tests
+    # ─────────────────────────────────────────
+    unit-tests:
+      name: Unit Tests
+      runs-on: ubuntu-latest
+      steps:
+        - uses: actions/checkout@v4
+        - uses: pnpm/action-setup@v4
+          with:
+            version: latest
+        - uses: actions/setup-node@v4
+          with:
+            node-version: '20'
+            cache: 'pnpm'
+
+        - name: Install dependencies
+          run: pnpm install --frozen-lockfile
+
+        - name: Prisma generate
+          run: pnpm prisma:generate
+
+        - name: Unit tests                             # stage: Unit Tests
+          run: pnpm test:ci
+
+        - name: Upload test results
+          if: always()
+          uses: actions/upload-artifact@v4
+          with:
+            name: unit-test-results
+            path: junit.xml
+            if-no-files-found: ignore
+
+    # ─────────────────────────────────────────
+    # STAGES: build + e2e (com postgres nativo!)
+    # ─────────────────────────────────────────
+    e2e-tests:
+      name: Build & E2E Tests
+      runs-on: ubuntu-latest
+
+      # Equivale ao seu `docker run postgres` manual no Jenkins
+      # O GHA já sobe, espera o health check e derruba automaticamente
+      services:
+        postgres-test:
+          image: postgres:15-alpine
+          env:
+            POSTGRES_USER: auth_test_user
+            POSTGRES_PASSWORD: auth_test_password
+            POSTGRES_DB: auth_test_db
+          ports:
+            - 8239:5432
+          options: >-
+            --health-cmd pg_isready
+            --health-interval 5s
+            --health-timeout 5s
+            --health-retries 10
+
+      env:
+        DATABASE_URL: postgresql://auth_test_user:auth_test_password@localhost:8239/auth_test_db
+
+      steps:
+        - uses: actions/checkout@v4
+        - uses: pnpm/action-setup@v4
+          with:
+            version: latest
+        - uses: actions/setup-node@v4
+          with:
+            node-version: '20'
+            cache: 'pnpm'
+
+        - name: Install dependencies
+          run: pnpm install --frozen-lockfile
+
+        - name: Prisma generate
+          run: pnpm prisma:generate
+
+        - name: Build application                      # stage: Build Application
+          run: pnpm build
+
+        - name: Push test schema                       # stage: Test Database Setup
+          run: pnpm dlx prisma db push --schema=./test/schema.prisma --force-reset
+
+        - name: Generate Prisma test client
+          run: pnpm prisma:generate:test
+
+        - name: E2E tests                              # stage: E2E Tests
+          run: pnpm test:e2e:ci
+
+        - name: Upload e2e results
+          if: always()
+          uses: actions/upload-artifact@v4
+          with:
+            name: e2e-test-results
+            path: test-results/
+            if-no-files-found: ignore
