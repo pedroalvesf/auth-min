@@ -11,7 +11,7 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
-    "test:e2e": "jest --config ./test/jest-e2e.json",
+    "test:e2e": "jest --config ./test/jest-e2e.json --forceExit",
     "test:e2e:watch": "pnpm run test:e2e -- --watch",
     "test:all": "pnpm run test && pnpm run test:e2e",
     "lint": "npx eslint \"{src,test}/**/*.ts\" --fix",
