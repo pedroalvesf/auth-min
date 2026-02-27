@@ -21,7 +21,7 @@ src/
     enterprise/   # Domain entities (User, Role, Permission, Device, Token)
     application/  # Use cases, repository interfaces, cryptography interfaces
   infra/
-    auth/         # JWT strategy, guards (auth, permissions, roles, throttler)
+    auth/         # JWT strategy, guards (auth, permissions, roles)
     cryptography/ # Bcrypt, JWT, AES implementations
     database/     # Prisma repositories and mappers
     http/         # NestJS controllers, DTOs, presenters
@@ -31,7 +31,8 @@ src/
 
 ### Prerequisites
 
-- Node.js 18+
+- Node.js 20+
+- pnpm
 - Docker & Docker Compose
 
 ### 1. Clone & Install
@@ -39,7 +40,7 @@ src/
 ```bash
 git clone <your-repo-url>
 cd auth-min
-npm install
+pnpm install
 ```
 
 ### 2. Setup Environment
@@ -52,19 +53,19 @@ cp .env.example .env
 ### 3. Start Database
 
 ```bash
-docker-compose up -d
+docker compose up -d
 ```
 
 ### 4. Run Migrations
 
 ```bash
-npm run prisma:migrate
+pnpm prisma:migrate
 ```
 
 ### 5. Seed Database (Optional)
 
 ```bash
-npm run db:seed
+pnpm db:seed
 ```
 
 This creates roles, permissions, and test users. See `prisma/permissions.config.ts` to customize.
@@ -78,7 +79,7 @@ Test credentials:
 ### 6. Development
 
 ```bash
-npm run dev
+pnpm dev
 # Server running on http://localhost:3000
 ```
 
@@ -115,7 +116,7 @@ npm run dev
 ### Unit Tests
 
 ```bash
-npm test
+pnpm test
 ```
 
 ### E2E Tests
@@ -124,16 +125,16 @@ Requires a running test database:
 
 ```bash
 # Setup test database
-npm run db:setup:test
+pnpm db:setup:test
 
 # Run e2e tests
-npm run test:e2e
+pnpm test:e2e
 ```
 
 ### All Tests
 
 ```bash
-npm run test:all
+pnpm test:all
 ```
 
 ## Tech Stack
@@ -146,6 +147,8 @@ npm run test:all
 - **Validation**: Zod + class-validator
 - **Logging**: Winston
 - **Container**: Docker
+- **Package Manager**: pnpm
+- **CI**: GitHub Actions
 
 ## License
 
