@@ -13,18 +13,7 @@ import { UserAlreadyExistsError } from '@/domain/auth/application/use-cases/erro
 import { AuthenticateDeviceUseCase } from '@/domain/auth/application/use-cases/authenticate-device';
 import { UniqueEntityID } from '@/core/entities/unique-entity-id';
 import { Device } from '@/domain/auth/enterprise/entities/device';
-import {
-  ApiOperation,
-  ApiTags,
-  ApiHeader,
-  ApiBody,
-  ApiBadRequestResponse,
-  ApiConflictResponse,
-  ApiCreatedResponse,
-} from '@nestjs/swagger';
-import { AuthResponseDto, ErrorResponseDto } from '../dto/auth-response-dto';
 
-@ApiTags('Authentication')
 @Controller('auth/user')
 export class CreateUserController {
   constructor(
@@ -34,54 +23,10 @@ export class CreateUserController {
 
   @Post()
   @HttpCode(201)
-  @ApiOperation({
-    summary: 'Create new user',
-    description:
-      'Creates a new user account and automatically authenticates the device, returning access and refresh tokens.',
-  })
-  @ApiBody({ type: CreateUserDto })
-  @ApiHeader({
-    name: 'x-ipaddress',
-    description: 'Client IP address for device tracking',
-    required: true,
-    example: '192.168.1.1',
-  })
-  @ApiHeader({
-    name: 'x-operatingsystem',
-    description: 'Operating system information',
-    required: true,
-    example: 'Windows 10',
-  })
-  @ApiHeader({
-    name: 'x-browser',
-    description: 'Browser information',
-    required: true,
-    example: 'Chrome 120.0',
-  })
-  @ApiHeader({
-    name: 'x-type',
-    description: 'Device type',
-    required: true,
-    example: 'desktop',
-    schema: { enum: ['desktop', 'mobile', 'tablet'] },
-  })
-  @ApiCreatedResponse({
-    description: 'User created successfully and device authenticated',
-    type: AuthResponseDto,
-  })
-  @ApiBadRequestResponse({
-    description: 'Invalid input data or missing required headers',
-    type: ErrorResponseDto,
-  })
-  @ApiConflictResponse({
-    description: 'User already exists',
-    type: ErrorResponseDto,
-  })
   async handle(
     @Body() body: CreateUserDto,
     @Headers() headers: Record<string, string>
   ) {
-    // Validate required device headers
     const ipAddress = headers['x-ipaddress'];
     const operatingSystem = headers['x-operatingsystem'];
     const browser = headers['x-browser'];
@@ -111,8 +56,6 @@ export class CreateUserController {
       }
     }
 
-    const location = 'unknown';
-
     const deviceEntity = Device.create({
       userId: new UniqueEntityID(result.value.user.id.toString()),
       name: `${operatingSystem} - ${browser}`,
@@ -120,7 +63,7 @@ export class CreateUserController {
       operatingSystem,
       ipAddress,
       browser,
-      location: location,
+      location: 'unknown',
       lastLogin: new Date(),
       createdAt: new Date(),
       active: true,
