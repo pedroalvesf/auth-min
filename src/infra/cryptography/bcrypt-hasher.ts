@@ -5,7 +5,7 @@ import { HashGenerator } from '@/domain/auth/application/cryptography/hash-gener
 
 @Injectable()
 export class BcryptHasher implements HashGenerator, HashComparer {
-  private HASH_SALT_LENGTH = 10;
+  private HASH_SALT_LENGTH = process.env.NODE_ENV === 'test' ? 1 : 10;
 
   hash(plain: string): Promise<string> {
     return hash(plain, this.HASH_SALT_LENGTH);
