@@ -19,7 +19,7 @@
     "resolveJsonModule": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-    "types": ["node", "jest"],
+    "types": ["node", "vitest/globals"],
     "isolatedModules": true
   },
   "include": ["src/**/*", "test/**/*"],

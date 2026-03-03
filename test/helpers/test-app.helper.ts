@@ -3,8 +3,6 @@ import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { envSchema } from '../../src/infra/env/env';
 import { AppModule } from '../../src/app.module';
-import { TestDatabaseModule } from './test-database.module';
-import { DatabaseModule } from '../../src/infra/database/database.module';
 
 export class TestAppHelper {
   private static app: INestApplication;
@@ -19,10 +17,7 @@ export class TestAppHelper {
         }),
         AppModule,
       ],
-    })
-      .overrideModule(DatabaseModule)
-      .useModule(TestDatabaseModule)
-      .compile();
+    }).compile();
 
     this.app = moduleFixture.createNestApplication();
 

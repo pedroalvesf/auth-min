@@ -114,11 +114,5 @@ jobs:
       - name: Build application
         run: pnpm build
 
-      - name: Push test schema
-        run: pnpm dlx prisma db push --schema=./test/schema.prisma --force-reset
-
-      - name: Generate Prisma test client
-        run: pnpm prisma:generate:test
-
       - name: E2E tests
         run: pnpm test:e2e

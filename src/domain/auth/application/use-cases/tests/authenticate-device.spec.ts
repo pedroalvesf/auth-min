@@ -24,10 +24,10 @@ describe('Authenticate Device', () => {
     hashComparer = new FakeHashComparer();
     encrypter = new FakeEncrypter();
     mockLogger = {
-      info: jest.fn(),
-      warn: jest.fn(),
-      error: jest.fn(),
-      debug: jest.fn(),
+      info: vi.fn(),
+      warn: vi.fn(),
+      error: vi.fn(),
+      debug: vi.fn(),
     };
     sut = new AuthenticateDeviceUseCase(
       devicesRepository,
