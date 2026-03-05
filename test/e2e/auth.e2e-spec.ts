@@ -1,8 +1,5 @@
 import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
-import { execSync } from 'child_process';
-import { randomUUID } from 'crypto';
-import { Client } from 'pg';
 import { TestAppHelper } from '../helpers/test-app.helper';
 import { AuthHelper } from '../helpers/auth.helper';
 import { DatabaseHelper } from '../helpers/database.helper';
@@ -14,21 +11,7 @@ describe('Authentication E2E', () => {
   let databaseHelper: DatabaseHelper;
   let prisma: PrismaService;
 
-  const schemaName = `test_${randomUUID().replace(/-/g, '_')}`;
-  const baseUrl = process.env.DATABASE_URL!;
-
   beforeAll(async () => {
-    // Set DATABASE_URL with isolated schema for this test run
-    const url = new URL(baseUrl);
-    url.searchParams.set('schema', schemaName);
-    process.env.DATABASE_URL = url.toString();
-
-    // Apply migrations to create the isolated schema
-    execSync('npx prisma migrate deploy', {
-      env: { ...process.env, DATABASE_URL: process.env.DATABASE_URL },
-      stdio: 'pipe',
-    });
-
     app = await TestAppHelper.createTestApp();
     authHelper = new AuthHelper(app);
     prisma = app.get<PrismaService>(PrismaService);
@@ -37,15 +20,6 @@ describe('Authentication E2E', () => {
 
   afterAll(async () => {
     await TestAppHelper.closeApp();
-
-    // Drop the isolated schema
-    const pgClient = new Client({ connectionString: baseUrl });
-    try {
-      await pgClient.connect();
-      await pgClient.query(`DROP SCHEMA IF EXISTS "${schemaName}" CASCADE`);
-    } finally {
-      await pgClient.end();
-    }
   });
 
   beforeEach(async () => {

@@ -20,8 +20,9 @@ export default defineConfig({
         test: {
           name: 'e2e',
           include: ['test/**/*.e2e-spec.ts'],
-          setupFiles: ['./test/setup-env.ts'],
+          setupFiles: ['./test/setup-e2e.ts'],
           testTimeout: 30000,
+          hookTimeout: 30000,
           sequence: { concurrent: false },
         },
       },
