@@ -17,7 +17,7 @@ pnpm build              # Compile TypeScript (nest build --tsc)
 pnpm test               # Unit tests (vitest run --project unit)
 pnpm test:watch         # Unit tests watch mode
 pnpm test:coverage      # Unit tests with coverage
-pnpm test:e2e           # E2E tests (needs postgres on port 8239)
+pnpm test:e2e           # E2E tests (needs postgres on port 8239, see E2E setup below)
 pnpm test:all           # All tests
 
 # Code quality
@@ -58,7 +58,7 @@ test/
 ├── cryptography/       # Fake implementations (FakeEncrypter, FakeHashComparer)
 ├── helpers/            # TestAppHelper, DatabaseHelper, AuthHelper
 ├── e2e/                # E2E specs using supertest
-└── setup-env.ts        # Loads .env.test for E2E
+└── setup-e2e.ts        # E2E setup: loads .env.test + runs prisma db push
 ```
 
 **Dependency flow**: Controllers -> Use Cases -> Repository interfaces <- Prisma implementations
@@ -76,7 +76,7 @@ test/
 ## Testing Conventions
 
 - Unit tests: `src/**/*.spec.ts` — use in-memory repos + fake crypto, no DB needed
-- E2E tests: `test/**/*.e2e-spec.ts` — real PostgreSQL with schema isolation per test file
+- E2E tests: `test/**/*.e2e-spec.ts` — real PostgreSQL, `setup-e2e.ts` runs `prisma db push` before tests, `DatabaseHelper.cleanup()`/`seed()` resets data between tests
 - Factory functions: `makeUser()`, `makeRole()`, `makeDevice()`, etc. accept `Partial<Props>` overrides
 - Use `vi.fn()` for mocks (Vitest, not Jest)
 - Test config: `vitest.config.ts` with two projects (`unit` and `e2e`)

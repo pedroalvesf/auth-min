@@ -38,7 +38,7 @@ O `auth-min` é um microserviço responsável por:
 | Auth | JWT + Passport + Bcrypt |
 | Validação | Zod + class-validator |
 | Logs | Winston + nest-winston |
-| Testes | Jest 30 + Supertest |
+| Testes | Vitest + SWC + Supertest |
 | Package manager | pnpm |
 | CI | GitHub Actions |
 
@@ -95,8 +95,7 @@ auth-min/
 │   │   │   └── controllers/auth/    # Controllers HTTP
 │   │   └── logging/                 # Interceptors de log
 │   ├── generated/
-│   │   ├── prisma/                  # Cliente Prisma (produção)
-│   │   └── prisma-test/             # Cliente Prisma (testes)
+│   │   └── prisma/                  # Cliente Prisma (auto-gerado, git-ignored)
 │   ├── app.module.ts
 │   └── main.ts
 ├── test/
@@ -105,8 +104,7 @@ auth-min/
 │   ├── repositories/                # Repositórios in-memory
 │   ├── factories/                   # Factories de entidades
 │   ├── cryptography/                # Fakes de criptografia
-│   ├── setup-env.ts                 # Carrega .env.test antes dos testes
-│   └── jest-e2e.json                # Configuração Jest e2e
+│   └── setup-e2e.ts                 # Setup E2E: carrega .env.test + prisma db push
 ├── prisma/
 │   └── schema.prisma                # Schema principal
 ├── .github/
@@ -138,12 +136,11 @@ auth-min/
 | `LoginHistory` | Histórico de logins |
 | `AuditLog` | Auditoria completa de ações |
 
-### Dois schemas
+### Schema único
 
-| Schema | Localização | Output | Banco |
-|--------|-------------|--------|-------|
-| Produção | `prisma/schema.prisma` | `src/generated/prisma` | `auth_db` (porta 8238) |
-| Teste | `test/schema.prisma` | `src/generated/prisma-test` | `auth_test_db` (porta 8239) |
+| Localização | Output | Banco dev | Banco teste |
+|-------------|--------|-----------|-------------|
+| `prisma/schema.prisma` | `src/generated/prisma` | `auth_db` (porta 8238) | `auth_test_db` (porta 8239) |
 
 ---
 
@@ -210,9 +207,8 @@ DELETE /revoke-device-session → Revogar dispositivo específico
 
 - NestJS sobe em memória via `@nestjs/testing`
 - Banco de teste real (PostgreSQL na porta 8239)
-- Schema isolado (`test/schema.prisma`)
-- Cleanup automático entre testes via `DatabaseHelper`
-- `setup-env.ts` carrega `.env.test` sem sobrescrever variáveis de CI
+- `setup-e2e.ts` carrega `.env.test` e executa `prisma db push` para sincronizar o schema
+- Cleanup automático entre testes via `DatabaseHelper.cleanup()` + `seed()`
 
 ### Cobertura atual
 
@@ -261,9 +257,6 @@ pnpm db:seed
 ```bash
 # subir banco de teste (necessário para e2e)
 docker compose -f docker-compose.test.yml up -d
-
-# configurar banco de teste (push schema + gerar cliente)
-pnpm db:setup:test
 
 # rodar testes unitários
 pnpm test
@@ -316,16 +309,12 @@ pnpm start:prod
 # instalar dependências
 pnpm install
 
-# gerar clientes Prisma
+# gerar cliente Prisma
 pnpm prisma:generate
-pnpm prisma:generate:test
 
 # subir bancos
 docker compose up -d
 docker compose -f docker-compose.test.yml up -d
-
-# configurar banco de teste
-pnpm db:setup:test
 
 # iniciar
 pnpm dev
