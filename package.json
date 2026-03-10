@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "dev": "lsof -ti:3000 | xargs kill -9 2>/dev/null || true && nest start --watch -p tsconfig.build.json",
+    "dev": "nest build -p tsconfig.build.json && node dist/src/main.js",
     "dev:clean": "pkill -f 'pnpm run dev' || true && pnpm run dev",
     "build": "nest build --tsc -p tsconfig.build.json",
     "start": "node dist/main.js",
