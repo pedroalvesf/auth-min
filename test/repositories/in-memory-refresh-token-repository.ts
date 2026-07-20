@@ -22,6 +22,10 @@ export class InMemoryRefreshTokenRepository implements RefreshTokenRepository {
     return this.items.filter((item) => item.deviceId.toString() === deviceId);
   }
 
+  async findByFamilyId(familyId: string): Promise<RefreshToken[]> {
+    return this.items.filter((item) => item.familyId.toString() === familyId);
+  }
+
   async create(refreshToken: RefreshToken): Promise<void> {
     this.items.push(refreshToken);
   }

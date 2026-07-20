@@ -20,6 +20,13 @@ export class PrismaRefreshTokenRepository implements RefreshTokenRepository {
     return refreshTokens.map(PrismaRefreshTokenMapper.toDomain);
   }
 
+  async findByFamilyId(familyId: string): Promise<RefreshToken[]> {
+    const refreshTokens = await this.prisma.refreshToken.findMany({
+      where: { familyId },
+    });
+    return refreshTokens.map(PrismaRefreshTokenMapper.toDomain);
+  }
+
   async findByUserId(userId: string): Promise<RefreshToken[]> {
     const refreshTokens = await this.prisma.refreshToken.findMany({
       where: { userId },
@@ -37,7 +44,7 @@ export class PrismaRefreshTokenRepository implements RefreshTokenRepository {
   }
 
   async save(refreshToken: RefreshToken): Promise<void> {
-    const data = PrismaRefreshTokenMapper.toPrisma(refreshToken);
+    const data = PrismaRefreshTokenMapper.toPrismaUpdate(refreshToken);
     await this.prisma.refreshToken.update({
       where: { id: refreshToken.id.toString() },
       data,

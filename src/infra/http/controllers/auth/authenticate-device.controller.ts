@@ -85,7 +85,7 @@ export class AuthenticateDeviceController {
     const { accessToken, refreshToken } = result.value;
 
     return {
-      accessToken: accessToken.token,
+      accessToken,
       refreshToken: refreshToken.token,
     };
   }

@@ -11,12 +11,16 @@ export class InMemoryUsersRepository implements UsersRepository {
   public roles: RoleDTO[] = [];
 
   async findById(id: string): Promise<User | null> {
-    const user = this.items.find((item) => item.id.toString() === id);
+    const user = this.items.find(
+      (item) => item.id.toString() === id && !item.isDeleted
+    );
     return user ?? null;
   }
 
   async findByEmail(email: string): Promise<User | null> {
-    const user = this.items.find((item) => item.email === email);
+    const user = this.items.find(
+      (item) => item.email === email && !item.isDeleted
+    );
     return user ?? null;
   }
 

@@ -34,9 +34,9 @@ export class PrismaRolesRepository implements RolesRepository {
     const role = await this.prisma.role.findUnique({
       where: { id },
       include: {
-        Permissions: {
+        permissions: {
           include: {
-            Permission: true,
+            permission: true,
           },
         },
       },
@@ -47,8 +47,8 @@ export class PrismaRolesRepository implements RolesRepository {
     // Transform structure to the format expected by the mapper
     const roleWithPermissions = {
       ...role,
-      permissions: role.Permissions.map(
-        (rolePermission) => rolePermission.Permission
+      permissions: role.permissions.map(
+        (rolePermission) => rolePermission.permission
       ),
     };
 

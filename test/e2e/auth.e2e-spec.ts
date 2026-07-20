@@ -168,11 +168,11 @@ describe('Authentication E2E', () => {
 
       const user = await prisma.user.findUnique({
         where: { email: userData.email },
-        include: { Devices: true },
+        include: { devices: true },
       });
 
-      expect(user!.Devices).toHaveLength(2);
-      const deviceTypes = user!.Devices.map((d) => d.type);
+      expect(user!.devices).toHaveLength(2);
+      const deviceTypes = user!.devices.map((d) => d.type);
       expect(deviceTypes).toContain('desktop');
       expect(deviceTypes).toContain('mobile');
 
@@ -220,15 +220,15 @@ describe('Authentication E2E', () => {
 
       const user = await prisma.user.findUnique({
         where: { email: userData.email },
-        include: { Devices: true },
+        include: { devices: true },
       });
-      const deviceId = user!.Devices[0].id;
+      const deviceId = user!.devices[0].id;
 
       const tokenBefore = await prisma.refreshToken.findFirst({
         where: { deviceId },
       });
       expect(tokenBefore).toBeTruthy();
-      expect(tokenBefore!.revoked).toBe(false);
+      expect(tokenBefore!.revokedAt).toBeNull();
 
       const response = await request(app.getHttpServer())
         .delete('/revoke-device-session')
@@ -246,7 +246,7 @@ describe('Authentication E2E', () => {
       const tokenAfter = await prisma.refreshToken.findFirst({
         where: { deviceId },
       });
-      expect(tokenAfter!.revoked).toBe(true);
+      expect(tokenAfter!.revokedAt).not.toBeNull();
     });
 
     it('should return 401 without authentication', async () => {
@@ -273,9 +273,9 @@ describe('Authentication E2E', () => {
 
       const foundUserA = await prisma.user.findUnique({
         where: { email: userA.email },
-        include: { Devices: true },
+        include: { devices: true },
       });
-      const deviceIdOfUserA = foundUserA!.Devices[0].id;
+      const deviceIdOfUserA = foundUserA!.devices[0].id;
 
       await request(app.getHttpServer())
         .delete('/revoke-device-session')
@@ -319,9 +319,9 @@ describe('Authentication E2E', () => {
 
       const user = await prisma.user.findUnique({
         where: { email: userData.email },
-        include: { Devices: true },
+        include: { devices: true },
       });
-      expect(user!.Devices).toHaveLength(2);
+      expect(user!.devices).toHaveLength(2);
 
       const response = await request(app.getHttpServer())
         .post(`/logout/${user!.id}`)
@@ -340,7 +340,7 @@ describe('Authentication E2E', () => {
       const refreshTokens = await prisma.refreshToken.findMany({
         where: { userId: user!.id },
       });
-      const activeTokens = refreshTokens.filter((t) => !t.revoked);
+      const activeTokens = refreshTokens.filter((t) => !t.revokedAt);
       expect(activeTokens).toHaveLength(0);
     });
 
@@ -497,7 +497,7 @@ describe('Authentication E2E', () => {
       expect(activeDevices).toHaveLength(0);
 
       const activeTokens = await prisma.refreshToken.findMany({
-        where: { userId: user!.id, revoked: false },
+        where: { userId: user!.id, revokedAt: null },
       });
       expect(activeTokens).toHaveLength(0);
     });

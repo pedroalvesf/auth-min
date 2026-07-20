@@ -2,23 +2,23 @@ import { Injectable } from '@nestjs/common';
 import { Either, left, right } from '@/core/either';
 import { UsersRepository } from '@/domain/auth/application/repositories/users-repository';
 import { RefreshTokenRepository } from '@/domain/auth/application/repositories/refresh-token-repository';
-import { AccessToken } from '@/domain/auth/enterprise/entities/access-token';
+import { RefreshToken } from '@/domain/auth/enterprise/entities/refresh-token';
 import { Encrypter } from '../cryptography/encrypter';
-import { InvalidTokenError } from '@/domain/auth/application/use-cases/errors/invalid-token-error';
-import { UniqueEntityID } from '@/core/entities/unique-entity-id';
-import { RefreshTokenExpiredError } from './errors/refresh-token-expired-error';
 import { UserNotFoundError } from './errors/user-not-found-error';
+import { RefreshTokenExpiredError } from './errors/refresh-token-expired-error';
 import { RefreshTokenNotFoundError } from './errors/refresh-token-not-found-error';
+import { RefreshTokenReuseError } from './errors/refresh-token-reuse-error';
+import { REFRESH_TOKEN_TTL_MS } from './token-config';
 
 interface RefreshAccessTokenUseCaseRequest {
   refreshToken: string;
 }
 
 type RefreshAccessTokenUseCaseResponse = Either<
-  | InvalidTokenError
   | UserNotFoundError
   | RefreshTokenExpiredError
-  | RefreshTokenNotFoundError,
+  | RefreshTokenNotFoundError
+  | RefreshTokenReuseError,
   {
     accessToken: string;
     refreshToken: string;
@@ -36,44 +36,69 @@ export class RefreshAccessTokenUseCase {
   async execute({
     refreshToken,
   }: RefreshAccessTokenUseCaseRequest): Promise<RefreshAccessTokenUseCaseResponse> {
-    const refreshTokenEntity = await this.refreshTokenRepository.findByToken(
+    const currentToken = await this.refreshTokenRepository.findByToken(
       refreshToken
     );
 
-    if (!refreshTokenEntity) {
+    if (!currentToken) {
       return left(new RefreshTokenNotFoundError());
     }
 
-    if (!refreshTokenEntity.isValid()) {
+    // Detecção de reuso: um token já revogado sendo apresentado indica
+    // roubo/replay. Revoga a família inteira e força novo login.
+    if (currentToken.isRevoked()) {
+      await this.revokeFamily(currentToken.familyId.toString());
+      return left(new RefreshTokenReuseError());
+    }
+
+    if (currentToken.isExpired()) {
       return left(new RefreshTokenExpiredError());
     }
 
     const user = await this.userRepository.findById(
-      refreshTokenEntity.userId.toString()
+      currentToken.userId.toString()
     );
 
     if (!user) {
-      return left(new UserNotFoundError(refreshTokenEntity.userId.toString()));
+      return left(new UserNotFoundError(currentToken.userId.toString()));
     }
 
-    const { accessToken } = await this.encrypter.encrypt({
-      sub: refreshTokenEntity.userId.toString(),
-      deviceId: refreshTokenEntity.deviceId.toString(),
-    });
+    // Rotação: revoga o token atual e emite um novo na mesma família.
+    currentToken.revoke();
+    await this.refreshTokenRepository.save(currentToken);
 
-    const newAccessTokenEntity = AccessToken.create({
-      userId: new UniqueEntityID(user.id.toString()),
-      token: accessToken,
-      expiresAt: new Date(Date.now() + 900 * 1000),
+    const { accessToken, refreshToken: newRefreshToken } =
+      await this.encrypter.encrypt({
+        sub: currentToken.userId.toString(),
+        deviceId: currentToken.deviceId.toString(),
+      });
+
+    const rotatedToken = RefreshToken.create({
+      userId: currentToken.userId,
+      deviceId: currentToken.deviceId,
+      familyId: currentToken.familyId,
+      token: newRefreshToken,
       createdAt: new Date(),
-      revoked: false,
+      expiresAt: new Date(Date.now() + REFRESH_TOKEN_TTL_MS),
     });
 
-    await this.refreshTokenRepository.save(refreshTokenEntity);
+    await this.refreshTokenRepository.create(rotatedToken);
 
     return right({
-      accessToken: newAccessTokenEntity.token,
-      refreshToken: refreshTokenEntity.token,
+      accessToken,
+      refreshToken: rotatedToken.token,
     });
+  }
+
+  private async revokeFamily(familyId: string): Promise<void> {
+    const familyTokens = await this.refreshTokenRepository.findByFamilyId(
+      familyId
+    );
+
+    for (const token of familyTokens) {
+      if (token.isRevoked()) continue;
+      token.revoke();
+      await this.refreshTokenRepository.save(token);
+    }
   }
 }

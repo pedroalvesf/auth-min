@@ -13,6 +13,7 @@ export interface UserProps {
   roles: RoleList;
   createdAt: Date;
   updatedAt?: Date;
+  deletedAt?: Date;
 }
 
 export class User extends AggregateRoot<UserProps> {
@@ -48,6 +49,14 @@ export class User extends AggregateRoot<UserProps> {
     return this.props.roles;
   }
 
+  get deletedAt() {
+    return this.props.deletedAt;
+  }
+
+  get isDeleted(): boolean {
+    return this.props.deletedAt != null;
+  }
+
   set password(password: string) {
     this.props.password = password;
     this.touch();
@@ -65,6 +74,13 @@ export class User extends AggregateRoot<UserProps> {
 
   updateLastLogin() {
     this.props.lastLoginAt = new Date();
+    this.touch();
+  }
+
+  softDelete() {
+    if (this.props.deletedAt) return;
+    this.props.deletedAt = new Date();
+    this.props.isActive = false;
     this.touch();
   }
 
