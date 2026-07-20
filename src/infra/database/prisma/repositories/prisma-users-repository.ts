@@ -9,19 +9,19 @@ export class PrismaUsersRepository implements UsersRepository {
   constructor(private prisma: PrismaService) {}
 
   async findById(id: string): Promise<User | null> {
-    const user = await this.prisma.user.findUnique({
-      where: { id },
+    const user = await this.prisma.user.findFirst({
+      where: { id, deletedAt: null },
     });
     return user ? PrismaUsersMapper.toDomain(user) : null;
   }
 
   async findByIdWithRoles(id: string): Promise<User | null> {
-    const user = await this.prisma.user.findUnique({
-      where: { id },
+    const user = await this.prisma.user.findFirst({
+      where: { id, deletedAt: null },
       include: {
-        Roles: {
+        roles: {
           include: {
-            Role: true,
+            role: true,
           },
         },
       },
@@ -32,15 +32,15 @@ export class PrismaUsersRepository implements UsersRepository {
     // Transform structure to the format expected by the mapper
     const userWithRoles = {
       ...user,
-      roles: user.Roles.map((userRole) => userRole.Role),
+      roles: user.roles.map((userRole) => userRole.role),
     };
 
     return PrismaUsersMapper.toDomain(userWithRoles);
   }
 
   async findByEmail(email: string): Promise<User | null> {
-    const user = await this.prisma.user.findUnique({
-      where: { email },
+    const user = await this.prisma.user.findFirst({
+      where: { email, deletedAt: null },
     });
     if (!user) return null;
     return PrismaUsersMapper.toDomain(user);
@@ -57,7 +57,10 @@ export class PrismaUsersRepository implements UsersRepository {
   }
 
   async delete(id: string): Promise<void> {
-    await this.prisma.user.delete({ where: { id } });
+    await this.prisma.user.update({
+      where: { id },
+      data: { deletedAt: new Date(), isActive: false },
+    });
   }
 
   async assignRole(
@@ -88,12 +91,12 @@ export class PrismaUsersRepository implements UsersRepository {
   async findRolesByUserId(userId: string) {
     const userRoles = await this.prisma.userRole.findMany({
       where: { userId },
-      include: { Role: true },
+      include: { role: true },
     });
     return userRoles.map((userRole) => ({
-      id: userRole.Role.id,
-      slug: userRole.Role.slug,
-      name: userRole.Role.name,
+      id: userRole.role.id,
+      slug: userRole.role.slug,
+      name: userRole.role.name,
     }));
   }
 }

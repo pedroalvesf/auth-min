@@ -2,7 +2,6 @@ import { Injectable, Inject } from '@nestjs/common';
 import { Either, left, right } from '@/core/either';
 import { Device } from '../../enterprise/entities/device';
 import { RefreshToken } from '../../enterprise/entities/refresh-token';
-import { AccessToken } from '../../enterprise/entities/access-token';
 import { User } from '../../enterprise/entities/user';
 import { HashComparer } from '../cryptography/hash-comparer';
 import { Encrypter } from '../cryptography/encrypter';
@@ -14,6 +13,7 @@ import { DevicesRepository } from '../repositories/devices-repository';
 import { UsersRepository } from '../repositories/users-repository';
 import { RefreshTokenRepository } from '../repositories/refresh-token-repository';
 import { WrongCredentialsError } from './errors/wrong-credentials-error';
+import { REFRESH_TOKEN_TTL_MS } from './token-config';
 
 interface AuthenticateDeviceUseCaseRequest {
   password: string;
@@ -23,7 +23,7 @@ interface AuthenticateDeviceUseCaseRequest {
 type AuthenticateDeviceUseCaseResponse = Either<
   WrongCredentialsError,
   {
-    accessToken: AccessToken;
+    accessToken: string;
     refreshToken: RefreshToken;
   }
 >;
@@ -110,21 +110,13 @@ export class AuthenticateDeviceUseCase {
       deviceId: updatedDevice.id.toString(),
     });
 
-    const accessTokenEntity = AccessToken.create({
-      userId: new UniqueEntityID(user.id.toString()),
-      token: accessToken,
-      createdAt: new Date(),
-      expiresAt: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000),
-      revoked: false,
-    });
-
     const refreshTokenEntity = RefreshToken.create({
       userId: new UniqueEntityID(user.id.toString()),
       deviceId: updatedDevice.id,
+      familyId: new UniqueEntityID(),
       token: refreshToken,
       createdAt: new Date(),
-      expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-      revoked: false,
+      expiresAt: new Date(Date.now() + REFRESH_TOKEN_TTL_MS),
     });
 
     await this.refreshTokenRepository.create(refreshTokenEntity);
@@ -133,7 +125,7 @@ export class AuthenticateDeviceUseCase {
     await this.usersRepository.save(user);
 
     return {
-      accessToken: accessTokenEntity,
+      accessToken,
       refreshToken: refreshTokenEntity,
     };
   }

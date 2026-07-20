@@ -79,7 +79,7 @@ export class CreateUserController {
     }
 
     return {
-      accessToken: tokens.value.accessToken.token,
+      accessToken: tokens.value.accessToken,
       refreshToken: tokens.value.refreshToken.token,
     };
   }

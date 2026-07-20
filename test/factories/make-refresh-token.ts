@@ -16,9 +16,9 @@ export function makeRefreshToken(
     {
       userId: new UniqueEntityID('user-1'),
       deviceId: new UniqueEntityID('device-1'),
+      familyId: new UniqueEntityID('family-1'),
       token: `refresh-token-${refreshTokenCounter}`,
       expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
-      revoked: false,
       ...override,
     },
     id

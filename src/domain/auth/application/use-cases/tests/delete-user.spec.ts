@@ -1,18 +1,30 @@
 import { InMemoryUsersRepository } from '@/test/repositories/in-memory-users-repository';
+import { InMemoryRefreshTokenRepository } from '@/test/repositories/in-memory-refresh-token-repository';
+import { InMemoryDevicesRepository } from '@/test/repositories/in-memory-devices-repository';
 import { makeUser } from '@/test/factories/make-user';
+import { makeRefreshToken } from '@/test/factories/make-refresh-token';
+import { makeDevice } from '@/test/factories/make-device';
 import { DeleteUserUseCase } from '../delete-user';
 import { UserNotFoundError } from '../errors/user-not-found-error';
 
 let usersRepository: InMemoryUsersRepository;
+let refreshTokenRepository: InMemoryRefreshTokenRepository;
+let devicesRepository: InMemoryDevicesRepository;
 let sut: DeleteUserUseCase;
 
 describe('Delete User', () => {
   beforeEach(() => {
     usersRepository = new InMemoryUsersRepository();
-    sut = new DeleteUserUseCase(usersRepository);
+    refreshTokenRepository = new InMemoryRefreshTokenRepository();
+    devicesRepository = new InMemoryDevicesRepository();
+    sut = new DeleteUserUseCase(
+      usersRepository,
+      refreshTokenRepository,
+      devicesRepository
+    );
   });
 
-  it('should be able to delete a user', async () => {
+  it('should soft-delete a user', async () => {
     const user = makeUser();
 
     await usersRepository.create(user);
@@ -26,9 +38,11 @@ describe('Delete User', () => {
       expect(result.value.message).toBe('User deleted successfully');
     }
 
-    // Verify user was deleted
+    // Soft-delete: some das buscas, mas o registro permanece marcado.
     const deletedUser = await usersRepository.findById(user.id.toString());
     expect(deletedUser).toBeNull();
+    expect(usersRepository.items[0].isDeleted).toBe(true);
+    expect(usersRepository.items[0].deletedAt).toBeInstanceOf(Date);
   });
 
   it('should not be able to delete a non-existent user', async () => {
@@ -40,25 +54,14 @@ describe('Delete User', () => {
     expect(result.value).toBeInstanceOf(UserNotFoundError);
   });
 
-  it('should remove all user roles when deleting user', async () => {
+  it('should revoke refresh tokens and deactivate devices on delete', async () => {
     const user = makeUser();
+    const refreshToken = makeRefreshToken({ userId: user.id });
+    const device = makeDevice({ userId: user.id, active: true });
 
     await usersRepository.create(user);
-
-    // Add some mock roles to the user
-    await usersRepository.assignRole(user.id.toString(), 'role-1');
-    await usersRepository.assignRole(user.id.toString(), 'role-2');
-
-    // Verify roles were assigned
-    const userRoles = await usersRepository.findRolesByUserId(
-      user.id.toString()
-    );
-    expect(userRoles).toHaveLength(0); // Will be 0 because roles don't exist in mock data
-
-    // But userRoles association should exist
-    expect(
-      usersRepository.userRoles.filter((ur) => ur.userId === user.id.toString())
-    ).toHaveLength(2);
+    await refreshTokenRepository.create(refreshToken);
+    await devicesRepository.create(device);
 
     const result = await sut.execute({
       userId: user.id.toString(),
@@ -66,9 +69,14 @@ describe('Delete User', () => {
 
     expect(result.isRight()).toBe(true);
 
-    // Verify user roles were removed
-    expect(
-      usersRepository.userRoles.filter((ur) => ur.userId === user.id.toString())
-    ).toHaveLength(0);
+    const tokens = await refreshTokenRepository.findByUserId(
+      user.id.toString()
+    );
+    expect(tokens.every((t) => t.isRevoked())).toBe(true);
+
+    const devices = await devicesRepository.findManyByUserId(
+      user.id.toString()
+    );
+    expect(devices.every((d) => d.active === false)).toBe(true);
   });
 });

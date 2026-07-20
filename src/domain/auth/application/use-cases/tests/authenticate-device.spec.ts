@@ -59,9 +59,10 @@ describe('Authenticate Device', () => {
     expect(result.isRight()).toBe(true);
     if (result.isRight()) {
       expect(result.value.accessToken).toBeDefined();
+      expect(typeof result.value.accessToken).toBe('string');
       expect(result.value.refreshToken).toBeDefined();
-      expect(result.value.accessToken.userId).toEqual(user.id);
       expect(result.value.refreshToken.userId).toEqual(user.id);
+      expect(result.value.refreshToken.familyId).toBeDefined();
     }
 
     // Verify device was created

@@ -33,7 +33,7 @@ export class PrismaDevicesMapper {
       createdAt: device.createdAt,
       updatedAt: device.updatedAt,
       active: device.active,
-      User: {
+      user: {
         connect: {
           id: device.userId.toString(),
         },

@@ -27,9 +27,6 @@ export class DatabaseHelper {
 
   async cleanup(): Promise<void> {
     await this.prisma.$transaction([
-      this.prisma.auditLog.deleteMany(),
-      this.prisma.accessToken.deleteMany(),
-      this.prisma.loginHistory.deleteMany(),
       this.prisma.refreshToken.deleteMany(),
       this.prisma.device.deleteMany(),
       this.prisma.userRole.deleteMany(),

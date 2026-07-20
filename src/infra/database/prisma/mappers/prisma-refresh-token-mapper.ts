@@ -10,34 +10,38 @@ export class PrismaRefreshTokenMapper {
     return RefreshToken.create(
       {
         userId: new UniqueEntityID(raw.userId),
-        token: raw.token,
         deviceId: new UniqueEntityID(raw.deviceId),
+        familyId: new UniqueEntityID(raw.familyId),
+        token: raw.token,
         createdAt: raw.createdAt,
         expiresAt: raw.expiresAt,
-        revoked: raw.revoked,
+        revokedAt: raw.revokedAt ?? undefined,
       },
       new UniqueEntityID(raw.id)
     );
   }
 
-  static toPrisma(refreshToken: RefreshToken): Prisma.RefreshTokenCreateInput {
+  static toPrisma(
+    refreshToken: RefreshToken
+  ): Prisma.RefreshTokenUncheckedCreateInput {
     return {
       id: refreshToken.id.toString(),
+      userId: refreshToken.userId.toString(),
+      deviceId: refreshToken.deviceId.toString(),
+      familyId: refreshToken.familyId.toString(),
       token: refreshToken.token,
       createdAt: refreshToken.createdAt,
       expiresAt: refreshToken.expiresAt,
       revokedAt: refreshToken.revokedAt,
-      revoked: refreshToken.revoked,
-      User: {
-        connect: {
-          id: refreshToken.userId.toString(),
-        },
-      },
-      Device: {
-        connect: {
-          id: refreshToken.deviceId.toString(),
-        },
-      },
+    };
+  }
+
+  static toPrismaUpdate(
+    refreshToken: RefreshToken
+  ): Prisma.RefreshTokenUncheckedUpdateInput {
+    return {
+      expiresAt: refreshToken.expiresAt,
+      revokedAt: refreshToken.revokedAt ?? null,
     };
   }
 }
